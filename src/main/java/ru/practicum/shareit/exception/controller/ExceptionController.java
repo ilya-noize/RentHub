@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.practicum.shareit.exception.AccessException;
 import ru.practicum.shareit.exception.AlreadyExistsException;
 import ru.practicum.shareit.exception.NotFoundException;
 
@@ -88,6 +89,19 @@ public class ExceptionController {
                 .status(CONFLICT)
                 .lastModified(NOW)
                 .header("Already Exists", message)
+                .build();
+    }
+
+    @ExceptionHandler(AccessException.class)
+    @ResponseStatus(NOT_FOUND)
+    public ResponseEntity<?> handleAccessException(AccessException e) {
+        String message = e.getMessage();
+        log.error("[!] {}", message);
+
+        return ResponseEntity
+                .notFound()
+                .lastModified(NOW)
+                .header("Access denied", message)
                 .build();
     }
 }

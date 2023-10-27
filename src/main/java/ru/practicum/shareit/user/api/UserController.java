@@ -4,16 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.api.CRUDController;
-import ru.practicum.shareit.api.CRUDService;
 import ru.practicum.shareit.user.api.dto.UserDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequiredArgsConstructor
 public class UserController implements CRUDController<UserDto> {
@@ -22,7 +18,7 @@ public class UserController implements CRUDController<UserDto> {
     public static final String GET_USER = "/users/{id}";
     public static final String DELETE_USER = "/users/{id}";
     public static final String GET_ALL_USERS = "/users";
-    private final CRUDService<UserDto> service;
+    private final UserServiceImpl service;
 
     @PostMapping(CREATE_USER)
     public UserDto create(
@@ -62,5 +58,3 @@ public class UserController implements CRUDController<UserDto> {
         service.delete(id);
     }
 }
-
-

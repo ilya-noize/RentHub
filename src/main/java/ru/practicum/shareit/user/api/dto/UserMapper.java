@@ -6,15 +6,14 @@ import ru.practicum.shareit.user.entity.User;
 
 @Component
 public class UserMapper implements Mapper<User, UserDto> {
-    public UserDto makeEntityToDto(User user) {
+    public UserDto toDto(User user) {
         return UserDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .name(user.getName()).build();
     }
 
-    @Override
-    public User makeDtoToEntity(UserDto userDto) {
+    public User toEntity(UserDto userDto) {
         return User.builder()
                 .id(userDto.getId())
                 .name(userDto.getName())

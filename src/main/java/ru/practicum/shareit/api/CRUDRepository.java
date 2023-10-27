@@ -2,7 +2,7 @@ package ru.practicum.shareit.api;
 
 import java.util.List;
 
-public interface Storage<T> {
+public interface CRUDRepository<T> {
     T create(T t);
 
     T get(Integer id);
