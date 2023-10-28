@@ -1,6 +1,7 @@
 package ru.practicum.shareit.exception.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,6 +12,8 @@ import ru.practicum.shareit.exception.AccessException;
 import ru.practicum.shareit.exception.AlreadyExistsException;
 import ru.practicum.shareit.exception.NotFoundException;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
@@ -19,14 +22,23 @@ import static org.springframework.http.HttpStatus.*;
 @Slf4j
 @RestControllerAdvice
 public class ExceptionController {
-
     public static final ZonedDateTime NOW = ZonedDateTime.now();
+
+    private void logError(HttpStatus status, String message, Throwable e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String stackTraceString = sw.toString().replace(", ", "\n");
+
+        log.error("[!] Received the status {} Error: {}\n{}", status, message, stackTraceString);
+    }
 
     @ExceptionHandler
     @ResponseStatus(INTERNAL_SERVER_ERROR)
     public ResponseEntity<?> handleThrowable(Throwable e) {
         String message = e.getMessage();
-        log.error("[!] {}", message);
+
+        logError(INTERNAL_SERVER_ERROR, message, e);
 
         return ResponseEntity
                 .internalServerError()
@@ -44,7 +56,7 @@ public class ExceptionController {
                 .getField();
         String message = result.getAllErrors().get(0).getDefaultMessage();
 
-        log.error("[!] Field {}: {}", field, message);
+        logError(BAD_REQUEST, message, e);
 
         return ResponseEntity
                 .badRequest()
@@ -57,7 +69,8 @@ public class ExceptionController {
     @ResponseStatus(BAD_REQUEST)
     public ResponseEntity<?> handleNullPointerException(NullPointerException e) {
         String message = e.getMessage();
-        log.error("[!] {}", message);
+
+        logError(BAD_REQUEST, message, e);
 
         return ResponseEntity
                 .badRequest()
@@ -70,7 +83,8 @@ public class ExceptionController {
     @ResponseStatus(NOT_FOUND)
     public ResponseEntity<?> handleNotFoundException(NotFoundException e) {
         String message = e.getMessage();
-        log.error("[!] {}", message);
+
+        logError(NOT_FOUND, message, e);
 
         return ResponseEntity
                 .notFound()
@@ -83,7 +97,8 @@ public class ExceptionController {
     @ResponseStatus(CONFLICT)
     public ResponseEntity<?> handleAlreadyExistsException(AlreadyExistsException e) {
         String message = e.getMessage();
-        log.error("[!] {}", message);
+
+        logError(CONFLICT, message, e);
 
         return ResponseEntity
                 .status(CONFLICT)
@@ -96,7 +111,8 @@ public class ExceptionController {
     @ResponseStatus(NOT_FOUND)
     public ResponseEntity<?> handleAccessException(AccessException e) {
         String message = e.getMessage();
-        log.error("[!] {}", message);
+
+        logError(NOT_FOUND, message, e);
 
         return ResponseEntity
                 .notFound()

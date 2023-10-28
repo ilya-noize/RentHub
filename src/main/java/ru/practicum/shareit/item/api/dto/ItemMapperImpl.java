@@ -18,11 +18,6 @@ public class ItemMapperImpl implements ItemMapper {
     }
 
     @Override
-    public Item toEntity(ItemDto itemDto) {
-        return null;
-    }
-
-    @Override
     public Item toEntity(ItemDto itemDto, Integer userId) {
 
         return Item.builder()

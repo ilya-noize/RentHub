@@ -14,7 +14,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserStorageImpl implements UserStorage {
     private final Map<Integer, User> users;
-    Integer id = 0;
+    private Integer id = 0;
 
     /**
      * Создание пользователя
@@ -30,7 +30,7 @@ public class UserStorageImpl implements UserStorage {
                 .name(user.getName())
                 .build();
         users.put(id, user);
-        return get(id);
+        return user;
     }
 
     /**
@@ -39,9 +39,7 @@ public class UserStorageImpl implements UserStorage {
      */
     @Override
     public User get(Integer id) {
-        User user = users.get(id);
-        log.debug("[i] GET Id:{} User:{}", id, user);
-        return user;
+        return users.get(id);
     }
 
     /**
@@ -62,7 +60,7 @@ public class UserStorageImpl implements UserStorage {
     @Override
     public User update(Integer id, User user) {
         users.replace(id, user);
-        return get(id);
+        return user;
     }
 
     /**
