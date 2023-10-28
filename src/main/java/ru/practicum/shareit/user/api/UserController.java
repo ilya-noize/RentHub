@@ -19,7 +19,7 @@ public class UserController implements CRUDController<UserDto> {
     public static final String GET_USER = "/users/{id}";
     public static final String DELETE_USER = "/users/{id}";
     public static final String GET_ALL_USERS = "/users";
-    private final UserServiceImpl service;
+    private final UserService service;
 
     @PostMapping(CREATE_USER)
     public UserDto create(
