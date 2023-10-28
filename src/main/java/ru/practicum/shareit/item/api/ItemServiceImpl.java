@@ -7,7 +7,7 @@ import ru.practicum.shareit.api.CRUDRepository;
 import ru.practicum.shareit.exception.AccessException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.api.dto.ItemDto;
-import ru.practicum.shareit.item.api.dto.ItemMapperImpl;
+import ru.practicum.shareit.item.api.dto.ItemMapper;
 import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.user.entity.User;
 
@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.toList;
 public class ItemServiceImpl implements ItemService {
     private final CRUDRepository<User> userStorage;
     private final CRUDRepository<Item> itemRepository;
-    private final ItemMapperImpl mapper;
+    private final ItemMapper mapper;
 
     /**
      * Создание предмета
@@ -35,22 +35,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto create(Integer userId, ItemDto itemDto) {
         log.debug("[i] CREATE ITEM:{} by User.id:{}", itemDto, userId);
-        isTheOwnerSpecified(userId);
-        if (!userStorage.isExist(userId)) {
-            throw new NotFoundException(String.format("user.id(%d) is not exist!", userId));
-        }
-
-        String name = itemDto.getName();
-        if (name == null || name.isBlank()) {
-            throw new NullPointerException("Name - skipped.");
-        }
-        String description = itemDto.getDescription();
-        if (description == null || description.isBlank()) {
-            throw new NullPointerException("Description - skipped.");
-        }
-        if (itemDto.isAvailable() == null) {
-            throw new NullPointerException("Available - skipped");
-        }
+        isExistOwnerUser(userId);
 
         return mapper.toDto(
                 itemRepository.create(
@@ -73,8 +58,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto update(Integer userId, Integer itemId, ItemDto itemDto) {
         log.info("[i] UPDATE ITEM\nUserId:{}\nItemId:{}\nItemDto:{}", userId, itemId, itemDto.toString());
-        isExist(itemId);
-        isTheOwnerSpecified(userId);
+        isExistItem(itemId);
+        isExistOwnerUser(userId);
 
         Item itemFromRepository = getItemAfterCheckingOwner(userId, itemId);
         String name = itemDto.getName();
@@ -103,7 +88,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto get(Integer id) {
         log.debug("[i] GET ITEM.id:{}", id);
-        isExist(id);
+        isExistItem(id);
 
         return mapper.toDto(itemRepository.get(id));
     }
@@ -133,7 +118,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public void delete(Integer userId, Integer itemId) {
         log.debug("[i] DELETE Item.Id:{} by User.Id:{}", itemId, userId);
-        isExist(itemId);
+        isExistItem(itemId);
         getItemAfterCheckingOwner(userId, itemId);
         itemRepository.delete(itemId);
     }
@@ -166,7 +151,7 @@ public class ItemServiceImpl implements ItemService {
      * Проверка предмета на существование в репозитории
      * @param itemId Идентификатор предмета
      */
-    private void isExist(Integer itemId) {
+    private void isExistItem(Integer itemId) {
         log.debug("[i] is exist Item by ID:{}", itemId);
         if (!itemRepository.isExist(itemId)) {
             throw new NotFoundException(String.format("item.id(%d) is not exist!", itemId));
@@ -193,10 +178,8 @@ public class ItemServiceImpl implements ItemService {
      * Проверка на указание пользователя в заголовке запроса
      * @param userId    Идентификатор пользователя
      */
-    private void isTheOwnerSpecified(Integer userId) {
-        if (userId == null) {
-            throw new NotFoundException("You must specify the owner of the item.");
-        } else if (!userStorage.isExist(userId)) {
+    private void isExistOwnerUser(Integer userId) {
+        if (!userStorage.isExist(userId)) {
             throw new NotFoundException("userId:" + userId + " not found");
         }
     }
