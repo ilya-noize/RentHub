@@ -30,7 +30,7 @@ public class ItemStorageImpl implements ItemStorage {
                 .description(item.getDescription())
                 .available(item.isAvailable())
                 .userId(item.getUserId())
-                .request(item.getRequest()).build();
+                .build();
         items.put(id, item);
         return item;
     }
@@ -47,7 +47,6 @@ public class ItemStorageImpl implements ItemStorage {
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.isAvailable())
-                .request(item.getRequest())
                 .userId(item.getUserId())
                 .build();
         items.replace(item.getId(), item);

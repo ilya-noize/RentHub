@@ -4,14 +4,11 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import ru.practicum.shareit.request.entity.ItemRequest;
 
 import javax.validation.constraints.Positive;
 
 /**
- * TODO Sprint add-controllers.
- * <p>
- * Класс Вещь.
+ * Класс Предмет.
  * <p>
  * {@code id} ID Item <br/>
  * {@code name} Item's name <br/>
@@ -31,7 +28,6 @@ public class Item {
     @Getter(AccessLevel.NONE)
     private final boolean available;
     private final Integer userId;
-    private final ItemRequest request;
 
     @Override
     public String toString() {
@@ -41,7 +37,6 @@ public class Item {
                 ", description='" + description + '\'' +
                 ", available=" + available +
                 ", userId=" + userId +
-                ", request=" + request +
                 '}';
     }
 

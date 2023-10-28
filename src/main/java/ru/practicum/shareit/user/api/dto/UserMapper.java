@@ -1,21 +1,13 @@
 package ru.practicum.shareit.user.api.dto;
 
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import ru.practicum.shareit.user.entity.User;
 
-@Component
-public class UserMapper {
-    public UserDto toDto(User user) {
-        return UserDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .name(user.getName()).build();
-    }
+@Mapper(componentModel = "spring")
+@Qualifier("UserMapper")
+public interface UserMapper {
+    UserDto toDto(User user);
 
-    public User toEntity(UserDto userDto) {
-        return User.builder()
-                .id(userDto.getId())
-                .name(userDto.getName())
-                .email(userDto.getEmail()).build();
-    }
+    User toEntity(UserDto userDto);
 }
