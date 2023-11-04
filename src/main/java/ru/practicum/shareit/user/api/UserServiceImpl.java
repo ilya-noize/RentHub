@@ -26,12 +26,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto create(UserDto userDto) {
         log.debug("[d] Create user {}", userDto);
-        if (userDto.getEmail() == null) {
-            throw new NullPointerException("Email пользователя не может быть пустым");
-        }
-        if (userDto.getName() == null) {
-            userDto.setName("");
-        }
+
         User user = mapper.toEntity(userDto);
         checkUniqueEmail(user.getEmail());
 
@@ -62,6 +57,16 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * <p>Обновление пользователя</p>
+     * <ul>Проверка на уникальность почты игнорируется, если:
+     *      <li> почта не указана (значение берётся из репозитория) </li>
+     *      <li> почта указана и её значение совпадает со значением из репозитория </li>
+     * </ul>
+     * @param id        User ID
+     * @param userDto   UserDTO from Controller
+     * @return          UserDTO for Controller
+     */
     @Override
     public UserDto update(Integer id, UserDto userDto) {
         log.debug("[i] update User:{} by ID:{}", userDto, id);
@@ -69,12 +74,13 @@ public class UserServiceImpl implements UserService {
         boolean checkEmail = true;
 
         userDto.setId(id);
-        if (userDto.getName() == null) {
-            userDto.setName(get(id).getName());
+        User userEntity = repository.get(id);
+        if (userDto.getName() == null || userDto.getName().isBlank()) {
+            userDto.setName(userEntity.getName());
         }
 
-        String email = get(id).getEmail();
-        if (userDto.getEmail() == null) {
+        String email = userEntity.getEmail();
+        if (userDto.getEmail() == null || userDto.getEmail().isBlank()) {
             userDto.setEmail(email);
             checkEmail = false;
         } else {

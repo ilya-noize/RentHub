@@ -30,9 +30,9 @@ public class ItemStorageImpl implements ItemStorage {
                 .description(item.getDescription())
                 .available(item.isAvailable())
                 .userId(item.getUserId())
-                .request(item.getRequest()).build();
+                .build();
         items.put(id, item);
-        return get(id);
+        return item;
     }
 
     /**
@@ -47,11 +47,10 @@ public class ItemStorageImpl implements ItemStorage {
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.isAvailable())
-                .request(item.getRequest())
                 .userId(item.getUserId())
                 .build();
         items.replace(item.getId(), item);
-        return get(item.getId());
+        return item;
     }
 
     /**
@@ -61,9 +60,7 @@ public class ItemStorageImpl implements ItemStorage {
      */
     @Override
     public Item get(Integer id) {
-        Item item = items.get(id);
-        log.info("[i] GET\nid:{}\nItem:{}", id, item);
-        return item;
+        return items.get(id);
     }
 
     /**

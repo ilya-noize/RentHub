@@ -1,13 +1,18 @@
 package ru.practicum.shareit.item.api.dto;
 
 import lombok.*;
+import ru.practicum.shareit.valid.group.Create;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 
 /**
  * DTO-Class Item.
  * <p>
- *     Used in Controller, Service;
+ * Used in Controller, Service;
  * <p>
- *     Fields: <br/>
+ * Fields: <br/>
  * {@code id} ID Item <br/>
  * {@code name} Name item <br/>
  * {@code description} Description item <br/>
@@ -19,12 +24,18 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 public class ItemDto {
+    @PositiveOrZero
     private Integer id;
+
+    @NotBlank(groups = {Create.class})
     private String name;
+
+    @NotBlank(groups = {Create.class})
     private String description;
+
     @Getter(AccessLevel.NONE)
+    @NotNull(groups = {Create.class})
     private Boolean available;
-    private Integer request;
 
     public Boolean isAvailable() {
         return this.available;
