@@ -2,8 +2,8 @@ package ru.practicum.shareit.user.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.api.CRUDRepository;
 import ru.practicum.shareit.exception.AlreadyExistsException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.api.dto.UserDto;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final CRUDRepository<User> repository;
+    private final JpaRepository<User, Integer> repository;
     private final UserMapper mapper;
 
     @Override
@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
         User user = mapper.toEntity(userDto);
         checkUniqueEmail(user.getEmail());
 
-        return mapper.toDto(repository.create(user));
+        return mapper.toDto(repository.save(user));
     }
 
     /**
@@ -45,14 +45,14 @@ public class UserServiceImpl implements UserService {
     public UserDto get(Integer id) {
         log.debug("[i] get User by ID:{}", id);
         isExist(id);
-        User user = repository.get(id);
+        User user = repository.getReferenceById(id);
         return mapper.toDto(user);
     }
 
     @Override
     public List<UserDto> getAll() {
         log.debug("[i] get All Users");
-        return repository.getAll().stream()
+        return repository.findAll().stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -74,7 +74,7 @@ public class UserServiceImpl implements UserService {
         boolean checkEmail = true;
 
         userDto.setId(id);
-        User userEntity = repository.get(id);
+        User userEntity = repository.getReferenceById(id);
         if (userDto.getName() == null || userDto.getName().isBlank()) {
             userDto.setName(userEntity.getName());
         }
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
             checkUniqueEmail(user.getEmail());
         }
 
-        user = repository.update(id, user);
+        user = repository.save(user);
         return mapper.toDto(user);
     }
 
@@ -102,12 +102,12 @@ public class UserServiceImpl implements UserService {
     public void delete(Integer id) {
         log.debug("[i] delete User by ID:{}", id);
         isExist(id);
-        repository.delete(id);
+        repository.deleteById(id);
     }
 
     private void isExist(Integer id) {
         log.debug("[i] is exist User by ID:{}", id);
-        if (!repository.isExist(id)) {
+        if (!repository.existsById(id)) {
             throw new NotFoundException(String.format("user.id(%d) is not exist!", id));
         }
     }
@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserService {
      */
     private void checkUniqueEmail(String email) {
         log.debug("[i] check unique email:{} by User", email);
-        boolean isNotUnique = repository.getAll().stream()
+        boolean isNotUnique = repository.findAll().stream()
                 .map(User::getEmail)
                 .anyMatch(eMail -> eMail.equals(email));
         if (isNotUnique) {

@@ -1,11 +1,8 @@
 package ru.practicum.shareit.item.entity;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
-import javax.validation.constraints.Positive;
+import javax.persistence.*;
 
 /**
  * Класс Предмет.
@@ -20,14 +17,18 @@ import javax.validation.constraints.Positive;
 @Builder
 @Getter
 @AllArgsConstructor
+@Entity
+@Table(name = "items", schema = "public")
+@NoArgsConstructor
 public class Item {
-    @Positive
-    private final int id;
-    private final String name;
-    private final String description;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    private String name;
+    private String description;
     @Getter(AccessLevel.NONE)
-    private final boolean available;
-    private final Integer userId;
+    private boolean available;
+    private Integer ownerId;
 
     @Override
     public String toString() {
@@ -36,7 +37,7 @@ public class Item {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", available=" + available +
-                ", userId=" + userId +
+                ", userId=" + ownerId +
                 '}';
     }
 

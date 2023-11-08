@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.exception.AccessException;
 import ru.practicum.shareit.exception.AlreadyExistsException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.RentalPeriodException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -65,6 +66,20 @@ public class ExceptionController {
                 .build();
     }
 
+    @ExceptionHandler(RentalPeriodException.class)
+    @ResponseStatus(BAD_REQUEST)
+    public ResponseEntity<?> handleRentalPeriodException(RentalPeriodException e) {
+        String message = e.getMessage();
+
+        logError(BAD_REQUEST, message, e);
+
+        return ResponseEntity
+                .badRequest()
+                .lastModified(NOW)
+                .header("Rental period", message)
+                .build();
+    }
+
     @ExceptionHandler(NullPointerException.class)
     @ResponseStatus(BAD_REQUEST)
     public ResponseEntity<?> handleNullPointerException(NullPointerException e) {
@@ -103,7 +118,7 @@ public class ExceptionController {
         return ResponseEntity
                 .status(CONFLICT)
                 .lastModified(NOW)
-                .header("Already Exists", message)
+                .header("Already exists", message)
                 .build();
     }
 
