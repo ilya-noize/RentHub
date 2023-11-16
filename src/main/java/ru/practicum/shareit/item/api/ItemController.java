@@ -41,7 +41,8 @@ public class ItemController {
     public ItemDto update(
             @RequestHeader(HEADER_USER_ID) Integer userId,
             @PathVariable Integer id,
-            @RequestBody @Validated(Update.class) ItemDto itemDto) {
+            @RequestBody @Validated(Update.class) ItemDto itemDto
+            ) {
 
         return service.update(userId, id, itemDto);
     }

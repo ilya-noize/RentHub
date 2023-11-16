@@ -8,10 +8,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.shareit.exception.AccessException;
-import ru.practicum.shareit.exception.AlreadyExistsException;
-import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.RentalPeriodException;
+import ru.practicum.shareit.exception.*;
+import ru.practicum.shareit.exception.entity.ErrorException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -34,19 +32,19 @@ public class ExceptionController {
         log.error("[!] Received the status {} Error: {}\n{}", status, message, stackTraceString);
     }
 
-    @ExceptionHandler
-    @ResponseStatus(INTERNAL_SERVER_ERROR)
-    public ResponseEntity<?> handleThrowable(Throwable e) {
-        String message = e.getMessage();
-
-        logError(INTERNAL_SERVER_ERROR, message, e);
-
-        return ResponseEntity
-                .internalServerError()
-                .lastModified(NOW)
-                .header(message)
-                .build();
-    }
+//    @ExceptionHandler
+//    @ResponseStatus(INTERNAL_SERVER_ERROR)
+//    public ResponseEntity<?> handleThrowable(Throwable e) {
+//        String message = e.getMessage();
+//
+//        logError(INTERNAL_SERVER_ERROR, message, e);
+//
+//        return ResponseEntity
+//                .status(INTERNAL_SERVER_ERROR)
+//                .lastModified(NOW)
+//                .header("Error message", message)
+//                .build();
+//    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(BAD_REQUEST)
@@ -60,21 +58,21 @@ public class ExceptionController {
         logError(BAD_REQUEST, message, e);
 
         return ResponseEntity
-                .badRequest()
+                .status(BAD_REQUEST)
                 .lastModified(NOW)
                 .header(field, message)
                 .build();
     }
 
     @ExceptionHandler(RentalPeriodException.class)
-    @ResponseStatus(BAD_REQUEST)
+    @ResponseStatus(INTERNAL_SERVER_ERROR)
     public ResponseEntity<?> handleRentalPeriodException(RentalPeriodException e) {
         String message = e.getMessage();
 
-        logError(BAD_REQUEST, message, e);
+        logError(INTERNAL_SERVER_ERROR, message, e);
 
         return ResponseEntity
-                .badRequest()
+                .status(BAD_REQUEST)
                 .lastModified(NOW)
                 .header("Rental period", message)
                 .build();
@@ -88,7 +86,7 @@ public class ExceptionController {
         logError(BAD_REQUEST, message, e);
 
         return ResponseEntity
-                .badRequest()
+                .status(BAD_REQUEST)
                 .lastModified(NOW)
                 .header("null", message)
                 .build();
@@ -102,7 +100,7 @@ public class ExceptionController {
         logError(NOT_FOUND, message, e);
 
         return ResponseEntity
-                .notFound()
+                .status(NOT_FOUND)
                 .lastModified(NOW)
                 .header("Not Found", message)
                 .build();
@@ -123,16 +121,30 @@ public class ExceptionController {
     }
 
     @ExceptionHandler(AccessException.class)
-    @ResponseStatus(NOT_FOUND)
+    @ResponseStatus(BAD_REQUEST)
     public ResponseEntity<?> handleAccessException(AccessException e) {
         String message = e.getMessage();
 
-        logError(NOT_FOUND, message, e);
+        logError(BAD_REQUEST, message, e);
 
         return ResponseEntity
-                .notFound()
+                .status(BAD_REQUEST)
                 .lastModified(NOW)
                 .header("Access denied", message)
                 .build();
+    }
+
+    @ExceptionHandler(StateException.class)
+    @ResponseStatus(INTERNAL_SERVER_ERROR)
+    public ResponseEntity<?> handleStateException(StateException e) {
+        String message = e.getMessage();
+
+        logError(INTERNAL_SERVER_ERROR, message, e);
+
+        return new ResponseEntity<>(
+                new ErrorException(
+                        INTERNAL_SERVER_ERROR.value(),
+                        message),
+                INTERNAL_SERVER_ERROR);
     }
 }

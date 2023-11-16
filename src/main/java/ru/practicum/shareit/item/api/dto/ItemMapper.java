@@ -8,6 +8,6 @@ import ru.practicum.shareit.item.entity.Item;
 public interface ItemMapper {
     ItemDto toDto(Item item);
 
-    @Mapping(target = "userId", source = "userId")
+    @Mapping(target = "owner.id", source = "userId")
     Item toEntity(ItemDto itemDto, Integer userId);
 }

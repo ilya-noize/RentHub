@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking.entity;
+package ru.practicum.shareit.booking.entity.enums;
 
 /**
  * Для списка бронирования у владельца:
@@ -9,9 +9,10 @@ package ru.practicum.shareit.booking.entity;
  *      <li>CANCELED - отменено пользователем</li>
  * </ul>
  */
+
 public enum BookingStatus {
     WAITING,
     APPROVED,
-    REJECTED,
-    CANCELED // todo: use this constant in booking! Cancel booking from user in updateStatusById.
+    REJECTED//,
+//    CANCELED // todo: use this constant in booking! Cancel booking from user in updateStatusById.
 }

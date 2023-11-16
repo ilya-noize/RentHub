@@ -1,61 +1,62 @@
 package ru.practicum.shareit.booking.api.repository;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.entity.Booking;
-import ru.practicum.shareit.booking.entity.BookingStatus;
+import ru.practicum.shareit.booking.entity.enums.BookingStatus;
+import ru.practicum.shareit.user.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
-@Repository
-public interface BookingRepository extends JpaRepository<Booking, Integer> {
+public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Transactional
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update Booking b set b.status = ?1 where b.id = ?2")
-    void updateStatusById(BookingStatus status, @NonNull Integer id);
+    void updateStatusById(BookingStatus status, @NonNull Long id);
 
-    List<Booking> findAllByBooker_Id(Integer bookerId, Sort sort);
+    List<Booking> findAllByBookerOrderByStartDesc(User user);
 
-    List<Booking> findAllByBooker_IdAndStatus(Integer bookerId, BookingStatus bookingStatus, Sort sort);
+    List<Booking> findAllByBookerAndStatusOrderByStartDesc(
+            User booker,
+            BookingStatus bookingStatus);
 
-    List<Booking> findAllByBooker_IdAndStart_TimestampBeforeAndEnd_TimestampAfter(
-            Integer bookerId,
+    List<Booking> findAllByBookerAndStartBeforeAndEndAfterOrderByStartDesc(
+            User booker,
             LocalDateTime startTimestampBefore,
-            LocalDateTime endTimestampAfter,
-            Sort sort);
+            LocalDateTime endTimestampAfter);
 
-    List<Booking> findAllByBooker_IdAndStart_TimestampAfter(Integer bookerId,
-                                                            LocalDateTime startTimestampAfter,
-                                                            Sort sort);
+    List<Booking> findAllByBookerAndStartAfterOrderByStartDesc(
+            User booker,
+            LocalDateTime startTimestampAfter);
 
-    List<Booking> findAllByBooker_IdAndEnd_TimestampBefore(Integer bookerId,
-                                                           LocalDateTime endTimestampBefore,
-                                                           Sort sort);
+    List<Booking> findAllByBookerAndEndBeforeOrderByStartDesc(
+            User booker,
+            LocalDateTime endTimestampBefore);
 
-    List<Booking> findAllByItemOwner_Id(Integer ownerId, Sort sort);
+    List<Booking> findAllByItem_OwnerOrderByStartDesc(User user);
 
-    List<Booking> findAllByItemOwner_IdAndStatus(Integer bookerId, BookingStatus bookingStatus, Sort sort);
-
-    List<Booking> findAllByItemOwner_IdAndStart_TimestampBeforeAndEnd_TimestampAfter(
-            Integer bookerId,
+    List<Booking> findAllByItem_OwnerAndStartBeforeAndEndAfterOrderByStartDesc(
+            User user,
             LocalDateTime startTimestampBefore,
-            LocalDateTime endTimestampAfter,
-            Sort sort);
+            LocalDateTime endTimestampAfter);
 
-    List<Booking> findAllByItemOwner_IdAndStart_TimestampAfter(Integer bookerId,
-                                                            LocalDateTime startTimestampAfter,
-                                                            Sort sort);
+    List<Booking> findAllByItem_OwnerAndStartAfterOrderByStartDesc(
+            User user,
+            LocalDateTime startTimestampAfter);
 
-    List<Booking> findAllByItemOwner_IdAndEnd_TimestampBefore(Integer bookerId,
-                                                           LocalDateTime endTimestampBefore,
-                                                           Sort sort);
+    List<Booking> findAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(
+            User owner,
+            LocalDateTime endTimestampBefore);
 
-    Optional<Booking> findByItem_IdAndBooker_Id(int itemId, Integer bookerId);
+    List<Booking> findAllByItem_OwnerAndStatusOrderByStartDesc(
+            User owner,
+            BookingStatus bookingStatus);
+
+    boolean existsByItem_IdAndBooker_Id(
+            Integer itemId,
+            Integer bookerId);
 }

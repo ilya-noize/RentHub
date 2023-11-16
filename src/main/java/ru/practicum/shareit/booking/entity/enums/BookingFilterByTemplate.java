@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking.entity;
+package ru.practicum.shareit.booking.entity.enums;
 
 /**
  * Для фильтрации списка бронирования у пользователя:

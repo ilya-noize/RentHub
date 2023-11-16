@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.entity;
 
 import lombok.*;
+import ru.practicum.shareit.user.entity.User;
 
 import javax.persistence.*;
 
@@ -16,6 +17,7 @@ import javax.persistence.*;
  */
 @Builder
 @Getter
+@Setter
 @AllArgsConstructor
 @Entity
 @Table(name = "items", schema = "public")
@@ -28,18 +30,11 @@ public class Item {
     private String description;
     @Getter(AccessLevel.NONE)
     private boolean available;
-    private Integer ownerId;
-
-    @Override
-    public String toString() {
-        return "Item{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", available=" + available +
-                ", userId=" + ownerId +
-                '}';
-    }
+    @ManyToOne
+//            (fetch = FetchType.LAZY)
+    @JoinColumn(name = "OWNER_ID",
+            referencedColumnName = "ID")
+    private User owner;
 
     public boolean isAvailable() {
         return this.available;

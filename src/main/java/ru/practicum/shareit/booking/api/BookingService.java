@@ -1,19 +1,19 @@
 package ru.practicum.shareit.booking.api;
 
 import ru.practicum.shareit.booking.api.dto.BookingDto;
-import ru.practicum.shareit.booking.entity.BookingFilterByTemplate;
+import ru.practicum.shareit.booking.api.dto.BookingDtoRecord;
 
 import java.util.List;
 
 public interface BookingService {
 
-    BookingDto create(BookingDto dto);
+    BookingDtoRecord create(Integer userId, BookingDto dto);
 
-    BookingDto update(Integer id, Integer userId, Boolean approved);
+    BookingDtoRecord update(Integer userId, Long bookingId, Boolean approved);
 
-    BookingDto get(Integer id, Integer userId);
+    BookingDtoRecord get(Integer userId, Long bookingId);
 
-    List<BookingDto> getAllByUser(BookingFilterByTemplate state, Integer userId);
+    List<BookingDtoRecord> getAllByUser(Integer userId, String state);
 
-    List<BookingDto> getAllByOwner(BookingFilterByTemplate state, Integer userId);
+    List<BookingDtoRecord> getAllByOwner(Integer bookerId, String state);
 }
