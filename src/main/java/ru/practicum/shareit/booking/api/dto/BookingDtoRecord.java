@@ -1,7 +1,7 @@
 package ru.practicum.shareit.booking.api.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import ru.practicum.shareit.booking.entity.enums.BookingStatus;
 
 import java.time.LocalDateTime;
@@ -9,24 +9,26 @@ import java.time.LocalDateTime;
 /**
  * Just a class with data. Don't touch him.
  */
-@Data
 @AllArgsConstructor
+@Getter
 public final class BookingDtoRecord {
     private final Long id;
     private final LocalDateTime start;
     private final LocalDateTime end;
     private final BookingStatus status;
-    private final BookerDto booker;
     private final ItemDto item;
+    private final BookerDto booker;
 
-    @Data
+    @AllArgsConstructor
+    @Getter
     static
     class ItemDto {
         private final Integer id;
         private final String name;
     }
 
-    @Data
+    @AllArgsConstructor
+    @Getter
     static
     class BookerDto {
         private final Integer id;

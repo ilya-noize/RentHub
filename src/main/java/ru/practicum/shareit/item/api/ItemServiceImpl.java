@@ -3,13 +3,13 @@ package ru.practicum.shareit.item.api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.api.dto.BookingMapper;
+import ru.practicum.shareit.booking.api.dto.BookingToItemDto;
 import ru.practicum.shareit.booking.api.repository.BookingRepository;
-import ru.practicum.shareit.exception.AccessException;
+import ru.practicum.shareit.booking.entity.Booking;
+import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.api.dto.CommentDto;
-import ru.practicum.shareit.item.api.dto.CommentMapper;
-import ru.practicum.shareit.item.api.dto.ItemDto;
-import ru.practicum.shareit.item.api.dto.ItemMapper;
+import ru.practicum.shareit.item.api.dto.*;
 import ru.practicum.shareit.item.api.repository.CommentRepository;
 import ru.practicum.shareit.item.api.repository.ItemRepository;
 import ru.practicum.shareit.item.entity.CommentEntity;
@@ -17,21 +17,30 @@ import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.user.api.repository.UserRepository;
 import ru.practicum.shareit.user.entity.User;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static ru.practicum.shareit.ShareItApp.ITEM_WITH_ID_NOT_EXIST;
+import static ru.practicum.shareit.ShareItApp.USER_WITH_ID_NOT_EXIST;
+import static ru.practicum.shareit.booking.api.BookingServiceImpl.NOW;
+import static ru.practicum.shareit.booking.entity.enums.BookingStatus.APPROVED;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-    private final UserRepository userRepository;
+
     private final ItemRepository itemRepository;
     private final ItemMapper itemMapper;
+    private final BookingRepository bookingRepository;
+    private final BookingMapper bookingMapper;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
-    private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
 
     /**
      * Создание предмета
@@ -45,11 +54,13 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto create(Integer userId, ItemDto itemDto) {
         log.debug("[i] CREATE ITEM:{} by User.id:{}", itemDto, userId);
-        isExistOwnerUser(userId);
 
-        return itemMapper.toDto(
-                itemRepository.save(
-                        itemMapper.toEntity(itemDto, userId)));
+        checkingExistUserById(userId);
+        Item item = itemRepository.save(
+                itemMapper.toEntity(itemDto, userId));
+        log.info("[i] CREATE ITEM (ID:{}) SUCCESSFUL (OWNER_ID:{})", item.getId(), item.getOwner().getId());
+
+        return itemMapper.toDto(item);
     }
 
     /**
@@ -69,22 +80,21 @@ public class ItemServiceImpl implements ItemService {
      *                Доступность предмета
      * @return itemDTO
      */
-//    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
     @Override
-    public ItemDto update(Integer userId, Integer itemId, ItemDto itemDto) { // String name, String description, Boolean available) { //ItemDto itemDto) {
+    public ItemDto update(Integer userId, Integer itemId, ItemDto itemDto) {
         String name = itemDto.getName();
         String description = itemDto.getDescription();
         Boolean available = itemDto.isAvailable();
 
-        checkingExistById(userRepository.existsById(userId),
-                format("User with id:(%d) not exist", userId));
+        checkingExistUserById(userId);
 
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(
-                        () -> new NotFoundException(format("Item with id:(%d) not exist", itemId))
-                );
+                        () -> new NotFoundException(
+                                format(ITEM_WITH_ID_NOT_EXIST, itemId)));
+
         if (!item.getOwner().getId().equals(userId)) {
-            throw new AccessException("Editing an item is only allowed to the owner of that item.");
+            throw new BadRequestException("Editing an item is only allowed to the owner of that item.");
         }
 
         boolean notNullDescription = !(description == null || description.isEmpty());
@@ -141,34 +151,35 @@ public class ItemServiceImpl implements ItemService {
     }
 
     /**
-     * Получение предмета
+     * Получение предмета.
+     * Target:
+     * {@code (/items/{id})}
      *
-     * @param itemId идентификатор предмета
-     * @return предмет
+     * @param userId User ID
+     * @param itemId Item ID
+     * @return Item with/without Booking
      */
     @Override
-    public ItemDto get(Integer itemId) {
+    public ItemDto get(Integer userId, Integer itemId) {
         log.debug("[i] GET ITEM.id:{}", itemId);
-        String error = format("Item with id:(%d) not exist", itemId);
+        boolean isOwnerIdOfItem;
+        checkingExistUserById(userId);
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException(
+                        format(ITEM_WITH_ID_NOT_EXIST, itemId)));
 
-        return itemMapper.toDto(
-                itemRepository.findById(itemId)
-                        .orElseThrow(() -> new NotFoundException(error))
-        );
-    }
+        ItemDto itemDto = itemMapper.toDto(item);
 
-    /**
-     * Получение списка всех доступных предметов в аренду от пользователя
-     *
-     * @param userId Идентификатор пользователя
-     * @return Список предметов пользователя
-     */
-    @Override
-    public List<ItemDto> getAll(Integer userId) {
-        log.debug("[i] GET ALL ITEMS by User.id:{}", userId);
-        return itemRepository.findDistinctByOwner_IdAndAvailableTrueOrderByIdAsc(userId)
-                .stream().map(itemMapper::toDto)
-                .collect(toList());
+        isOwnerIdOfItem = item.getOwner().getId().equals(userId);
+
+        if (isOwnerIdOfItem) {
+            itemDto.setLastBooking(getLastBookingList(itemId));
+            itemDto.setNextBooking(getNextBookingList(itemId));
+        }
+        itemDto.setComments(
+                getCommentDtoList(List.of(itemId)));
+
+        return itemDto;
     }
 
     /**
@@ -183,16 +194,16 @@ public class ItemServiceImpl implements ItemService {
     public void delete(Integer userId, Integer itemId) {
         log.debug("[i] DELETE Item.Id:{} by User.Id:{}", itemId, userId);
 
-        String errorItem = format("Item with id:(%d) not exist", itemId);
-        checkingExistById(itemRepository.existsById(itemId), errorItem);
+        checkingExistItemById(itemId);
+        checkingExistUserById(userId);
 
-        getItemAfterCheckingOwner(userId, itemId);
+        boolean isNotOwnerThisItem = !itemRepository.existsByIdAndOwner_Id(itemId, userId);
+        if (isNotOwnerThisItem) {
+            throw new BadRequestException(
+                    "Editing an item is only allowed to the owner of that item.");
+        }
 
-        String errorUser = format("User with id:(%d) not exist", userId);
-        User owner = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(errorUser));
-
-        itemRepository.deleteByIdAndOwner(itemId, owner);
+        itemRepository.deleteByIdAndOwner_Id(userId, itemId);
     }
 
     /**
@@ -204,72 +215,170 @@ public class ItemServiceImpl implements ItemService {
      * @return Список найденных вещей
      */
     @Override
-    public List<ItemDto> search(String searchText) {
+    public List<ItemSimpleDto> search(String searchText) {
         log.debug("[i] SEARCH text:{}", searchText);
         if (searchText.isBlank()) {
             return List.of();
         }
 
-        return itemRepository.findByNameContainsIgnoreCaseOrDescriptionContainsIgnoreCaseAndAvailableTrueOrderByIdAsc(
+        return itemRepository
+                .findByNameContainsIgnoreCaseOrDescriptionContainsIgnoreCaseAndAvailableTrueOrderByIdAsc(
                         searchText, searchText)
                 .stream()
-                .map(itemMapper::toDto)
+                .map(itemMapper::toSimpleDto)
                 .collect(toList());
     }
 
+    /**
+     * Добавление комментария к предмету от пользователя,
+     * бравшего его в аренду хотя бы 1 раз.
+     *
+     * @param userId     User ID - Author
+     * @param itemId     Item ID
+     * @param commentDto Comment DTO
+     * @return Комментарий
+     */
     @Override
-    public CommentDto createComment(Integer userId, Integer itemId, String text) {
-        checkingExistById(userRepository.existsById(userId),
-                format("User with id:(%d) not exist", userId));
-        checkingExistById(itemRepository.existsById(itemId),
-                format("Item with id:(%d) not exist", itemId));
+    public CommentDto createComment(Integer userId, Integer itemId, CommentDto commentDto) {
+        User author = userRepository.findById(userId)
+                .orElseThrow(
+                        () -> new NotFoundException(
+                                format(USER_WITH_ID_NOT_EXIST, userId)));
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(
+                        () -> new NotFoundException(
+                                format(ITEM_WITH_ID_NOT_EXIST, itemId)));
 
-        boolean booking = bookingRepository.existsByItem_IdAndBooker_Id(itemId, userId);
+        boolean booking = bookingRepository
+                .existsByBooker_IdAndItem_IdAndEndBeforeAndStatus(
+                        userId, itemId, NOW, APPROVED);
         if (!booking) {
-            String error = format("A user with an ID:(%d) has never rented an item with an ID:(%d)", userId, itemId);
-            throw new NotFoundException(error);
+            String error = format("A user with an ID:(%d) has never rented an item with an ID:(%d)",
+                    userId, itemId);
+            throw new BadRequestException(error);
         }
         CommentEntity comment = CommentEntity.builder()
-                .authorId(userId)
-                .itemId(itemId)
-                .commentText(text).build();
+                .author(author)
+                .item(item)
+                .text(commentDto.getText())
+                .build();
+
         return commentMapper.toDto(commentRepository.save(comment));
+    }
+
+    /**
+     * Получение списка всех доступных предметов в аренду от пользователя
+     * {@code (/items)}
+     *
+     * @param userId Идентификатор пользователя
+     * @return Список предметов пользователя
+     */
+    @Override
+    public List<ItemDto> getAll(Integer userId) {
+        final boolean userIsOwnerByItems;
+        List<ItemDto> itemDtoList;
+        List<Integer> itemDtoIds;
+        Map<Integer, BookingToItemDto> lastBookingStorage = new HashMap<>();
+        Map<Integer, BookingToItemDto> nextBookingStorage = new HashMap<>();
+        Map<Integer, List<CommentDto>> itemCommentsStorage = new HashMap<>();
+
+        log.debug("[i] GET ALL ITEMS by User.id:{}", userId);
+
+        checkingExistUserById(userId);
+        userIsOwnerByItems = itemRepository.existsByOwner_Id(userId);
+
+        if (userIsOwnerByItems) {
+            log.info("[i] DTO LIST + BOOKING");
+            itemDtoList = itemRepository.getByOwner_IdOrderByIdAsc(userId)
+                    .stream().map(itemMapper::toDto).collect(toList());
+        } else {
+            log.info("DTO LIST");
+            itemDtoList = itemRepository.getByAvailableTrueOrderByIdAsc()
+                    .stream().map(itemMapper::toDto).collect(toList());
+        }
+        itemDtoIds = itemDtoList.stream()
+                .map(ItemDto::getId)
+                .collect(toList());
+
+        itemDtoIds.forEach(i -> {
+            if (userIsOwnerByItems) {
+                lastBookingStorage.put(i, getLastBookingList(i));
+                nextBookingStorage.put(i, getNextBookingList(i));
+            }
+            itemCommentsStorage.put(i, null);
+        });
+
+        for (CommentDto dto : getCommentDtoList(itemDtoIds)) {
+            if (dto != null) {
+                Integer currentItem = dto.getItemId();
+                itemCommentsStorage.get(currentItem).add(dto);
+            }
+        }
+        itemDtoList.forEach(
+                itemDto -> {
+                    Integer itemId = itemDto.getId();
+                    BookingToItemDto last = lastBookingStorage.get(itemId);
+                    BookingToItemDto next = nextBookingStorage.get(itemId);
+                    if (userIsOwnerByItems && (last != null && next != null)) {
+                        log.info("[i] BEFORE SET BOOKINGS:\n" +
+                                        "LAST (ID:{}, USER_ID:{}, ITEM_ID:{})\n" +
+                                        "NEXT (ID:{}, USER_ID:{}, ITEM_ID:{})",
+                                last.getId(), last.getBookerId(), last.getItemId(),
+                                next.getId(), next.getBookerId(), next.getItemId());
+                        itemDto.setLastBooking(last);
+                        itemDto.setNextBooking(next);
+                    }
+                    itemDto.setComments(itemCommentsStorage.get(itemId));
+                }
+        );
+
+        return itemDtoList;
+    }
+
+    private BookingToItemDto getLastBookingList(Integer itemId) {
+        Optional<Booking> booking = bookingRepository
+                .getFirstByItem_IdAndStartAfterAndStatusOrderByIdAsc(
+                        itemId, NOW, APPROVED);
+
+        return booking.map(value -> bookingMapper.toItemDto(value, itemId)).orElse(null);
+    }
+
+    private BookingToItemDto getNextBookingList(Integer itemId) {
+        Optional<Booking> booking = bookingRepository
+                .getFirstByItem_IdAndStartGreaterThanEqualAndStatusOrderByIdDesc(
+                        itemId, NOW, APPROVED);
+
+        return booking.map(value -> bookingMapper.toItemDto(value, itemId)).orElse(null);
+    }
+
+    private List<CommentDto> getCommentDtoList(List<Integer> itemIds) {
+
+        return commentRepository.getByItem_IdIn(itemIds).stream()
+                .map(commentMapper::toDto)
+                .collect(toList());
     }
 
     /**
      * Проверка на существование в репозитории
      *
-     * @param isExist Условие проверки (true if not exists)
-     * @param error   Текст ошибки
+     * @param userId User ID
      */
-    private void checkingExistById(boolean isExist, String error) {
-        if (!isExist) {
-            throw new NotFoundException(error);
-        }
-    }
-
-    /**
-     * Проверка принадлежности предмета пользователю
-     *
-     * @param userId Идентификатор пользователя
-     * @param itemId Идентификатор предмета
-     * @see #update(Integer, Integer, ItemDto) todo: another (Integer, Integer, String, String, Boolean)
-     * @see #delete(Integer, Integer)
-     */
-    private void getItemAfterCheckingOwner(Integer userId, Integer itemId) {
-        if (!itemRepository.existsByIdAndOwner_Id(itemId, userId)) {
-            throw new AccessException("Editing an item is only allowed to the owner of that item.");
-        }
-    }
-
-    /**
-     * Проверка на указание пользователя в заголовке запроса
-     *
-     * @param userId Идентификатор пользователя
-     */
-    private void isExistOwnerUser(Integer userId) {
+    private void checkingExistUserById(Integer userId) {
         if (!userRepository.existsById(userId)) {
-            throw new NotFoundException("userId:" + userId + " not found");
+            throw new NotFoundException(
+                    format(USER_WITH_ID_NOT_EXIST, userId));
+        }
+    }
+
+    /**
+     * Проверка на существование в репозитории
+     *
+     * @param itemId Item ID
+     */
+    private void checkingExistItemById(Integer itemId) {
+        if (!itemRepository.existsById(itemId)) {
+            throw new NotFoundException(
+                    format(ITEM_WITH_ID_NOT_EXIST, itemId));
         }
     }
 }

@@ -12,6 +12,9 @@ import ru.practicum.shareit.user.entity.User;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+import static ru.practicum.shareit.ShareItApp.USER_WITH_ID_NOT_EXIST;
+
 /**
  * DTO processing class before saving to memory
  */
@@ -43,7 +46,9 @@ public class UserServiceImpl implements UserService {
     public UserDto get(Integer id) {
         log.debug("[i] get User by ID:{}", id);
         isExist(id);
-        User user = userRepository.getById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(
+                        format(USER_WITH_ID_NOT_EXIST, id)));
         return mapper.toDto(user);
     }
 
@@ -71,7 +76,7 @@ public class UserServiceImpl implements UserService {
         isExist(id);
 
         userDto.setId(id);
-        User userEntity = userRepository.getById(id);
+        User userEntity = userRepository.getReferenceById(id);
         if (userDto.getName() == null || userDto.getName().isBlank()) {
             userDto.setName(userEntity.getName());
         }
@@ -94,7 +99,7 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
-    private void isExist(Integer id) {
+    public void isExist(Integer id) {
         log.debug("[i] is exist User by ID:{}", id);
         if (!userRepository.existsById(id)) {
             throw new NotFoundException(String.format("user.id(%d) is not exist!", id));

@@ -4,21 +4,23 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.item.entity.Item;
-import ru.practicum.shareit.user.entity.User;
 
 import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Integer> {
-    List<Item> findByNameContainsIgnoreCaseOrDescriptionContainsIgnoreCaseAndAvailableTrueOrderByIdAsc(String name, String description);
+    List<Item> getByAvailableTrueOrderByIdAsc();
 
-    List<Item> findDistinctByOwner_IdAndAvailableTrueOrderByIdAsc(@NonNull Integer id);
+    boolean existsByOwner_Id(Integer id);
+
+    List<Item> getByOwner_IdOrderByIdAsc(Integer ownerId);
+
+    List<Item> findByNameContainsIgnoreCaseOrDescriptionContainsIgnoreCaseAndAvailableTrueOrderByIdAsc(String name, String description);
 
     boolean existsByIdAndOwner_Id(int id, Integer id1);
 
-    void deleteByIdAndOwner(int id, User owner);
+    void deleteByIdAndOwner_Id(Integer ownerId, Integer itemId);
 
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)

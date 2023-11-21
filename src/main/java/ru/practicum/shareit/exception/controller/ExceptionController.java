@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -32,19 +33,19 @@ public class ExceptionController {
         log.error("[!] Received the status {} Error: {}\n{}", status, message, stackTraceString);
     }
 
-//    @ExceptionHandler
-//    @ResponseStatus(INTERNAL_SERVER_ERROR)
-//    public ResponseEntity<?> handleThrowable(Throwable e) {
-//        String message = e.getMessage();
-//
-//        logError(INTERNAL_SERVER_ERROR, message, e);
-//
-//        return ResponseEntity
-//                .status(INTERNAL_SERVER_ERROR)
-//                .lastModified(NOW)
-//                .header("Error message", message)
-//                .build();
-//    }
+    @ExceptionHandler
+    @ResponseStatus(INTERNAL_SERVER_ERROR)
+    public ResponseEntity<?> handleThrowable(Throwable e) {
+        String message = e.getMessage();
+
+        logError(INTERNAL_SERVER_ERROR, message, e);
+
+        return ResponseEntity
+                .status(INTERNAL_SERVER_ERROR)
+                .lastModified(NOW)
+                .header("Error message", message)
+                .build();
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(BAD_REQUEST)
@@ -62,6 +63,18 @@ public class ExceptionController {
                 .lastModified(NOW)
                 .header(field, message)
                 .build();
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
+    @ResponseStatus(NOT_ACCEPTABLE)
+    public ResponseEntity<?> handleHttpMediaTypeNotAcceptableException(HttpMediaTypeNotAcceptableException e) {
+        String message = e.getMessage();
+
+        logError(NOT_ACCEPTABLE, message, e);
+
+        return ResponseEntity
+                .status(406)
+                .body(new ErrorException(406, message));
     }
 
     @ExceptionHandler(RentalPeriodException.class)
@@ -120,9 +133,9 @@ public class ExceptionController {
                 .build();
     }
 
-    @ExceptionHandler(AccessException.class)
+    @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(BAD_REQUEST)
-    public ResponseEntity<?> handleAccessException(AccessException e) {
+    public ResponseEntity<?> handleBadRequestException(BadRequestException e) {
         String message = e.getMessage();
 
         logError(BAD_REQUEST, message, e);
@@ -130,21 +143,32 @@ public class ExceptionController {
         return ResponseEntity
                 .status(BAD_REQUEST)
                 .lastModified(NOW)
-                .header("Access denied", message)
+                .header("Bad Request", message)
                 .build();
     }
 
     @ExceptionHandler(StateException.class)
-    @ResponseStatus(INTERNAL_SERVER_ERROR)
+    @ResponseStatus(BAD_REQUEST)
     public ResponseEntity<?> handleStateException(StateException e) {
         String message = e.getMessage();
 
         logError(INTERNAL_SERVER_ERROR, message, e);
 
-        return new ResponseEntity<>(
-                new ErrorException(
-                        INTERNAL_SERVER_ERROR.value(),
-                        message),
-                INTERNAL_SERVER_ERROR);
+        return ResponseEntity.badRequest()
+                .body(new ErrorException(400, message));
+    }
+
+    @ExceptionHandler(BookingException.class)
+    @ResponseStatus(NOT_FOUND)
+    public ResponseEntity<?> handleBookingException(BookingException e) {
+        String message = e.getMessage();
+
+        logError(NOT_FOUND, message, e);
+
+        return ResponseEntity
+                .status(NOT_FOUND)
+                .lastModified(NOW)
+                .header("Booking error", message)
+                .build();
     }
 }

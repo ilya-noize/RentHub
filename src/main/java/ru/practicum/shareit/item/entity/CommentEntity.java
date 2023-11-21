@@ -4,21 +4,31 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.user.entity.User;
 
 import javax.persistence.*;
 
+@Entity
+@Table(name = "COMMENTS", schema = "PUBLIC")
 @Builder
 @Getter
 @AllArgsConstructor
-@Entity
-@Table(name = "COMMENTS", schema = "PUBLIC")
 @NoArgsConstructor
 public class CommentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
-    private String commentText;
-    private Integer itemId;
-    private Integer authorId;
+
+    private String text;
+
+    @ManyToOne
+    @JoinColumn(name = "item_id",
+            referencedColumnName = "id")
+    private Item item;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id",
+            referencedColumnName = "id")
+    private User author;
 }

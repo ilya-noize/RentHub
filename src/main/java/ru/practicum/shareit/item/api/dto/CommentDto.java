@@ -1,21 +1,15 @@
 package ru.practicum.shareit.item.api.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
-
-@Data
-@Builder
+@AllArgsConstructor
+@Getter
+@Setter
 public class CommentDto {
-    @PositiveOrZero
-    private Integer id;
-    @NotBlank
-    private String commentText;
-    @NotNull
-    private Integer itemId;
-    @NotNull
-    private Integer authorId;
+    private final Integer id;
+    private final String text;
+    private final Integer itemId;
+    private final Integer authorId;
 }

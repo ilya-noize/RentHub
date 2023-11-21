@@ -5,9 +5,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.api.dto.CommentDto;
 import ru.practicum.shareit.item.api.dto.ItemDto;
+import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
 import ru.practicum.shareit.valid.group.Create;
 import ru.practicum.shareit.valid.group.Update;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -48,20 +50,22 @@ public class ItemController {
     }
 
     @GetMapping(GET_ITEM)
-    public ItemDto get(@PathVariable Integer id) {
+    public ItemDto get(
+            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @PathVariable Integer id) {
 
-        return service.get(id);
+        return service.get(userId, id);
     }
 
     @GetMapping(SEARCH_ITEM)
-    public List<ItemDto> search(
+    public List<ItemSimpleDto> search(
             @RequestParam(name = "text") String textSearch) {
 
         return service.search(textSearch);
     }
 
     @GetMapping(GET_ALL_ITEMS)
-    public List<ItemDto> getAll(
+    public List<? extends ItemDto> getAll(
             @RequestHeader(HEADER_USER_ID) Integer userId) {
 
         return service.getAll(userId);
@@ -71,7 +75,8 @@ public class ItemController {
     public CommentDto createComment(
             @RequestHeader(HEADER_USER_ID) Integer userId,
             @PathVariable Integer id,
-            @RequestBody String comment) {
+            @RequestBody
+            @NotBlank(groups = {Create.class}) CommentDto comment) {
         return service.createComment(userId, id, comment);
     }
 }
