@@ -20,6 +20,7 @@ public class CommentEntity {
     @Column(name = "id", nullable = false)
     private Integer id;
 
+    @Column(name = "comment_text")
     private String text;
 
     @ManyToOne
@@ -28,7 +29,7 @@ public class CommentEntity {
     private Item item;
 
     @ManyToOne
-    @JoinColumn(name = "user_id",
+    @JoinColumn(name = "author_id",
             referencedColumnName = "id")
     private User author;
 }

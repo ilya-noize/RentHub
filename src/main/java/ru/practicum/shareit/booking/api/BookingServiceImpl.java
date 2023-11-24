@@ -32,9 +32,6 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
     private final BookingMapper mapper;
 
-    // todo remove later
-    private static int count;
-
     @Override
     public BookingDtoRecord create(Integer bookerId, BookingDto dto) {
         Integer itemId = dto.getItemId();
@@ -230,8 +227,7 @@ public class BookingServiceImpl implements BookingService {
                         .getAllByBookerAndEndBeforeOrderByStartDesc(
                         booker, NOW);
 
-                count = bookingList.size();
-                log.info("[!!!!!] GET ALL BY BOOKER:{} STATE {} COUNT:{}", bookerId, state, count);
+                log.info("[!!!!!] GET ALL BY BOOKER:{} STATE {} COUNT:{}", bookerId, state, bookingList.size());
                 break;
             case FUTURE:
                 bookingList = bookingRepository
@@ -243,8 +239,7 @@ public class BookingServiceImpl implements BookingService {
                         .getAllByBooker_IdAndStartBeforeAndEndAfterOrderByStartDesc(
                                 bookerId, NOW, NOW);
 
-                count = bookingList.size();
-                log.info("[i] GET ALL BY BOOKER:{} STATE {} COUNT:{}", bookerId, state, count);
+                log.info("[i] GET ALL BY BOOKER:{} STATE {} COUNT:{}", bookerId, state, bookingList.size());
                 break;
             case WAITING:
                 bookingList = bookingRepository
@@ -267,7 +262,7 @@ public class BookingServiceImpl implements BookingService {
             Integer userId, String stateIn) {
 
         if (!userRepository.existsById(userId)) {
-            throw new NotFoundException(format("User ID:%d Not Found", userId));
+            throw new NotFoundException(format("User with id:%s not found.", userId));
         }
         try {
             return Enum.valueOf(BookingFilterByTemplate.class, stateIn);
@@ -296,11 +291,6 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDtoRecord> getAllByOwner(Integer ownerId, String stateIn) {
         List<Booking> bookingList;
 
-
-        User owner = userRepository.findById(ownerId).orElseThrow(
-                () -> new NotFoundException(
-                        format("User with id:%s not found.", ownerId)));
-
         BookingFilterByTemplate state =
                 checkingInputParametersAndReturnEnumBookingFilterByTemplate(ownerId, stateIn);
 
@@ -308,14 +298,13 @@ public class BookingServiceImpl implements BookingService {
             case ALL:
                 bookingList = bookingRepository
                         .getAllByItem_Owner_IdOrderByStartDesc(ownerId);
-                log.info("[i] GET ALL BY OWNER:{}  STATE {}  COUNT:{}", ownerId, state, count);
+                log.info("[i] GET ALL BY OWNER:{}  STATE {}  COUNT:{}", ownerId, state, bookingList.size());
                 break;
             case PAST:// wrong
                 bookingList = bookingRepository
                         .getAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(
                                 ownerId, NOW);
-                count = bookingList.size();
-                log.info("[i] GET ALL BY OWNER:{}  STATE {}  COUNT:{}", ownerId, state, count);
+                log.info("[i] GET ALL BY OWNER:{}  STATE {}  COUNT:{}", ownerId, state, bookingList.size());
                 break;
             case FUTURE:
                 bookingList = bookingRepository
@@ -326,8 +315,7 @@ public class BookingServiceImpl implements BookingService {
                 bookingList = bookingRepository
                         .getAllByItem_Owner_IdAndStartBeforeOrderByStartDesc(
                                 ownerId, NOW);//, NOW);
-                count = bookingList.size();
-                log.info("[i] GET ALL BY OWNER:{}  STATE {}  COUNT:{}", ownerId, state, count);
+                log.info("[i] GET ALL BY OWNER:{}  STATE {}  COUNT:{}", ownerId, state, bookingList.size());
                 break;
             case WAITING:
                 bookingList = bookingRepository
