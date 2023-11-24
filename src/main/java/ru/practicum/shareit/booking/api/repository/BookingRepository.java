@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.api.repository;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -8,55 +9,86 @@ import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.entity.Booking;
 import ru.practicum.shareit.booking.entity.enums.BookingStatus;
-import ru.practicum.shareit.user.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    @Query("select b from Booking b where b.booker = :booker and b.end < :end" +
-            " order by b.start DESC")
-    List<Booking> findByBookerAndEndBefore(@Param("booker") User booker, @Param("end") LocalDateTime end);
+    // - - - - - - - - - - - - - - - - - - ALL OWNER
+    List<Booking> findAllByItem_Owner_IdOrderByStartDesc(int id);
 
-    List<Booking> getAllByBooker_IdAndStatusOrderByStartDesc(Integer bookerId, BookingStatus status);
+    // - - - - - - - - - - - - - - - - - - ALL BOOKER
+    List<Booking> findAllByBooker_IdOrderByStartDesc(int id);
 
-    List<Booking> getAllByBooker_IdAndStartBeforeAndEndAfterOrderByStartDesc(Integer bookerId, LocalDateTime start, LocalDateTime end);
+    // - - - - - - - - - - - - - - - - - - APPROVED, WAITING OWNER
+    List<Booking> findAllByItem_Owner_IdAndStatusOrderByStartDesc(
+            int id,
+            BookingStatus status);
 
-    List<Booking> getAllByBooker_IdAndStartAfterOrderByStartDesc(Integer bookerId, LocalDateTime start);
+    // - - - - - - - - - - - - - - - - - - APPROVED, WAITING BOOKER
+    List<Booking> findAllByBooker_IdAndStatusOrderByStartDesc(
+            int id,
+            BookingStatus status);
 
-    List<Booking> getAllByBookerAndEndBeforeOrderByStartDesc(User booker, LocalDateTime end);
+    // - - - - - - - - - - - - - - - - - - PAST OWNER
+    List<Booking> findAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(
+            int ownerId,
+            LocalDateTime end);
 
-    List<Booking> getAllByBooker_IdOrderByStartDesc(Integer bookerId);
+    // - - - - - - - - - - - - - - - - - - PAST BOOKER
+    List<Booking> findAllByBooker_IdAndEndBeforeOrderByStartDesc(
+            Integer bookerId,
+            LocalDateTime now);
 
-    List<Booking> getAllByItem_Owner_IdAndStatusOrderByStartDesc(Integer ownerId, BookingStatus status);
+    // - - - - - - - - - - - - - - - - - - FUTURE BOOKER
+    List<Booking> findAllByBooker_IdAndStartAfterOrderByStartDesc(
+            int id,
+            LocalDateTime start);
 
-    List<Booking> getAllByItem_Owner_IdAndStartBeforeOrderByStartDesc(Integer ownerId, LocalDateTime start);
+    // - - - - - - - - - - - - - - - - - - FUTURE OWNER
+    List<Booking> findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(
+            int id,
+            LocalDateTime start);
 
-    List<Booking> getAllByItem_Owner_IdAndStartAfterOrderByStartDesc(Integer ownerId, LocalDateTime start);
+    // - - - - - - - - - - - - - - - - - - CURRENT BOOKER
+    List<Booking> findAllByBooker_IdAndStartBeforeAndEndAfterOrderByStartDesc(
+            int bookerId,
+            LocalDateTime start,
+            LocalDateTime end,
+            Sort sort);
 
-    List<Booking> getAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(Integer ownerId, LocalDateTime end);
+    // - - - - - - - - - - - - - - - - - - CURRENT OWNER
+    List<Booking> findAllByItem_Owner_IdAndStartBeforeAndEndAfter(
+            int ownerId,
+            LocalDateTime start,
+            LocalDateTime end,
+            Sort sort);
 
-    List<Booking> getAllByItem_Owner_IdOrderByStartDesc(Integer ownerId);
+    // - - - - - - - - - - - - - - - - - - NEXT
 
-    @Query("select b from Booking b " +
-            "where b.item.id = :id and b.start < :start and b.status = :status " +
-            "order by b.start DESC")
-    Optional<Booking> findByItem_IdAndStartBeforeAndStatusOrderByStartDesc(@Param("id") int id, @Param("start") LocalDateTime start, @Param("status") BookingStatus status);
+    Optional<Booking> getFirstByItem_IdAndStartGreaterThanEqualAndStatusOrderByIdDesc(
+            int itemId,
+            LocalDateTime start,
+            BookingStatus status);
 
-    @Query("select b from Booking b " +
-            "where b.item.id = :id and b.start > :start and b.status = :status " +
-            "order by b.start DESC")
-    Optional<Booking> findByItem_IdAndStartAfterAndStatusOrderByStartDesc(@Param("id") int id, @Param("start") LocalDateTime start, @Param("status") BookingStatus status);
+    // - - - - - - - - - - - - - - - - - - LAST
+    Optional<Booking> getFirstByItem_IdAndStartAfterAndStatusOrderByIdAsc(
+            int itemId,
+            LocalDateTime start,
+            BookingStatus status);
 
-    Optional<Booking> getFirstByItem_IdAndStartGreaterThanEqualAndStatusOrderByIdDesc(Integer itemId, LocalDateTime start, BookingStatus status);
-
-    Optional<Booking> getFirstByItem_IdAndStartAfterAndStatusOrderByIdAsc(Integer itemId, LocalDateTime start, BookingStatus status);
-
-    boolean existsByBooker_IdAndItem_IdAndEndBeforeAndStatus(Integer bookerId, int itemId, LocalDateTime end, BookingStatus status);
+    // - - - - - - - - - - - - - - - - - - BOOKING IS EXISTS
+    boolean existsByBooker_IdAndItem_IdAndEndLessThanAndStatus(
+            int bookerId,
+            int itemId,
+            LocalDateTime end,
+            BookingStatus status);
 
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("update Booking b set b.status = ?1 where b.id = ?2")
-    void updateStatusById(BookingStatus status, @NonNull Long id);
+    @Query("update Booking b set b.status = :status where b.id = :id")
+    void updateStatusById(
+            @Param(value = "status") BookingStatus status,
+            @Param(value = "id")@NonNull Long id);
 }

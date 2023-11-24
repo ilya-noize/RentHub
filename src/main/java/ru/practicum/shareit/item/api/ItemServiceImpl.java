@@ -250,7 +250,7 @@ public class ItemServiceImpl implements ItemService {
                                 format(ITEM_WITH_ID_NOT_EXIST, itemId)));
 
         boolean booking = bookingRepository
-                .existsByBooker_IdAndItem_IdAndEndBeforeAndStatus(
+                .existsByBooker_IdAndItem_IdAndEndLessThanAndStatus(
                         userId, itemId, NOW, APPROVED);
         if (!booking) {
             String error = format("A user with an ID:(%d) has never rented an item with an ID:(%d)",

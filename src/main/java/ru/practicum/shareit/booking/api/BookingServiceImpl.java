@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.api.dto.BookingDto;
 import ru.practicum.shareit.booking.api.dto.BookingDtoRecord;
@@ -206,56 +207,45 @@ public class BookingServiceImpl implements BookingService {
      */
     @Override
     public List<BookingDtoRecord> getAllByUser(Integer bookerId, String stateIn) {
-        List<Booking> bookingList;
-
-        User booker = userRepository.findById(bookerId).orElseThrow(
-                () -> new NotFoundException(
-                    format("User with id:%s not found.", bookerId)));
+        List<Booking> bookingList;//bookingList;
 
         BookingFilterByTemplate state =
                 checkingInputParametersAndReturnEnumBookingFilterByTemplate(bookerId, stateIn);
 
         switch (state) {
-            case ALL:
+            case CURRENT: // !!!!!!!!!
                 bookingList = bookingRepository
-                        .getAllByBooker_IdOrderByStartDesc(bookerId);
+                        .findAllByBooker_IdAndStartBeforeAndEndAfterOrderByStartDesc(bookerId,
+                                LocalDateTime.now(), LocalDateTime.now(), Sort.by(Sort.Direction.DESC, "start"));
                 break;
-            case PAST: // wrong
-                bookingList = bookingRepository
-//                        .findByBookerAndEndBefore(
-//                        )
-                        .getAllByBookerAndEndBeforeOrderByStartDesc(
-                        booker, NOW);
-
-                log.info("[!!!!!] GET ALL BY BOOKER:{} STATE {} COUNT:{}", bookerId, state, bookingList.size());
+            case PAST: // !!!!!!!!!
+                bookingList = bookingRepository.findAllByBooker_IdAndEndBeforeOrderByStartDesc(
+                        bookerId, LocalDateTime.now());
                 break;
-            case FUTURE:
-                bookingList = bookingRepository
-                        .getAllByBooker_IdAndStartAfterOrderByStartDesc(
-                                bookerId, NOW);
+            case ALL: // OK
+                bookingList = bookingRepository.findAllByBooker_IdOrderByStartDesc(
+                        bookerId);
                 break;
-            case CURRENT: // wrong
-                bookingList = bookingRepository
-                        .getAllByBooker_IdAndStartBeforeAndEndAfterOrderByStartDesc(
-                                bookerId, NOW, NOW);
-
-                log.info("[i] GET ALL BY BOOKER:{} STATE {} COUNT:{}", bookerId, state, bookingList.size());
+            case FUTURE: // Start > NOW
+                bookingList = bookingRepository.findAllByBooker_IdAndStartAfterOrderByStartDesc(
+                        bookerId, NOW);
                 break;
             case WAITING:
-                bookingList = bookingRepository
-                        .getAllByBooker_IdAndStatusOrderByStartDesc(
-                                bookerId, WAITING);
+                bookingList = bookingRepository.findAllByBooker_IdAndStatusOrderByStartDesc(
+                        bookerId, WAITING);
                 break;
             case REJECTED:
-                bookingList = bookingRepository
-                        .getAllByBooker_IdAndStatusOrderByStartDesc(
-                                bookerId, REJECTED);
+                bookingList = bookingRepository.findAllByBooker_IdAndStatusOrderByStartDesc(
+                        bookerId, REJECTED);
                 break;
             default:
                 bookingList = List.of();
         }
 
-        return getCollect(bookingList);
+//        return getListBookingDtoRecord(bookingList);
+        return bookingList.stream()
+                .map(mapper::toDtoRecord)
+                .collect(toList());
     }
 
     private BookingFilterByTemplate checkingInputParametersAndReturnEnumBookingFilterByTemplate(
@@ -295,46 +285,43 @@ public class BookingServiceImpl implements BookingService {
                 checkingInputParametersAndReturnEnumBookingFilterByTemplate(ownerId, stateIn);
 
         switch (state) {
+            case CURRENT: // !!!!!!!!!
+                bookingList = bookingRepository.findAllByItem_Owner_IdAndStartBeforeAndEndAfter(ownerId,
+                        LocalDateTime.now(), LocalDateTime.now(), Sort.by(Sort.Direction.DESC, "start"));
+
+                break;
+            case PAST: // !!!!!!!!!
+                bookingList = bookingRepository.findAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(
+                        ownerId, LocalDateTime.now());
+                break;
             case ALL:
                 bookingList = bookingRepository
-                        .getAllByItem_Owner_IdOrderByStartDesc(ownerId);
-                log.info("[i] GET ALL BY OWNER:{}  STATE {}  COUNT:{}", ownerId, state, bookingList.size());
-                break;
-            case PAST:// wrong
-                bookingList = bookingRepository
-                        .getAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(
-                                ownerId, NOW);
-                log.info("[i] GET ALL BY OWNER:{}  STATE {}  COUNT:{}", ownerId, state, bookingList.size());
+                        .findAllByItem_Owner_IdOrderByStartDesc(
+                                ownerId);
                 break;
             case FUTURE:
                 bookingList = bookingRepository
-                        .getAllByItem_Owner_IdAndStartAfterOrderByStartDesc(
+                        .findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(
                                 ownerId, NOW);
-                break;
-            case CURRENT:// wrong
-                bookingList = bookingRepository
-                        .getAllByItem_Owner_IdAndStartBeforeOrderByStartDesc(
-                                ownerId, NOW);//, NOW);
-                log.info("[i] GET ALL BY OWNER:{}  STATE {}  COUNT:{}", ownerId, state, bookingList.size());
                 break;
             case WAITING:
                 bookingList = bookingRepository
-                        .getAllByItem_Owner_IdAndStatusOrderByStartDesc(
+                        .findAllByItem_Owner_IdAndStatusOrderByStartDesc(
                                 ownerId, WAITING);
                 break;
             case REJECTED:
                 bookingList = bookingRepository
-                        .getAllByItem_Owner_IdAndStatusOrderByStartDesc(
+                        .findAllByItem_Owner_IdAndStatusOrderByStartDesc(
                                 ownerId, REJECTED);
                 break;
             default:
                 bookingList = List.of();
         }
 
-        return getCollect(bookingList);
+        return getListBookingDtoRecord(bookingList);
     }
 
-    private List<BookingDtoRecord> getCollect(List<Booking> bookingList) {
+    private List<BookingDtoRecord> getListBookingDtoRecord(List<Booking> bookingList) {
 
         return bookingList.stream()
                 .map(
