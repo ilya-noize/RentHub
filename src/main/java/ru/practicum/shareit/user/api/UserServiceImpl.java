@@ -99,10 +99,11 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
-    public void isExist(Integer id) {
+    private void isExist(Integer id) {
         log.debug("[i] is exist User by ID:{}", id);
         if (!userRepository.existsById(id)) {
-            throw new NotFoundException(String.format("user.id(%d) is not exist!", id));
+            throw new NotFoundException(
+                    String.format(USER_WITH_ID_NOT_EXIST, id));
         }
     }
 }

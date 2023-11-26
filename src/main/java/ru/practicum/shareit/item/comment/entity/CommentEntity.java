@@ -1,35 +1,32 @@
-package ru.practicum.shareit.item.entity;
+package ru.practicum.shareit.item.comment.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.user.entity.User;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "COMMENTS", schema = "PUBLIC")
 @Builder
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "comment_text")
     private String text;
 
     @ManyToOne
-    @JoinColumn(name = "item_id",
-            referencedColumnName = "id")
+    @JoinColumn(name = "item_id")
     private Item item;
 
     @ManyToOne
-    @JoinColumn(name = "author_id",
-            referencedColumnName = "id")
+    @JoinColumn(name = "author_id")
     private User author;
+    private LocalDateTime created;
 }

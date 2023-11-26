@@ -30,10 +30,9 @@ public class Item {
     private String description;
     @Getter(AccessLevel.NONE)
     private boolean available;
-    @ManyToOne
-//            (fetch = FetchType.LAZY)
-    @JoinColumn(name = "OWNER_ID",
-            referencedColumnName = "ID")
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "OWNER_ID", nullable = false)
     private User owner;
 
     public boolean isAvailable() {

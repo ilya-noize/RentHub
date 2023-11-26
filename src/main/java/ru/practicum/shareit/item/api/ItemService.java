@@ -1,8 +1,9 @@
 package ru.practicum.shareit.item.api;
 
-import ru.practicum.shareit.item.api.dto.CommentDto;
 import ru.practicum.shareit.item.api.dto.ItemDto;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
+import ru.practicum.shareit.item.comment.api.dto.CommentDtoRecord;
+import ru.practicum.shareit.item.comment.api.dto.CommentDtoSource;
 
 import java.util.List;
 
@@ -19,5 +20,5 @@ public interface ItemService {
 
     List<ItemSimpleDto> search(String searchText);
 
-    CommentDto createComment(Integer userId, Integer id, CommentDto text);
+    CommentDtoRecord createComment(Integer userId, Integer itemId, CommentDtoSource commentDtoSource);
 }

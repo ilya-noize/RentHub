@@ -13,6 +13,5 @@ package ru.practicum.shareit.booking.entity.enums;
 public enum BookingStatus {
     WAITING,
     APPROVED,
-    REJECTED//,
-//    CANCELED // todo: use this constant in booking! Cancel booking from user in updateStatusById.
+    REJECTED
 }
