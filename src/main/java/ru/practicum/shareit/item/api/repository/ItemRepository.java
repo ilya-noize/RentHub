@@ -10,16 +10,20 @@ import ru.practicum.shareit.item.entity.Item;
 import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Integer> {
-    List<Item> getByAvailableTrueOrderByIdAsc();
+    @Query("select i from Item i where i.owner.id = ?1")
+    List<Item> findAllByOwner_Id(Integer id);
 
-    boolean existsByOwner_Id(Integer id);
-
-    List<Item> getByOwner_IdOrderByIdAsc(Integer ownerId);
-
+    @Query("select i from Item i " +
+            "where upper(i.name) like upper(concat('%', ?1, '%')) or upper(i.description) like upper(concat('%', ?2, '%')) and i.available = true " +
+            "order by i.id")
     List<Item> findByNameContainsIgnoreCaseOrDescriptionContainsIgnoreCaseAndAvailableTrueOrderByIdAsc(String name, String description);
 
+    @Query("select (count(i) > 0) from Item i where i.id = ?1 and i.owner.id = ?2")
     boolean existsByIdAndOwner_Id(int id, Integer id1);
 
+    @Transactional
+    @Modifying
+    @Query("delete from Item i where i.id = ?1 and i.owner.id = ?2")
     void deleteByIdAndOwner_Id(Integer ownerId, Integer itemId);
 
     @Transactional
