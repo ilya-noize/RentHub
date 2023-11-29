@@ -34,9 +34,11 @@ public class ItemDto {
     private Integer id;
 
     @NotBlank(groups = {Create.class})
+//    @Size(max = 255)
     private String name;
 
     @NotBlank(groups = {Create.class})
+//    @Size(max = 512)
     private String description;
 
     @Getter(AccessLevel.NONE)

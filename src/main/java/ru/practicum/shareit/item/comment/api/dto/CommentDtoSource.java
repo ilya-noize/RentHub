@@ -6,6 +6,7 @@ import lombok.Setter;
 import ru.practicum.shareit.valid.group.Create;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 public class CommentDtoSource {
     private final Integer id;
     @NotBlank(groups = {Create.class})
+    @Size(max = 2048)
     private final String text;
     private final Integer itemId;
     private final Integer authorId;

@@ -4,6 +4,7 @@ import lombok.*;
 import ru.practicum.shareit.user.entity.User;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 /**
  * Класс Предмет.
@@ -26,7 +27,11 @@ public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Size(max = 255)
     private String name;
+
+    @Size(max = 512)
     private String description;
     @Getter(AccessLevel.NONE)
     private boolean available;
