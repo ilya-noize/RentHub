@@ -15,6 +15,7 @@ import java.util.List;
 
 /**
  * DTO-Class Item.
+ * Just a class with data. Don't touch him.
  * <p>
  * Used in Controller, Service;
  * <p>

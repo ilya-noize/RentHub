@@ -355,7 +355,10 @@ public class ItemServiceImpl implements ItemService {
     public CommentDtoRecord createComment(Integer userId,
                                           Integer itemId,
                                           CommentDtoSource commentDto) {
-        CommentEntity comment = commentMapper.toEntity(commentDto, itemId);
+        String text = commentDto.getText().trim();
+        if (text.isBlank()) {
+            throw new BadRequestException("Text comment can't be blank");
+        }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(
                         format(USER_WITH_ID_NOT_EXIST, userId)));
@@ -377,9 +380,11 @@ public class ItemServiceImpl implements ItemService {
                         format("User with ID:(%d) can leave a comment only after the end" +
                                         " of the rental of the item with ID:(%d)",
                                 userId, itemId)));
-        comment.setAuthor(user);
-        comment.setItem(item);
-        comment.setCreated(LocalDateTime.now());
+        CommentEntity comment = CommentEntity.builder()
+                .text(text)
+                .item(item)
+                .author(user)
+                .created(LocalDateTime.now()).build();
         commentRepository.save(comment);
 
         return commentMapper.toDtoRecord(comment);
