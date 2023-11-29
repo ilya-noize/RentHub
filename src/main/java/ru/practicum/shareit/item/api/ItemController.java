@@ -8,7 +8,6 @@ import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
 import ru.practicum.shareit.item.comment.api.dto.CommentDtoRecord;
 import ru.practicum.shareit.item.comment.api.dto.CommentDtoSource;
 import ru.practicum.shareit.valid.group.Create;
-import ru.practicum.shareit.valid.group.Update;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -34,7 +33,7 @@ public class ItemController {
             Integer userId,
             @RequestBody
             @Validated(Create.class)
-            ItemDto itemDto) {
+            ItemSimpleDto itemDto) {
 
         return service.create(userId, itemDto);
     }
@@ -42,19 +41,18 @@ public class ItemController {
     @PatchMapping(UPDATE_ITEM)
     public ItemDto update(
             @RequestHeader(HEADER_USER_ID) Integer userId,
-            @PathVariable Integer id,
-            @RequestBody @Validated(Update.class) ItemDto itemDto
-            ) {
+            @PathVariable(name = "id") Integer itemId,
+            @RequestBody ItemSimpleDto itemDto) {
 
-        return service.update(userId, id, itemDto);
+        return service.update(userId, itemId, itemDto);
     }
 
     @GetMapping(GET_ITEM)
     public ItemDto get(
             @RequestHeader(HEADER_USER_ID) Integer userId,
-            @PathVariable Integer id) {
+            @PathVariable(name = "id") Integer itemId) {
 
-        return service.get(userId, id);
+        return service.get(userId, itemId);
     }
 
     @GetMapping(SEARCH_ITEM)
@@ -65,7 +63,7 @@ public class ItemController {
     }
 
     @GetMapping(GET_ALL_ITEMS)
-    public List<? extends ItemDto> getAll(
+    public List<ItemDto> getAll(
             @RequestHeader(HEADER_USER_ID) Integer userId) {
 
         return service.getAll(userId);
@@ -77,6 +75,7 @@ public class ItemController {
             @PathVariable(name = "id") Integer itemId,
             @RequestBody
             @Validated(Create.class) CommentDtoSource commentDtoSource) {
+
         return service.createComment(userId, itemId, commentDtoSource);
     }
 }

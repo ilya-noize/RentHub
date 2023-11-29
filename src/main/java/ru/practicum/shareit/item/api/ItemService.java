@@ -8,9 +8,9 @@ import ru.practicum.shareit.item.comment.api.dto.CommentDtoSource;
 import java.util.List;
 
 public interface ItemService {
-    ItemDto create(Integer userId, ItemDto itemDto);
+    ItemDto create(Integer userId, ItemSimpleDto itemDto);
 
-    ItemDto update(Integer userId, Integer itemId, ItemDto dto);
+    ItemDto update(Integer userId, Integer itemId, ItemSimpleDto dto);
 
     ItemDto get(Integer userId, Integer itemId);
 

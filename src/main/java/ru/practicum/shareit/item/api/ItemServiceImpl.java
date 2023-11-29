@@ -56,7 +56,7 @@ public class ItemServiceImpl implements ItemService {
      * @return Созданный объект, после всех проверок условий
      */
     @Override
-    public ItemDto create(Integer userId, ItemDto itemDto) {
+    public ItemDto create(Integer userId, ItemSimpleDto itemDto) {
         log.debug("[i] CREATE ITEM:{} by User.id:{}", itemDto, userId);
 
         checkingExistUserById(userId);
@@ -86,10 +86,10 @@ public class ItemServiceImpl implements ItemService {
      * @return itemDTO
      */
     @Override
-    public ItemDto update(Integer userId, Integer itemId, ItemDto itemDto) {
+    public ItemDto update(Integer userId, Integer itemId, ItemSimpleDto itemDto) {
         String name = itemDto.getName();
         String description = itemDto.getDescription();
-        Boolean available = itemDto.isAvailable();
+        Boolean available = itemDto.getAvailable();
 
         checkingExistUserById(userId);
 
@@ -330,6 +330,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemSimpleDto> search(String searchText) {
         log.debug("[i] SEARCH text:{}", searchText);
         if (searchText.isBlank()) {
+
             return List.of();
         }
 

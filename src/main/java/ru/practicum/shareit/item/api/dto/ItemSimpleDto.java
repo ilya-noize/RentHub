@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.api.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.valid.group.Create;
@@ -25,7 +24,6 @@ import javax.validation.constraints.Size;
 
 @Data
 @Builder
-@AllArgsConstructor
 public class ItemSimpleDto {
     @PositiveOrZero
     private Integer id;
@@ -40,5 +38,4 @@ public class ItemSimpleDto {
 
     @NotNull(groups = {Create.class})
     private Boolean available;
-
 }
