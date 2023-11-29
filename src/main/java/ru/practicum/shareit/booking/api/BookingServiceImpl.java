@@ -27,7 +27,6 @@ import static ru.practicum.shareit.booking.entity.enums.BookingStatus.*;
 @Slf4j
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
-    public static final LocalDateTime NOW = LocalDateTime.now();
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
@@ -196,7 +195,8 @@ public class BookingServiceImpl implements BookingService {
      */
     @Override
     public List<BookingDtoRecord> getAllByUser(Integer bookerId, String stateIn) {
-        List<Booking> bookingList;//bookingList;
+        List<Booking> bookingList;
+        LocalDateTime now = LocalDateTime.now();
 
         BookingFilterByTemplate state =
                 checkingInputParametersAndReturnEnumBookingFilterByTemplate(bookerId, stateIn);
@@ -205,11 +205,11 @@ public class BookingServiceImpl implements BookingService {
             case CURRENT:
                 bookingList = bookingRepository
                         .findAllByBooker_IdAndStartBeforeAndEndAfterOrderByStartDesc(bookerId,
-                                LocalDateTime.now(), LocalDateTime.now(), Sort.by(Sort.Direction.DESC, "start"));
+                                now, now);
                 break;
             case PAST:
                 bookingList = bookingRepository.findAllByBooker_IdAndEndBeforeOrderByStartDesc(
-                        bookerId, LocalDateTime.now());
+                        bookerId, now);
                 break;
             case ALL:
                 bookingList = bookingRepository.findAllByBooker_IdOrderByStartDesc(
@@ -217,7 +217,7 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case FUTURE:
                 bookingList = bookingRepository.findAllByBooker_IdAndStartAfterOrderByStartDesc(
-                        bookerId, NOW);
+                        bookerId, now);
                 break;
             case WAITING:
                 bookingList = bookingRepository.findAllByBooker_IdAndStatusOrderByStartDesc(
@@ -266,6 +266,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDtoRecord> getAllByOwner(Integer ownerId, String stateIn) {
         List<Booking> bookingList;
+        LocalDateTime now = LocalDateTime.now();
 
         BookingFilterByTemplate state =
                 checkingInputParametersAndReturnEnumBookingFilterByTemplate(ownerId, stateIn);
@@ -273,12 +274,12 @@ public class BookingServiceImpl implements BookingService {
         switch (state) {
             case CURRENT:
                 bookingList = bookingRepository.findAllByItem_Owner_IdAndStartBeforeAndEndAfter(ownerId,
-                        LocalDateTime.now(), LocalDateTime.now(), Sort.by(Sort.Direction.DESC, "start"));
+                        now, now, Sort.by(Sort.Direction.DESC, "start"));
 
                 break;
             case PAST:
                 bookingList = bookingRepository.findAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(
-                        ownerId, LocalDateTime.now());
+                        ownerId, now);
                 break;
             case ALL:
                 bookingList = bookingRepository
@@ -288,7 +289,7 @@ public class BookingServiceImpl implements BookingService {
             case FUTURE:
                 bookingList = bookingRepository
                         .findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(
-                                ownerId, NOW);
+                                ownerId, now);
                 break;
             case WAITING:
                 bookingList = bookingRepository
