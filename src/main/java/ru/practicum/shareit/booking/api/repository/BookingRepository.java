@@ -16,14 +16,14 @@ import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     // - - - - - - - - - - - - - - - - - - GET ALL LAST
-    Optional<Booking> findFirstByItem_IdInAndStartAfterAndStatus(
+    List<Booking> findFirstByItem_IdInAndStartAfterAndStatus(
             List<Integer> ids,
             LocalDateTime start,
             BookingStatus status,
             Sort sort);
 
     // - - - - - - - - - - - - - - - - - - GET ALL NEXT
-    Optional<Booking> findFirstByItem_IdInAndStartLessThanEqualAndStatus(
+    List<Booking> findFirstByItem_IdInAndStartLessThanEqualAndStatus(
             List<Integer> ids,
             LocalDateTime start,
             BookingStatus status,

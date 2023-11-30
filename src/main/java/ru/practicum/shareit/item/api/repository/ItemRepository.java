@@ -14,7 +14,9 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
     List<Item> findAllByOwner_Id(Integer id);
 
     @Query("select i from Item i " +
-            "where upper(i.name) like upper(concat('%', ?1, '%')) or upper(i.description) like upper(concat('%', ?2, '%')) and i.available = true " +
+            "where ( " +
+            "upper(i.name) like upper(concat('%', ?1, '%')) or upper(i.description) like upper(concat('%', ?2, '%')) " +
+            ") and i.available = true " +
             "order by i.id")
     List<Item> findByNameContainsIgnoreCaseOrDescriptionContainsIgnoreCaseAndAvailableTrueOrderByIdAsc(String name, String description);
 

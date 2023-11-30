@@ -256,7 +256,7 @@ public class ItemServiceImpl implements ItemService {
             itemDto.setLastBooking(lastBookingStorage.get(itemId));
             itemDto.setNextBooking(nextBookingStorage.get(itemId));
             itemDto.setComments(
-                    getCommentDtoRecords(commentStorage.get(itemId), itemId));
+                    getCommentDtoRecords(commentStorage.get(itemId)));
         });
 
         return itemsDto;
@@ -266,20 +266,16 @@ public class ItemServiceImpl implements ItemService {
      * Creating a list of comments for the backend
      *
      * @param comments comments from DB
-     * @param itemId   the desired item ID
      * @return list of comments for the backend
      */
     private List<CommentDtoRecord> getCommentDtoRecords(
-            List<CommentEntity> comments,
-            Integer itemId) {
+            List<CommentEntity> comments) {
         if (comments == null) {
 
             return null;
         }
 
         return comments.stream()
-                .filter(comment ->
-                        itemId.equals(comment.getItem().getId()))
                 .map(commentMapper::toDtoRecord)
                 .collect(Collectors.toList());
     }
