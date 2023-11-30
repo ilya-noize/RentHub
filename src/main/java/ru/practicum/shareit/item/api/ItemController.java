@@ -8,8 +8,8 @@ import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
 import ru.practicum.shareit.item.comment.api.dto.CommentDtoRecord;
 import ru.practicum.shareit.item.comment.api.dto.CommentDtoSource;
 import ru.practicum.shareit.valid.group.Create;
+import ru.practicum.shareit.valid.group.Update;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static ru.practicum.shareit.ShareItApp.HEADER_USER_ID;
@@ -28,12 +28,9 @@ public class ItemController {
 
     @PostMapping(CREATE_ITEM)
     public ItemDto create(
-            @RequestHeader(HEADER_USER_ID)
-            @NotNull(groups = Create.class)
-            Integer userId,
+            @RequestHeader(HEADER_USER_ID) Integer userId,
             @RequestBody
-            @Validated(Create.class)
-            ItemSimpleDto itemDto) {
+            @Validated(Create.class) ItemSimpleDto itemDto) {
 
         return service.create(userId, itemDto);
     }
@@ -42,7 +39,8 @@ public class ItemController {
     public ItemDto update(
             @RequestHeader(HEADER_USER_ID) Integer userId,
             @PathVariable(name = "id") Integer itemId,
-            @RequestBody ItemSimpleDto itemDto) {
+            @RequestBody
+            @Validated(Update.class) ItemSimpleDto itemDto) {
 
         return service.update(userId, itemId, itemDto);
     }

@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class CommentDtoSource {
     private final Integer id;
     @NotBlank(groups = {Create.class})
-    @Size(max = 2048)
+    @Size(max = 2048, groups = {Create.class})
     private final String text;
     private final Integer itemId;
     private final Integer authorId;

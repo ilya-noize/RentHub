@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.api.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import org.hibernate.sql.Update;
 import ru.practicum.shareit.valid.group.Create;
 
 import javax.validation.constraints.NotBlank;
@@ -29,11 +30,11 @@ public class ItemSimpleDto {
     private Integer id;
 
     @NotBlank(groups = {Create.class})
-    @Size(max = 255)
+    @Size(max = 255, groups = {Create.class, Update.class})
     private String name;
 
-    @NotBlank(groups = {Create.class})
-    @Size(max = 512)
+    @NotBlank(groups = {Create.class, Update.class})
+    @Size(max = 512, groups = {Create.class, Update.class})
     private String description;
 
     @NotNull(groups = {Create.class})
