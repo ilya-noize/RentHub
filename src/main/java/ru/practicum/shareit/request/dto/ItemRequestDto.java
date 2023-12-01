@@ -1,7 +1,7 @@
 package ru.practicum.shareit.request.dto;
 
 /**
- * TODO Sprint add-item-requests.
+ * Just a class with data. Don't touch him.
  */
 public class ItemRequestDto {
 }

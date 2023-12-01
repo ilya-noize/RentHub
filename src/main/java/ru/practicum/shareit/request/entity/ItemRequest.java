@@ -9,8 +9,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
- * TODO Sprint add-item-requests.
- * <p>
  * A class of user requests for items
  * <p>
  * {@code id} ID request <br/>
