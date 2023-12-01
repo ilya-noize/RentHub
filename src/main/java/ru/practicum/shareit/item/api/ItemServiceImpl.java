@@ -21,6 +21,7 @@ import ru.practicum.shareit.item.comment.api.repository.CommentRepository;
 import ru.practicum.shareit.item.comment.entity.CommentEntity;
 import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.user.api.repository.UserRepository;
+import ru.practicum.shareit.user.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -348,7 +349,9 @@ public class ItemServiceImpl implements ItemService {
         commentSimpleDto.setText(text);
         log.info("[i] CREATE COMMENT USER_ID:{}, ITEM_ID:{}, DTO:{}", authorId, itemId, commentSimpleDto);
 
-        checkingExistUserById(authorId);
+        User author = userRepository.findById(authorId)
+                .orElseThrow(() -> new NotFoundException(
+                        format(USER_WITH_ID_NOT_EXIST, authorId)));
         checkingExistItemById(itemId);
 
         boolean notExistBooking = !bookingRepository
@@ -359,10 +362,11 @@ public class ItemServiceImpl implements ItemService {
                     format("A user with an ID:(%d) has never rented an item with an ID:(%d)",
                             authorId, itemId));
         }
+        CommentEntity comment = commentMapper.toEntity(commentSimpleDto);
+        comment.setAuthor(author);
 
         return commentMapper.toDtoRecord(
-                commentRepository.save(
-                        commentMapper.toEntity(commentSimpleDto)));
+                commentRepository.save(comment));
     }
 
     /**
