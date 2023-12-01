@@ -6,10 +6,11 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.api.dto.ItemDto;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
 import ru.practicum.shareit.item.comment.api.dto.CommentDtoRecord;
-import ru.practicum.shareit.item.comment.api.dto.CommentDtoSource;
+import ru.practicum.shareit.item.comment.api.dto.CommentSimpleDto;
 import ru.practicum.shareit.valid.group.Create;
 import ru.practicum.shareit.valid.group.Update;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static ru.practicum.shareit.ShareItApp.HEADER_USER_ID;
@@ -17,14 +18,14 @@ import static ru.practicum.shareit.ShareItApp.HEADER_USER_ID;
 @RestController
 @RequiredArgsConstructor
 public class ItemController {
-    private final ItemService service;
-
     public static final String CREATE_ITEM = "/items";
     public static final String UPDATE_ITEM = "/items/{id}";
     public static final String GET_ITEM = "/items/{id}";
+    public static final String DELETE_ITEM = "/items/{id}";
     public static final String SEARCH_ITEM = "/items/search";
     public static final String GET_ALL_ITEMS = "/items";
     public static final String CREATE_COMMENT = "/items/{id}/comment";
+    private final ItemService service;
 
     @PostMapping(CREATE_ITEM)
     public ItemDto create(
@@ -53,6 +54,14 @@ public class ItemController {
         return service.get(userId, itemId);
     }
 
+    @DeleteMapping(DELETE_ITEM)
+    public void delete(
+            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @PathVariable(name = "id") Integer itemId) {
+
+        service.delete(userId, itemId);
+    }
+
     @GetMapping(SEARCH_ITEM)
     public List<ItemSimpleDto> search(
             @RequestParam(name = "text") String textSearch) {
@@ -72,8 +81,11 @@ public class ItemController {
             @RequestHeader(HEADER_USER_ID) Integer userId,
             @PathVariable(name = "id") Integer itemId,
             @RequestBody
-            @Validated(Create.class) CommentDtoSource commentDtoSource) {
+            @Validated(Create.class) CommentSimpleDto commentSimpleDto) {
+        commentSimpleDto.setItemId(itemId);
+        commentSimpleDto.setAuthorId(userId);
+        commentSimpleDto.setCreated(LocalDateTime.now());
 
-        return service.createComment(userId, itemId, commentDtoSource);
+        return service.createComment(commentSimpleDto);
     }
 }

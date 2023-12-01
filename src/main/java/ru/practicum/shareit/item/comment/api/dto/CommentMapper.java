@@ -8,4 +8,9 @@ import ru.practicum.shareit.item.comment.entity.CommentEntity;
 public interface CommentMapper {
     @Mapping(target = "authorName", source = "entity.author.name")
     CommentDtoRecord toDtoRecord(CommentEntity entity);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "item.id", source = "dto.itemId")
+    @Mapping(target = "author.id", source = "dto.authorId")
+    CommentEntity toEntity(CommentSimpleDto dto);
 }

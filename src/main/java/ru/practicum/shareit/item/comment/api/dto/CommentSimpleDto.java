@@ -12,12 +12,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
-public class CommentDtoSource {
-    private final Integer id;
+public class CommentSimpleDto {
     @NotBlank(groups = {Create.class})
     @Size(max = 2048, groups = {Create.class})
-    private final String text;
-    private final Integer itemId;
-    private final Integer authorId;
+    private String text;
+    private Integer itemId;
+    private Integer authorId;
     private LocalDateTime created;
 }

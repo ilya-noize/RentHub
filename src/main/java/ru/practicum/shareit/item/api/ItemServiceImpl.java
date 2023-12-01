@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.api.dto.BookingMapper;
 import ru.practicum.shareit.booking.api.dto.BookingToItemDto;
 import ru.practicum.shareit.booking.api.repository.BookingRepository;
-import ru.practicum.shareit.booking.entity.Booking;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.api.dto.ItemDto;
@@ -16,13 +15,12 @@ import ru.practicum.shareit.item.api.dto.ItemMapper;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
 import ru.practicum.shareit.item.api.repository.ItemRepository;
 import ru.practicum.shareit.item.comment.api.dto.CommentDtoRecord;
-import ru.practicum.shareit.item.comment.api.dto.CommentDtoSource;
 import ru.practicum.shareit.item.comment.api.dto.CommentMapper;
+import ru.practicum.shareit.item.comment.api.dto.CommentSimpleDto;
 import ru.practicum.shareit.item.comment.api.repository.CommentRepository;
 import ru.practicum.shareit.item.comment.entity.CommentEntity;
 import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.user.api.repository.UserRepository;
-import ru.practicum.shareit.user.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -232,18 +230,22 @@ public class ItemServiceImpl implements ItemService {
                 .collect(toList());
 
         Map<Integer, BookingToItemDto> lastBookingStorage = bookingRepository
-                .findFirstByItem_IdInAndStartLessThanEqualAndStatus(
+                .findByItem_IdInAndStartLessThanEqualAndStatus(
                         itemIds, now, APPROVED, sortStartDesc)
                 .stream()
                 .map(bookingMapper::toItemDto)
-                .collect(toMap(BookingToItemDto::getItemId, Function.identity()));
+                .collect(toMap(BookingToItemDto::getItemId,
+                        Function.identity(),
+                        (first, second) -> first));
 
         Map<Integer, BookingToItemDto> nextBookingStorage = bookingRepository
-                .findFirstByItem_IdInAndStartAfterAndStatus(
+                .findByItem_IdInAndStartAfterAndStatus(
                         itemIds, now, APPROVED, sortStartAsc)
                 .stream()
                 .map(bookingMapper::toItemDto)
-                .collect(toMap(BookingToItemDto::getItemId, Function.identity()));
+                .collect(toMap(BookingToItemDto::getItemId,
+                        Function.identity(),
+                        (first, second) -> first));
 
         Map<Integer, List<CommentEntity>> commentStorage = commentRepository
                 .findByItem_IdInOrderByCreatedDesc(itemIds)
@@ -321,8 +323,7 @@ public class ItemServiceImpl implements ItemService {
         }
 
         return itemRepository
-                .findByNameContainsIgnoreCaseOrDescriptionContainsIgnoreCaseAndAvailableTrueOrderByIdAsc(
-                        searchText, searchText)
+                .searchItemByNameOrDescription(searchText)
                 .stream()
                 .map(itemMapper::toSimpleDto)
                 .collect(toList());
@@ -332,49 +333,36 @@ public class ItemServiceImpl implements ItemService {
      * Adding a comment to the subject from the user,
      * who rented it at least 1 time.
      *
-     * @param userId     User ID - Author
-     * @param itemId     Item ID
-     * @param commentDto Comment DTO Source
+     * @param commentSimpleDto Comment DTO Source
      * @return Comment DTO Record
      */
     @Transactional
     @Override
-    public CommentDtoRecord createComment(Integer userId,
-                                          Integer itemId,
-                                          CommentDtoSource commentDto) {
-        String text = commentDto.getText().trim();
+    public CommentDtoRecord createComment(CommentSimpleDto commentSimpleDto) {
+        String text = commentSimpleDto.getText().trim();
         if (text.isBlank()) {
             throw new BadRequestException("Text comment can't be blank");
         }
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(
-                        format(USER_WITH_ID_NOT_EXIST, userId)));
-        Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException(
-                        format(ITEM_WITH_ID_NOT_EXIST, itemId)));
-        List<Booking> bookings = bookingRepository
-                .findAllByItemIdAndBookerIdAndStatus(
-                        itemId, userId, APPROVED)
-                .orElseThrow(() -> new BadRequestException(
-                        format("A user with an ID:(%d) has never " +
-                                        "rented an item with an ID:(%d)",
-                                userId, itemId)));
+        Integer authorId = commentSimpleDto.getAuthorId();
+        Integer itemId = commentSimpleDto.getItemId();
+        commentSimpleDto.setText(text);
+        log.info("[i] CREATE COMMENT USER_ID:{}, ITEM_ID:{}, DTO:{}", authorId, itemId, commentSimpleDto);
 
-        bookings.stream()
-                .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
-                .findAny()
-                .orElseThrow(() -> new BadRequestException(
-                        format("User with ID:(%d) can leave a comment only after the end" +
-                                        " of the rental of the item with ID:(%d)",
-                                userId, itemId)));
-        CommentEntity comment = CommentEntity.builder()
-                .text(text)
-                .item(item)
-                .author(user)
-                .created(LocalDateTime.now()).build();
-        commentRepository.save(comment);
+        checkingExistUserById(authorId);
+        checkingExistItemById(itemId);
 
-        return commentMapper.toDtoRecord(comment);
+        boolean notExistBooking = !bookingRepository
+                .existsByItem_IdAndBooker_IdAndStatusAndEndBefore(
+                        itemId, authorId, APPROVED, LocalDateTime.now());
+        if (notExistBooking) {
+            throw new BadRequestException(
+                    format("A user with an ID:(%d) has never rented an item with an ID:(%d)",
+                            authorId, itemId));
+        }
+
+        return commentMapper.toDtoRecord(
+                commentRepository.save(
+                        commentMapper.toEntity(commentSimpleDto)));
     }
 
     /**

@@ -15,10 +15,11 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 
     @Query("select i from Item i " +
             "where ( " +
-            "upper(i.name) like upper(concat('%', ?1, '%')) or upper(i.description) like upper(concat('%', ?2, '%')) " +
+            "upper(i.name) like upper(concat('%', :search, '%')) or upper(i.description) like upper(concat('%', :search, '%')) " +
             ") and i.available = true " +
             "order by i.id")
-    List<Item> findByNameContainsIgnoreCaseOrDescriptionContainsIgnoreCaseAndAvailableTrueOrderByIdAsc(String name, String description);
+    List<Item> searchItemByNameOrDescription(
+            @Param("search") String text);
 
     @Query("select (count(i) > 0) from Item i where i.id = ?1 and i.owner.id = ?2")
     boolean existsByIdAndOwner_Id(int id, Integer id1);
