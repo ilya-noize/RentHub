@@ -1,11 +1,10 @@
 package ru.practicum.shareit.item.entity;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
+import ru.practicum.shareit.user.entity.User;
 
-import javax.validation.constraints.Positive;
+import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 /**
  * Класс Предмет.
@@ -19,26 +18,27 @@ import javax.validation.constraints.Positive;
  */
 @Builder
 @Getter
+@Setter
 @AllArgsConstructor
+@Entity
+@Table(name = "items", schema = "public")
+@NoArgsConstructor
 public class Item {
-    @Positive
-    private final int id;
-    private final String name;
-    private final String description;
-    @Getter(AccessLevel.NONE)
-    private final boolean available;
-    private final Integer userId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-    @Override
-    public String toString() {
-        return "Item{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", available=" + available +
-                ", userId=" + userId +
-                '}';
-    }
+    @Size(max = 255)
+    private String name;
+
+    @Size(max = 512)
+    private String description;
+    @Getter(AccessLevel.NONE)
+    private boolean available;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "OWNER_ID", nullable = false)
+    private User owner;
 
     public boolean isAvailable() {
         return this.available;

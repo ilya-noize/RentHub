@@ -4,13 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.shareit.exception.AccessException;
-import ru.practicum.shareit.exception.AlreadyExistsException;
-import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.*;
+import ru.practicum.shareit.exception.entity.ErrorException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -41,9 +41,9 @@ public class ExceptionController {
         logError(INTERNAL_SERVER_ERROR, message, e);
 
         return ResponseEntity
-                .internalServerError()
+                .status(INTERNAL_SERVER_ERROR)
                 .lastModified(NOW)
-                .header(message)
+                .header("Error message", message)
                 .build();
     }
 
@@ -59,9 +59,35 @@ public class ExceptionController {
         logError(BAD_REQUEST, message, e);
 
         return ResponseEntity
-                .badRequest()
+                .status(BAD_REQUEST)
                 .lastModified(NOW)
                 .header(field, message)
+                .build();
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
+    @ResponseStatus(NOT_ACCEPTABLE)
+    public ResponseEntity<?> handleHttpMediaTypeNotAcceptableException(HttpMediaTypeNotAcceptableException e) {
+        String message = e.getMessage();
+
+        logError(NOT_ACCEPTABLE, message, e);
+
+        return ResponseEntity
+                .status(406)
+                .body(new ErrorException(406, message));
+    }
+
+    @ExceptionHandler(RentalPeriodException.class)
+    @ResponseStatus(INTERNAL_SERVER_ERROR)
+    public ResponseEntity<?> handleRentalPeriodException(RentalPeriodException e) {
+        String message = e.getMessage();
+
+        logError(INTERNAL_SERVER_ERROR, message, e);
+
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .lastModified(NOW)
+                .header("Rental period", message)
                 .build();
     }
 
@@ -73,7 +99,7 @@ public class ExceptionController {
         logError(BAD_REQUEST, message, e);
 
         return ResponseEntity
-                .badRequest()
+                .status(BAD_REQUEST)
                 .lastModified(NOW)
                 .header("null", message)
                 .build();
@@ -87,7 +113,7 @@ public class ExceptionController {
         logError(NOT_FOUND, message, e);
 
         return ResponseEntity
-                .notFound()
+                .status(NOT_FOUND)
                 .lastModified(NOW)
                 .header("Not Found", message)
                 .build();
@@ -103,21 +129,46 @@ public class ExceptionController {
         return ResponseEntity
                 .status(CONFLICT)
                 .lastModified(NOW)
-                .header("Already Exists", message)
+                .header("Already exists", message)
                 .build();
     }
 
-    @ExceptionHandler(AccessException.class)
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(BAD_REQUEST)
+    public ResponseEntity<?> handleBadRequestException(BadRequestException e) {
+        String message = e.getMessage();
+
+        logError(BAD_REQUEST, message, e);
+
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .lastModified(NOW)
+                .header("Bad Request", message)
+                .build();
+    }
+
+    @ExceptionHandler(StateException.class)
+    @ResponseStatus(BAD_REQUEST)
+    public ResponseEntity<?> handleStateException(StateException e) {
+        String message = e.getMessage();
+
+        logError(INTERNAL_SERVER_ERROR, message, e);
+
+        return ResponseEntity.badRequest()
+                .body(new ErrorException(400, message));
+    }
+
+    @ExceptionHandler(BookingException.class)
     @ResponseStatus(NOT_FOUND)
-    public ResponseEntity<?> handleAccessException(AccessException e) {
+    public ResponseEntity<?> handleBookingException(BookingException e) {
         String message = e.getMessage();
 
         logError(NOT_FOUND, message, e);
 
         return ResponseEntity
-                .notFound()
+                .status(NOT_FOUND)
                 .lastModified(NOW)
-                .header("Access denied", message)
+                .header("Booking error", message)
                 .build();
     }
 }

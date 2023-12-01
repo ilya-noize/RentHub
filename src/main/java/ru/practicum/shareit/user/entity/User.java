@@ -3,6 +3,9 @@ package ru.practicum.shareit.user.entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
 
 /**
  * Class USER
@@ -11,11 +14,18 @@ import lombok.Getter;
  * {@code name} User's name <br/>
  * {@code email} User's email <br/>
  */
+
 @Builder
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "users", schema = "public")
 public class User {
-    private final Integer id;
-    private final String email;
-    private final String name;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    @Column(unique = true)
+    private String email;
+    private String name;
 }

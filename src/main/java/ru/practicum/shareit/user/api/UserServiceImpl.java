@@ -3,15 +3,17 @@ package ru.practicum.shareit.user.api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.api.CRUDRepository;
-import ru.practicum.shareit.exception.AlreadyExistsException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.api.dto.UserDto;
 import ru.practicum.shareit.user.api.dto.UserMapper;
+import ru.practicum.shareit.user.api.repository.UserRepository;
 import ru.practicum.shareit.user.entity.User;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.lang.String.format;
+import static ru.practicum.shareit.ShareItApp.USER_WITH_ID_NOT_EXIST;
 
 /**
  * DTO processing class before saving to memory
@@ -20,7 +22,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final CRUDRepository<User> repository;
+    private final UserRepository userRepository;
     private final UserMapper mapper;
 
     @Override
@@ -28,9 +30,8 @@ public class UserServiceImpl implements UserService {
         log.debug("[d] Create user {}", userDto);
 
         User user = mapper.toEntity(userDto);
-        checkUniqueEmail(user.getEmail());
 
-        return mapper.toDto(repository.create(user));
+        return mapper.toDto(userRepository.save(user));
     }
 
     /**
@@ -45,14 +46,16 @@ public class UserServiceImpl implements UserService {
     public UserDto get(Integer id) {
         log.debug("[i] get User by ID:{}", id);
         isExist(id);
-        User user = repository.get(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(
+                        format(USER_WITH_ID_NOT_EXIST, id)));
         return mapper.toDto(user);
     }
 
     @Override
     public List<UserDto> getAll() {
         log.debug("[i] get All Users");
-        return repository.getAll().stream()
+        return userRepository.findAll().stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -71,10 +74,9 @@ public class UserServiceImpl implements UserService {
     public UserDto update(Integer id, UserDto userDto) {
         log.debug("[i] update User:{} by ID:{}", userDto, id);
         isExist(id);
-        boolean checkEmail = true;
 
         userDto.setId(id);
-        User userEntity = repository.get(id);
+        User userEntity = userRepository.getReferenceById(id);
         if (userDto.getName() == null || userDto.getName().isBlank()) {
             userDto.setName(userEntity.getName());
         }
@@ -82,19 +84,11 @@ public class UserServiceImpl implements UserService {
         String email = userEntity.getEmail();
         if (userDto.getEmail() == null || userDto.getEmail().isBlank()) {
             userDto.setEmail(email);
-            checkEmail = false;
-        } else {
-            if (userDto.getEmail().equals(email)) {
-                checkEmail = false;
-            }
         }
+
         User user = mapper.toEntity(userDto);
 
-        if (checkEmail) {
-            checkUniqueEmail(user.getEmail());
-        }
-
-        user = repository.update(id, user);
+        user = userRepository.save(user);
         return mapper.toDto(user);
     }
 
@@ -102,29 +96,14 @@ public class UserServiceImpl implements UserService {
     public void delete(Integer id) {
         log.debug("[i] delete User by ID:{}", id);
         isExist(id);
-        repository.delete(id);
+        userRepository.deleteById(id);
     }
 
     private void isExist(Integer id) {
         log.debug("[i] is exist User by ID:{}", id);
-        if (!repository.isExist(id)) {
-            throw new NotFoundException(String.format("user.id(%d) is not exist!", id));
-        }
-    }
-
-    /**
-     * Checking email for uniqueness
-     * <p>
-     *
-     * @param email User
-     */
-    private void checkUniqueEmail(String email) {
-        log.debug("[i] check unique email:{} by User", email);
-        boolean isNotUnique = repository.getAll().stream()
-                .map(User::getEmail)
-                .anyMatch(eMail -> eMail.equals(email));
-        if (isNotUnique) {
-            throw new AlreadyExistsException("This email is already exists.");
+        if (!userRepository.existsById(id)) {
+            throw new NotFoundException(
+                    String.format(USER_WITH_ID_NOT_EXIST, id));
         }
     }
 }

@@ -3,7 +3,6 @@ package ru.practicum.shareit.user.api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.api.CRUDController;
 import ru.practicum.shareit.user.api.dto.UserDto;
 import ru.practicum.shareit.valid.group.Create;
 import ru.practicum.shareit.valid.group.Update;
@@ -13,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class UserController implements CRUDController<UserDto> {
+public class UserController {
     public static final String CREATE_USER = "/users";
     public static final String UPDATE_USER = "/users/{id}";
     public static final String GET_USER = "/users/{id}";
@@ -29,7 +28,6 @@ public class UserController implements CRUDController<UserDto> {
     }
 
     @PatchMapping(UPDATE_USER)
-    @Validated
     public UserDto update(
             @PathVariable @Positive Integer id,
             @RequestBody @Validated(Update.class) UserDto userDto) {

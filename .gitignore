@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+/db/shareit.mv.db
+/db/shareit.trace.db
+/branches/shareit(booking).rar
