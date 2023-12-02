@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Стол",
+    "description": "Размер: метр на 60. Высота 75.",
+    "available": true,
+    "owner": null
+  },
+  {
+    "name": "Столовые приборы",
+    "description": "Чайные, десертные, столовые ложки. Ножи. Вилки. На 6 персон.",
+    "available": true,
+    "owner": null
+  },
+  {
+    "name": "Шуруповёрт",
+    "description": "Работает от сети 220 Вольт. Кейс в комплекте.",
+    "available": true,
+    "owner": null
+  },
+  {
+    "name": "Гайковёрт",
+    "description": "В комплекте 2 аккумулятора, зарядка к ним и 3 головки на 12, 14, 16мм",
+    "available": true,
+    "owner": null
+  },
+  {
+    "name": "Разводные ключи",
+    "description": "Для сантехнических/газовых работ",
+    "available": true,
+    "owner": null
+  },
+  {
+    "name": "Набор гаечных ключей",
+    "description": "Размеры от 6мм до 20мм с шагом в мм",
+    "available": true,
+    "owner": null
+  },
+  {
+    "name": "Стол",
+    "description": "Раскладной стол. В разложенном виде размеры 1,6м Х 0,8м",
+    "available": true,
+    "owner": null
+  },
+  {
+    "name": "Стремянка",
+    "description": "3 ступеньки + площадка. Алюминиевая. Компактная",
+    "available": true,
+    "owner": null
+  },
+  {
+    "name": "Компьютер",
+    "description": "Athlon X2 250. DDR3 8Gb. Для интернета сойдёт.",
+    "available": true,
+    "owner": null
+  },
+  {
+    "name": "Акустика 200W",
+    "description": "Для презентаций или праздников",
+    "available": true,
+    "owner": null
+  }
+]
