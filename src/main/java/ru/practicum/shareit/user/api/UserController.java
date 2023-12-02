@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.api.dto.UserDto;
+import ru.practicum.shareit.user.api.dto.UserSimpleDto;
 import ru.practicum.shareit.valid.group.Create;
 import ru.practicum.shareit.valid.group.Update;
 
@@ -22,7 +23,7 @@ public class UserController {
 
     @PostMapping(CREATE_USER)
     public UserDto create(
-            @RequestBody @Validated(Create.class) UserDto userDto) {
+            @RequestBody @Validated(Create.class) UserSimpleDto userDto) {
 
         return service.create(userDto);
     }
@@ -31,8 +32,8 @@ public class UserController {
     public UserDto update(
             @PathVariable @Positive Integer id,
             @RequestBody @Validated(Update.class) UserDto userDto) {
-
-        return service.update(id, userDto);
+        userDto.setId(id);
+        return service.update(userDto);
     }
 
     @GetMapping(GET_USER)

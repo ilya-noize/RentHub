@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.api.dto.UserDto;
 import ru.practicum.shareit.user.api.dto.UserMapper;
+import ru.practicum.shareit.user.api.dto.UserSimpleDto;
 import ru.practicum.shareit.user.api.repository.UserRepository;
 import ru.practicum.shareit.user.entity.User;
 
@@ -26,7 +27,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper mapper;
 
     @Override
-    public UserDto create(UserDto userDto) {
+    public UserDto create(UserSimpleDto userDto) {
         log.debug("[d] Create user {}", userDto);
 
         User user = mapper.toEntity(userDto);
@@ -55,7 +56,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> getAll() {
         log.debug("[i] get All Users");
-        return userRepository.findAll().stream()
+        return userRepository.findAll()
+                .stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -66,12 +68,13 @@ public class UserServiceImpl implements UserService {
      *      <li> почта не указана (значение берётся из репозитория) </li>
      *      <li> почта указана и её значение совпадает со значением из репозитория </li>
      * </ul>
-     * @param id        User ID
-     * @param userDto   UserDTO from Controller
-     * @return          UserDTO for Controller
+     *
+     * @param userDto UserDTO from Controller
+     * @return UserDTO for Controller
      */
     @Override
-    public UserDto update(Integer id, UserDto userDto) {
+    public UserDto update(UserDto userDto) {
+        int id = userDto.getId();
         log.debug("[i] update User:{} by ID:{}", userDto, id);
         isExist(id);
 
@@ -86,7 +89,7 @@ public class UserServiceImpl implements UserService {
             userDto.setEmail(email);
         }
 
-        User user = mapper.toEntity(userDto);
+        User user = mapper.toEntityFromDto(userDto);
 
         user = userRepository.save(user);
         return mapper.toDto(user);
