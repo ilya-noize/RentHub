@@ -1,5 +1,6 @@
 package ru.practicum.shareit;
 
+import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -10,7 +11,9 @@ public class ShareItApp {
 	public static final String ITEM_WITH_ID_NOT_EXIST = "Item with id:(%d) not exist";
 
 	public static void main(String[] args) {
-		SpringApplication.run(ShareItApp.class, args);
+		SpringApplication application = new SpringApplication(ShareItApp.class);
+		application.setBannerMode(Banner.Mode.OFF);
+		application.run(args);
 	}
 
 }
