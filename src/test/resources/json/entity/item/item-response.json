@@ -2,5 +2,8 @@
   "id": 1,
   "name": "Стол",
   "description": "Размер: метр на 60. Высота 75.",
-  "available": true
+  "available": true,
+  "owner": {
+    "id": 1
+  }
 }
