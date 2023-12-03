@@ -10,13 +10,9 @@ import static ru.practicum.shareit.utils.ResourcePool.*;
 
 @Setter
 public class ItemInjectResources {
-    @Setter
     protected ItemSimpleDto itemDtoRequest;
-    @Setter
     protected ItemDto itemDtoResponse;
-    @Setter
     protected Item itemRequest;
-    @Setter
     protected Item itemResponse;
 
     @BeforeEach

@@ -4,70 +4,18 @@ import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.api.dto.ItemDto;
-import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
-import ru.practicum.shareit.item.entity.Item;
 
-import java.util.List;
 import java.util.Optional;
 
 import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-class ItemServiceCreateUpdateSearchTest extends ItemServiceMasterTest {
+class ItemServiceUpdateValidateTest extends ItemServiceMasterTest {
 
     public static final String USER_WITH_ID_NOT_EXIST = "User with id:(%d) not exist";
     public static final String ITEM_WITH_ID_NOT_EXIST = "Item with id:(%d) not exist";
-
-    @Test
-    void create_whenSendValidItemDto_thenReturnItemDto() {
-        final int userId = 1;
-
-        when(userRepository.existsById(userId))
-                .thenReturn(true);
-
-        when(mapper.toEntity(itemDtoRequest, userId))
-                .thenReturn(itemRequest);
-
-        when(repository.save(itemRequest))
-                .thenReturn(itemResponse);
-
-        when(mapper.toDto(itemResponse))
-                .thenReturn(itemDtoResponse);
-
-        final ItemDto itemDto = service.create(userId, itemDtoRequest);
-
-        assertEquals(itemDtoRequest.getName(), itemDto.getName());
-        assertEquals(itemDtoRequest.getDescription(), itemDto.getDescription());
-        assertNotNull(itemDto.getId());
-
-        verify(mapper, times(1))
-                .toEntity(itemDtoRequest, userId);
-        verify(repository, times(1))
-                .save(itemRequest);
-        verify(mapper, times(1))
-                .toDto(itemResponse);
-    }
-
-    @Test
-    void create_whenUserNotExists_thenReturnException() {
-        final Integer userId = 100;
-
-        when(userRepository.existsById(userId))
-                .thenReturn(false);
-
-        assertThrows(NotFoundException.class,
-                () -> service.create(userId, itemDtoRequest),
-                "User with id:(" + userId + ") not exist");
-
-        verify(mapper, never())
-                .toEntity(itemDtoRequest, userId);
-        verify(repository, never())
-                .save(itemRequest);
-        verify(mapper, never())
-                .toDto(itemResponse);
-    }
 
     @Test
     void update_whenUserNotExists_thenReturnException() {
@@ -260,41 +208,5 @@ class ItemServiceCreateUpdateSearchTest extends ItemServiceMasterTest {
         verify(repository, times(1))
                 .save(itemRequest);
 
-    }
-
-    @Test
-    void search_whenSuccessSearching_thenReturnDtoList() {
-        final String text = "Стол";
-        final ItemSimpleDto itemResponse = itemDtoRequest;
-        when(repository.searchItemByNameOrDescription(text))
-                .thenReturn(anyList());
-
-        when(mapper.toSimpleDto(itemRequest))
-                .thenReturn(itemResponse);
-
-        List<ItemSimpleDto> resultSearchList = service.search(text);
-        assertTrue(resultSearchList.isEmpty()); // todo WHY? if (size > 0) TRUE else FALSE
-
-        verify(repository, times(1))
-                .searchItemByNameOrDescription(text);
-        verify(mapper, never()) // todo if (size > 0) atLeastOnce() else never()
-                .toDto(itemRequest);
-    }
-
-    @Test
-    void search_whenFailSearching_thenReturnEmptyList() {
-        String text = "qwerty";
-        when(repository.searchItemByNameOrDescription(text))
-                .thenReturn(List.of());
-        when(mapper.toSimpleDto(any(Item.class)))
-                .thenReturn(any(ItemSimpleDto.class));
-
-        List<ItemSimpleDto> resultSearchList = service.search(text);
-        assertTrue(resultSearchList.isEmpty());
-
-        verify(repository, times(1))
-                .searchItemByNameOrDescription(text);
-        verify(mapper, never())
-                .toDto(itemRequest);
     }
 }
