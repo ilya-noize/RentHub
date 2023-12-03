@@ -68,7 +68,7 @@ public class ItemServiceImpl implements ItemService {
         checkingExistUserById(userId);
         Item item = itemRepository.save(
                 itemMapper.toEntity(itemDto, userId));
-        log.info("[i] CREATE ITEM (ID:{}) SUCCESSFUL (OWNER_ID:{})",
+        log.debug("[i] CREATE ITEM (ID:{}) SUCCESSFUL (OWNER_ID:{})",
                 item.getId(), item.getOwner().getId());
 
         return itemMapper.toDto(item);
@@ -104,7 +104,8 @@ public class ItemServiceImpl implements ItemService {
                         () -> new NotFoundException(
                                 format(ITEM_WITH_ID_NOT_EXIST, itemId)));
 
-        if (!item.getOwner().getId().equals(userId)) {
+        boolean isNotOwner = itemRepository.notExistsByIdAndOwner_Id(itemId, userId);
+        if (isNotOwner) {
             throw new BadRequestException("Editing an item is only allowed to the owner of that item.");
         }
 
@@ -298,13 +299,13 @@ public class ItemServiceImpl implements ItemService {
         checkingExistItemById(itemId);
         checkingExistUserById(userId);
 
-        boolean isNotOwnerThisItem = !itemRepository.existsByIdAndOwner_Id(itemId, userId);
+        boolean isNotOwnerThisItem = !itemRepository.notExistsByIdAndOwner_Id(itemId, userId);
         if (isNotOwnerThisItem) {
             throw new BadRequestException(
                     "Edit or remove an item is only allowed to the owner of that item.");
         }
 
-        itemRepository.deleteByIdAndOwner_Id(userId, itemId);
+        itemRepository.deleteByIdAndOwner_Id(itemId, userId);
     }
 
     /**

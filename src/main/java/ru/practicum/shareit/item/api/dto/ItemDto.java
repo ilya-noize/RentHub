@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.api.dto;
 
+import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.booking.api.dto.BookingToItemDto;
 import ru.practicum.shareit.item.comment.api.dto.CommentDtoRecord;
@@ -21,6 +22,7 @@ import java.util.List;
  */
 
 @Data
+@Builder
 public class ItemDto {
     private Integer id;
     private String name;

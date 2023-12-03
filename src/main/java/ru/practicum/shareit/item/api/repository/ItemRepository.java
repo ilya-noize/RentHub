@@ -21,13 +21,13 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
     List<Item> searchItemByNameOrDescription(
             @Param("search") String text);
 
-    @Query("select (count(i) > 0) from Item i where i.id = ?1 and i.owner.id = ?2")
-    boolean existsByIdAndOwner_Id(int id, Integer id1);
+    @Query("select (count(i) == 0) from Item i where i.id = ?1 and i.owner.id = ?2")
+    boolean notExistsByIdAndOwner_Id(int itemId, Integer ownerId);
 
     @Transactional
     @Modifying
     @Query("delete from Item i where i.id = ?1 and i.owner.id = ?2")
-    void deleteByIdAndOwner_Id(Integer ownerId, Integer itemId);
+    void deleteByIdAndOwner_Id(Integer itemId, Integer ownerId);
 
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)
