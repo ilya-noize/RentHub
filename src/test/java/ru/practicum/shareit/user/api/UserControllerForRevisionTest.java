@@ -9,7 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import ru.practicum.shareit.user.api.dto.UserDto;
 import ru.practicum.shareit.user.api.dto.UserMapper;
 import ru.practicum.shareit.user.entity.User;
@@ -31,18 +30,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see UserController
  */
 @RunWith(SpringRunner.class)
-//@SpringBootTest
-//@AutoConfigureMockMvc
 @WebMvcTest(UserController.class)
-class UserControllerTestForRevision {
-    private static MockHttpServletRequestBuilder requestBuilder;
+class UserControllerForRevisionTest {
+    //    private static MockHttpServletRequestBuilder requestBuilder;
+//    @MockBean
+//    UserService service;
     @Autowired
     private MockMvc mockMvc;
-
-    //    @Mock
-    @MockBean
-    UserService service;
-
     @MockBean
     UserMapper mapper;
 
@@ -55,11 +49,11 @@ class UserControllerTestForRevision {
                 new User(3, "user3@user.com", "user3")
         );
 
-        List<User> AllUsers = Arrays.asList(user);
+        List<User> allUsers = Arrays.asList(user);
 
-        List<UserDto> AllUsersDto = AllUsers.stream().map(mapper::toDto).collect(Collectors.toList());
+        List<UserDto> allUsersDto = allUsers.stream().map(mapper::toDto).collect(Collectors.toList());
 
-//        given(service.getAll()).willReturn(AllUsersDto);
+//        given(service.getAll()).willReturn(allUsersDto);
 
         mockMvc.perform(request(GET, "/users"))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

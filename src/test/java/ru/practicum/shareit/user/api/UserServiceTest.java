@@ -146,18 +146,19 @@ class UserServiceTest {
 
     @Test
     void get_whenGetWithNotExistId_thenReturnThrowException() {
-        when(repository.existsById(100))
+        final int userId = 100;
+        when(repository.existsById(userId))
                 .thenReturn(false);
 
         assertThrows(NotFoundException.class,
-                () -> service.get(100),
-                "User with id:(100) not exist");
+                () -> service.get(userId),
+                "User with id:(" + userId + ") not exist");
 
         verify(repository, times(1))
                 .existsById(anyInt());
-        verify(mapper, Mockito.times(0))
+        verify(mapper, never())
                 .toDto(userResponse);
-        verify(repository, times(0))
+        verify(repository, never())
                 .findById(anyInt());
     }
 
@@ -223,6 +224,8 @@ class UserServiceTest {
                 .getReferenceById(1);
         verify(mapper, times(1))
                 .toEntityFromDto(any(UserDto.class));
+        verify(repository, times(1))
+                .save(userRequest);
         verify(mapper, times(1))
                 .toDto(any(User.class));
     }
