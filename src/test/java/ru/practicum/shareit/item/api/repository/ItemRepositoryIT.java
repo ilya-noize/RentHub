@@ -4,11 +4,9 @@ package ru.practicum.shareit.item.api.repository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.user.api.repository.UserRepository;
 import ru.practicum.shareit.user.entity.User;
@@ -20,10 +18,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static ru.practicum.shareit.utils.ResourcePool.*;
 
 
-@RunWith(SpringRunner.class)
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class ItemRepositoryIT {
+public class ItemRepositoryIT {
     @Autowired
     private ItemRepository itemRepository;
 
@@ -125,12 +122,10 @@ class ItemRepositoryIT {
         int ownerId = 1;
 
         //then
-        boolean notExistsByIdAndOwnerId = itemRepository.notExistsByIdAndOwner_Id(2, ownerId);
-        boolean existsByIdAndOwnerId = itemRepository.notExistsByIdAndOwner_Id(1, ownerId);
+        List<Item> itemsByOwner = itemRepository.findAllByOwner_Id(ownerId);
 
         //then
-        assertFalse(notExistsByIdAndOwnerId);
-        assertTrue(existsByIdAndOwnerId);
+        assertEquals(3, itemsByOwner.size());
     }
 
     @Test

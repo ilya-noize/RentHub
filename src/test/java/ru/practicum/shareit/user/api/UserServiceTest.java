@@ -1,8 +1,5 @@
 package ru.practicum.shareit.user.api;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import lombok.Setter;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,9 +7,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.api.InjectResources;
 import ru.practicum.shareit.user.api.dto.UserDto;
 import ru.practicum.shareit.user.api.dto.UserMapper;
-import ru.practicum.shareit.user.api.dto.UserSimpleDto;
 import ru.practicum.shareit.user.api.repository.UserRepository;
 import ru.practicum.shareit.user.entity.User;
 
@@ -22,10 +19,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
-import static ru.practicum.shareit.utils.ResourcePool.*;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
+class UserServiceTest extends InjectResources {
 
     @InjectMocks
     private UserServiceImpl service;
@@ -33,35 +29,6 @@ class UserServiceTest {
     private UserRepository repository;
     @Mock
     private UserMapper mapper;
-
-    //    @Setter
-//    private List<UserDto> userDtoList;
-    @Setter
-    private List<User> users;
-    @Setter
-    private UserSimpleDto userDtoRequest;
-    @Setter
-    private UserDto userDtoResponse;
-
-    @Setter
-    private User userRequest;
-    @Setter
-    private User userResponse;
-
-
-    @BeforeEach
-    void setUp() {
-//        this.setUserDtoList(readResource(CREATED_USER_DTO_S,
-//                new TypeReference<List<UserDto>>() {
-//                }));
-        this.setUsers(readResource(CREATE_USER_ENTITIES,
-                new TypeReference<>() {
-                }));
-        this.setUserRequest(readResource(CREATE_USER_ENTITY_REQUEST, User.class));
-        this.setUserResponse(readResource(CREATE_USER_ENTITY_RESPONSE, User.class));
-        this.setUserDtoRequest(readResource(CREATED_USER_DTO_REQUEST, UserSimpleDto.class));
-        this.setUserDtoResponse(readResource(CREATED_USER_DTO_RESPONSE, UserDto.class));
-    }
 
     @Test
     void create_whenSendValidUserDto_thenReturnUserDto() {
@@ -87,42 +54,6 @@ class UserServiceTest {
                 .save(userRequest);
         verify(mapper, Mockito.times(1))
                 .toDto(userResponse);
-    }
-
-    /**
-     * catch SQL Exception:
-     * Unique index or primary key violation
-     * --
-     * final User userRequestTwice = userRequest;
-     * final UserSimpleDto userDtoRequestTwice = userDtoRequest;
-     * <p>
-     * when(mapper.toEntity(userDtoRequest))
-     * .thenReturn(userRequest);
-     * when(repository.save(userRequest))
-     * .thenReturn(userResponse);
-     * when(mapper.toDto(userResponse))
-     * .thenReturn(userDtoResponse);
-     * <p>
-     * when(mapper.toEntity(userDtoRequestTwice))
-     * .thenReturn(userRequestTwice);
-     * //        doThrow(IllegalArgumentException.class)
-     * //                .when(repository).save(userRequestTwice);
-     * <p>
-     * <p>
-     * System.out.println("Save 1");
-     * service.create(userDtoRequest);
-     * System.out.println("Save 2");
-     * service.create(userDtoRequestTwice);
-     * <p>
-     * assertEquals(1, service.getAll().size());
-     * <p>
-     * Mockito.verify(mapper, Mockito.times(1)).toEntity(userDtoRequest);
-     * Mockito.verify(repository, Mockito.times(1)).save(userRequest);
-     * Mockito.verify(mapper, Mockito.times(0)).toDto(userResponse);
-     **/
-    @Test
-    void create_whenSendInvalidUserDto_thenReturnValidException() {
-
     }
 
     @Test

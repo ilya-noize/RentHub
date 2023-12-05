@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.api.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.valid.group.Create;
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 public class UserSimpleDto {
     @Email(groups = {Create.class})

@@ -1,15 +1,15 @@
 package ru.practicum.shareit.item.comment.api.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import ru.practicum.shareit.valid.group.Create;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 public class CommentSimpleDto {

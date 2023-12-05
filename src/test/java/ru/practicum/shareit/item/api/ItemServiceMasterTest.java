@@ -4,23 +4,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import ru.practicum.shareit.item.api.dto.ItemMapper;
 import ru.practicum.shareit.item.api.repository.ItemRepository;
-import ru.practicum.shareit.user.api.repository.UserRepository;
 
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
-class ItemServiceMasterTest extends ItemInjectResources {
+class ItemServiceMasterTest extends InjectResources {
+
     @InjectMocks
-    protected ItemServiceImpl service;
+    protected ItemServiceImpl itemService;
     @Mock
-    protected ItemRepository repository;
+    protected ItemRepository itemRepository;
     @Mock
-    protected UserRepository userRepository;
-    @Mock
-    protected ItemMapper mapper;
+    protected ItemMapper itemMapper;
 
 }

@@ -21,7 +21,7 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
     List<Item> searchItemByNameOrDescription(
             @Param("search") String text);
 
-    @Query("select (count(i) == 0) from Item i where i.id = ?1 and i.owner.id = ?2")
+    @Query("select not(count(i) > 0) from Item i where i.id = ?1 and i.owner.id = ?2")
     boolean notExistsByIdAndOwner_Id(int itemId, Integer ownerId);
 
     @Transactional

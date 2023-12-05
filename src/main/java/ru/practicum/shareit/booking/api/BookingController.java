@@ -15,8 +15,8 @@ import static ru.practicum.shareit.ShareItApp.HEADER_USER_ID;
 @RestController
 @RequiredArgsConstructor
 public class BookingController {
-    public static final String CREATE_BOOKING_REQUEST = "/bookings";
-    public static final String APPROVE_OR_REJECT_BOOKING = "/bookings/{id}";
+    public static final String CREATE_BOOKING = "/bookings";
+    public static final String UPDATE_STATUS_BOOKING = "/bookings/{id}";
     public static final String GET_BOOKING = "/bookings/{id}";
     public static final String ALL_BOOKING_FOR_USER = "/bookings";
     public static final String ALL_BOOKING_FOR_OWNER = "/bookings/owner";
@@ -26,14 +26,14 @@ public class BookingController {
      * Запрос может быть создан любым пользователем,<br/>
      * а затем подтверждён владельцем вещи.
      */
-    @PostMapping(CREATE_BOOKING_REQUEST)
+    @PostMapping(CREATE_BOOKING)
     public BookingDtoRecord create(
             @RequestHeader(HEADER_USER_ID)
             Integer userId,
             @RequestBody
             @Valid
             BookingDto dto) {
-        log.info("Point: [{}]\nIncoming: Dto:{} UserId:{}", CREATE_BOOKING_REQUEST, dto, userId);
+        log.info("Point: [{}]\nIncoming: Dto:{} UserId:{}", CREATE_BOOKING, dto, userId);
 
         BookingDtoRecord record = service.create(userId, dto);
 
@@ -56,7 +56,7 @@ public class BookingController {
      * @param userId   user ID - Owner
      * @param approved Booking status (true = APPROVED / false = REJECTED)
      */
-    @PatchMapping(APPROVE_OR_REJECT_BOOKING)
+    @PatchMapping(UPDATE_STATUS_BOOKING)
     public BookingDtoRecord update(
             @RequestHeader(HEADER_USER_ID) Integer userId,
             @PathVariable Long id,

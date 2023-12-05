@@ -2,12 +2,14 @@ package ru.practicum.shareit.booking.api.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 import ru.practicum.shareit.booking.entity.Booking;
 
 import static org.mapstruct.InjectionStrategy.CONSTRUCTOR;
 
 @Mapper(componentModel = "spring", injectionStrategy = CONSTRUCTOR)
 public interface BookingMapper {
+    BookingMapper COPY = Mappers.getMapper(BookingMapper.class);
 
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "item.id", source = "dto.itemId")

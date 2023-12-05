@@ -1,372 +1,445 @@
 package ru.practicum.shareit.item.api;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.item.api.dto.ItemDto;
+import ru.practicum.shareit.item.api.dto.ItemMapper;
+import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
+import ru.practicum.shareit.item.api.repository.ItemRepository;
+import ru.practicum.shareit.item.entity.Item;
+import ru.practicum.shareit.user.api.repository.UserRepository;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
-class ItemServiceUpdateTest extends ItemServiceMasterTest {
+@ExtendWith(MockitoExtension.class)
+class ItemServiceUpdateTest extends InjectResources {
+    @InjectMocks
+    private ItemServiceImpl itemService;
+    @Mock
+    private ItemRepository itemRepository;
+    @Mock
+    private UserRepository userRepository;
 
     @Test
-        // N + D
-    void update_whenNameAndDescriptionNotNull_thenReturnItemDto() {
+    @DisplayName("Update Name + Description, not Available")
+    void update_whenEditNameDescription_thenReturnDto() {
+        // given
+        Item entity = itemRequest;
         final int userId = 1;
-        final int itemId = 1;
+        final int itemId = entity.getId();
 
-        String name = itemRequest.getName();
-        String description = itemRequest.getDescription();
-        //Boolean available = null;
+        final String setName = "setName";
+        final String setDescription = "setDescription";
+
+        ItemSimpleDto requestDto = ItemMapper.COPY.toSimpleDto(entity);
+
+        requestDto.setName(setName);
+        requestDto.setDescription(setDescription);
+        requestDto.setAvailable(null);
+
+        String name = requestDto.getName();
+        String description = requestDto.getDescription();
+
 
         when(userRepository.existsById(userId))
                 .thenReturn(true);
 
-        when(repository.findById(itemId))
-                .thenReturn(Optional.ofNullable(itemRequest));
+        when(itemRepository.findById(itemId))
+                .thenReturn(Optional.of(entity));
 
-        when(repository.notExistsByIdAndOwner_Id(itemId, userId))
+        when(itemRepository.notExistsByIdAndOwner_Id(itemId, userId))
                 .thenReturn(false);
 
-        doNothing().when(repository).updateNameAndDescriptionById(name, description, itemId);
+        doNothing()
+                .when(itemRepository)
+                .updateNameAndDescriptionById(
+                        anyString(),
+                        anyString(),
+                        anyInt());
+        // when
+        ItemDto response = itemService.update(userId, itemId, requestDto);
+        // then
+        assertNotEquals(response.getAvailable(), requestDto.getAvailable());
+        assertEquals(name, response.getName());
+        assertEquals(description, response.getDescription());
+        assertEquals(entity.isAvailable(), response.getAvailable());
 
-        when(mapper.toDto(itemRequest))
-                .thenReturn(itemDtoResponse);
-
-        assertEquals(itemDtoResponse, service.update(userId, itemId, itemDtoRequest));
+        assertNotNull(response.getName());
+        assertNotNull(response.getDescription());
+        assertNotNull(response.getAvailable());
 
         verify(userRepository, times(1))
                 .existsById(anyInt());
-        verify(repository, times(1))
+        verify(itemRepository, times(1))
                 .findById(anyInt());
-        verify(repository, times(1))
+        verify(itemRepository, times(1))
                 .notExistsByIdAndOwner_Id(itemId, userId);
 
-        verify(repository, never())
-                .updateNameById(name, itemId);
-        verify(repository, times(1))
-                .updateNameAndDescriptionById(name, description, itemId);
-        verify(repository, never())
-                .updateNameAndAvailableById(name, false, itemId);
-        verify(repository, never())
-                .updateDescriptionAndAvailableById(description, false, itemId);
-        verify(repository, never())
-                .updateDescriptionById(description, itemId);
-        verify(repository, never())
-                .updateAvailableById(false, itemId);
-        verify(repository, never())
-                .save(itemRequest);
+        verify(itemRepository, never())
+                .updateNameById(anyString(), anyInt());
+        verify(itemRepository, times(1))
+                .updateNameAndDescriptionById(anyString(), anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateNameAndAvailableById(anyString(), anyBoolean(), anyInt());
+        verify(itemRepository, never())
+                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyInt());
+        verify(itemRepository, never())
+                .updateDescriptionById(anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateAvailableById(anyBoolean(), anyInt());
+        verify(itemRepository, never()).save(any(Item.class));
     }
 
     @Test
-        // N + A
-    void update_whenNameAndAvailableNotNull_thenReturnItemDto() {
+    @DisplayName("Update Name + Available , not Description")
+    void update_whenEditNameAvailable_thenReturnItemDto() {
+        // given
+        Item entity = itemRequest;
         final int userId = 1;
-        final int itemId = 1;
+        final int itemId = entity.getId();
 
-        String name = itemRequest.getName();
-        String description = null;
-        boolean available = itemRequest.isAvailable();
+        final String setName = "setName";
+        final String setDescription = "";
+        final Boolean setAvailable = !entity.isAvailable();
+
+        ItemSimpleDto requestDto = ItemMapper.COPY.toSimpleDto(entity);
+
+        requestDto.setName(setName);
+        requestDto.setDescription(setDescription);
+        requestDto.setAvailable(setAvailable);
+
+        String name = requestDto.getName();
+        Boolean available = requestDto.getAvailable();
+
 
         when(userRepository.existsById(userId))
                 .thenReturn(true);
 
-        when(repository.findById(itemId))
-                .thenReturn(Optional.ofNullable(itemRequest));
+        when(itemRepository.findById(itemId))
+                .thenReturn(Optional.of(entity));
 
-        doNothing().when(repository).updateNameAndAvailableById(name, available, itemId);
+        when(itemRepository.notExistsByIdAndOwner_Id(itemId, userId))
+                .thenReturn(false);
 
-        when(mapper.toDto(itemResponse))
-                .thenReturn(itemDtoResponse);
+        doNothing()
+                .when(itemRepository)
+                .updateNameAndAvailableById(
+                        anyString(),
+                        anyBoolean(),
+                        anyInt());
+        // when
+        ItemDto response = itemService.update(userId, itemId, requestDto);
+        // then
+        assertNotEquals(response.getDescription(), requestDto.getDescription());
+        assertEquals(name, response.getName());
+        assertEquals(entity.getDescription(), response.getDescription());
+        assertEquals(available, response.getAvailable());
 
-        ItemDto result = service.update(userId, itemId, itemDtoRequest);
-        assertNotNull(result.getName());
-        assertNotNull(result.getDescription());
-        assertNotNull(result.getAvailable());
+        assertNotNull(response.getName());
+        assertNotNull(response.getDescription());
+        assertNotNull(response.getAvailable());
 
         verify(userRepository, times(1))
                 .existsById(anyInt());
-        verify(repository, times(1))
+        verify(itemRepository, times(1))
                 .findById(anyInt());
-        verify(repository, times(1))
+        verify(itemRepository, times(1))
                 .notExistsByIdAndOwner_Id(itemId, userId);
 
-        verify(repository, never())
-                .updateNameById(name, itemId);
-        verify(repository, never())
-                .updateNameAndDescriptionById(name, description, itemId);
-        verify(repository, times(1))
-                .updateNameAndAvailableById(name, available, itemId);
-        verify(repository, never())
-                .updateDescriptionAndAvailableById(description, available, itemId);
-        verify(repository, never())
-                .updateDescriptionById(description, itemId);
-        verify(repository, never())
-                .updateAvailableById(available, itemId);
-        verify(repository, never())
-                .save(itemRequest);
-
+        verify(itemRepository, never())
+                .updateNameById(anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateNameAndDescriptionById(anyString(), anyString(), anyInt());
+        verify(itemRepository, times(1))
+                .updateNameAndAvailableById(anyString(), anyBoolean(), anyInt());
+        verify(itemRepository, never())
+                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyInt());
+        verify(itemRepository, never())
+                .updateDescriptionById(anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateAvailableById(anyBoolean(), anyInt());
+        verify(itemRepository, never()).save(any(Item.class));
     }
 
     @Test
-        // N
-    void update_whenNameNotNull_thenReturnItemDto() {
+    @DisplayName("Update Name , not Description + Available")
+    void update_whenEditName_thenReturnItemDto() {
+        // given
+        Item entity = itemRequest;
         final int userId = 1;
-        final int itemId = 1;
+        final int itemId = entity.getId();
+        final String setName = "setName";
+        final String setDescription = "";
 
-        String name = itemRequest.getName();
-        //String description = null;
-        //Boolean available = null;
+        ItemSimpleDto requestDto = ItemMapper.COPY.toSimpleDto(entity);
+        requestDto.setName(setName);
+        requestDto.setDescription(setDescription);
+        requestDto.setAvailable(null);
+
+        String name = requestDto.getName();
 
         when(userRepository.existsById(userId))
                 .thenReturn(true);
 
-        when(repository.findById(itemId))
-                .thenReturn(Optional.ofNullable(itemRequest));
+        when(itemRepository.findById(itemId))
+                .thenReturn(Optional.of(entity));
 
-        doNothing().when(repository).updateNameById(name, itemId);
+        when(itemRepository.notExistsByIdAndOwner_Id(itemId, userId))
+                .thenReturn(false);
 
-        when(mapper.toDto(itemResponse))
-                .thenReturn(itemDtoResponse);
+        doNothing()
+                .when(itemRepository)
+                .updateNameById(
+                        anyString(),
+                        anyInt());
+        // when
+        ItemDto response = itemService.update(userId, itemId, requestDto);
+        // then
+        assertNotEquals(response.getDescription(), requestDto.getDescription());
+        assertNotEquals(response.getAvailable(), requestDto.getAvailable());
+        assertEquals(name, response.getName());
+        assertEquals(entity.getDescription(), response.getDescription());
+        assertEquals(entity.isAvailable(), response.getAvailable());
 
-        ItemDto result = service.update(userId, itemId, itemDtoRequest);
-        assertNotNull(result.getName());
-        assertNotNull(result.getDescription());
-        assertNotNull(result.getAvailable());
+        assertNotNull(response.getName());
+        assertNotNull(response.getDescription());
+        assertNotNull(response.getAvailable());
 
         verify(userRepository, times(1))
                 .existsById(anyInt());
-        verify(repository, times(1))
+        verify(itemRepository, times(1))
                 .findById(anyInt());
-        verify(repository, times(1))
+        verify(itemRepository, times(1))
                 .notExistsByIdAndOwner_Id(itemId, userId);
 
-        verify(repository, times(1))
-                .updateNameById(name, itemId);
-        verify(repository, never())
-                .updateNameAndDescriptionById(name, "description", itemId);
-        verify(repository, never())
-                .updateNameAndAvailableById(name, false, itemId);
-        verify(repository, never())
-                .updateDescriptionAndAvailableById("description", false, itemId);
-        verify(repository, never())
-                .updateDescriptionById("description", itemId);
-        verify(repository, never())
-                .updateAvailableById(false, itemId);
-        verify(repository, never())
-                .save(itemRequest);
-
+        verify(itemRepository, times(1))
+                .updateNameById(anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateNameAndDescriptionById(anyString(), anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateNameAndAvailableById(anyString(), anyBoolean(), anyInt());
+        verify(itemRepository, never())
+                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyInt());
+        verify(itemRepository, never())
+                .updateDescriptionById(anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateAvailableById(anyBoolean(), anyInt());
+        verify(itemRepository, never()).save(any(Item.class));
     }
 
     @Test
-        // D + A
-    void update_whenDescriptionAndAvailableNotNull_thenReturnItemDto() {
+    @DisplayName("Update Description + Available, not Name")
+    void update_whenEditDescriptionAvailable_thenReturnDto() {
+        // given
+        Item entity = itemRequest;
         final int userId = 1;
-        final int itemId = 1;
+        final int itemId = entity.getId();
 
-        String name = null;
-        String description = itemRequest.getDescription();
-        boolean available = itemRequest.isAvailable();
+        final String setName = "";
+        final String setDescription = "setDescription";
+        final Boolean setAvailable = !entity.isAvailable();
+
+        ItemSimpleDto requestDto = ItemMapper.COPY.toSimpleDto(entity);
+
+        requestDto.setName(setName);
+        requestDto.setDescription(setDescription);
+        requestDto.setAvailable(setAvailable);
+
+        String description = requestDto.getDescription();
+        Boolean available = requestDto.getAvailable();
+
 
         when(userRepository.existsById(userId))
                 .thenReturn(true);
 
-        when(repository.findById(itemId))
-                .thenReturn(Optional.ofNullable(itemRequest));
+        when(itemRepository.findById(itemId))
+                .thenReturn(Optional.of(entity));
 
-        doNothing().when(repository).updateDescriptionAndAvailableById(description, available, itemId);
+        when(itemRepository.notExistsByIdAndOwner_Id(itemId, userId))
+                .thenReturn(false);
 
-        when(mapper.toDto(itemResponse))
-                .thenReturn(itemDtoResponse);
+        doNothing()
+                .when(itemRepository)
+                .updateDescriptionAndAvailableById(
+                        anyString(),
+                        anyBoolean(),
+                        anyInt());
+        // when
+        ItemDto response = itemService.update(userId, itemId, requestDto);
+        // then
+        assertNotEquals(response.getName(), requestDto.getName());
+        assertEquals(entity.getName(), response.getName());
+        assertEquals(description, response.getDescription());
+        assertEquals(available, response.getAvailable());
 
-        ItemDto result = service.update(userId, itemId, itemDtoRequest);
-        assertNotNull(result.getName());
-        assertNotNull(result.getDescription());
-        assertNotNull(result.getAvailable());
+        assertNotNull(response.getName());
+        assertNotNull(response.getDescription());
+        assertNotNull(response.getAvailable());
 
         verify(userRepository, times(1))
                 .existsById(anyInt());
-        verify(repository, times(1))
+        verify(itemRepository, times(1))
                 .findById(anyInt());
-        verify(repository, times(1))
+        verify(itemRepository, times(1))
                 .notExistsByIdAndOwner_Id(itemId, userId);
 
-        verify(repository, never())
-                .updateNameById(name, itemId);
-        verify(repository, never())
-                .updateNameAndDescriptionById(name, description, itemId);
-        verify(repository, never())
-                .updateNameAndAvailableById(name, available, itemId);
-        verify(repository, times(1))
-                .updateDescriptionAndAvailableById(description, available, itemId);
-        verify(repository, never())
-                .updateDescriptionById(description, itemId);
-        verify(repository, never())
-                .updateAvailableById(available, itemId);
-        verify(repository, never())
-                .save(itemRequest);
+        verify(itemRepository, never())
+                .updateNameById(anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateNameAndDescriptionById(anyString(), anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateNameAndAvailableById(anyString(), anyBoolean(), anyInt());
+        verify(itemRepository, times(1))
+                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyInt());
+        verify(itemRepository, never())
+                .updateDescriptionById(anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateAvailableById(anyBoolean(), anyInt());
+        verify(itemRepository, never()).save(any(Item.class));
     }
 
     @Test
-        // D
-    void update_whenDescriptionNotNull_thenReturnItemDto() {
+    @DisplayName("Update Description, not Name + Available")
+    void update_whenEditDescription_thenReturnDto() {
+        // given
+        Item entity = itemRequest;
         final int userId = 1;
-        final int itemId = 1;
+        final int itemId = entity.getId();
 
-        //String name = null;
-        String description = itemRequest.getDescription();
-        //Boolean available = null;
+        final String setName = "";
+        final String setDescription = "setDescription";
+
+        ItemSimpleDto requestDto = ItemMapper.COPY.toSimpleDto(entity);
+
+        requestDto.setName(setName);
+        requestDto.setDescription(setDescription);
+        requestDto.setAvailable(null);
+
+        String description = requestDto.getDescription();
 
         when(userRepository.existsById(userId))
                 .thenReturn(true);
 
-        when(repository.findById(itemId))
-                .thenReturn(Optional.ofNullable(itemRequest));
+        when(itemRepository.findById(itemId))
+                .thenReturn(Optional.of(entity));
 
-        doNothing().when(repository).updateDescriptionById(description, itemId);
+        when(itemRepository.notExistsByIdAndOwner_Id(itemId, userId))
+                .thenReturn(false);
 
-        when(mapper.toDto(itemResponse))
-                .thenReturn(itemDtoResponse);
+        doNothing()
+                .when(itemRepository)
+                .updateDescriptionById(
+                        anyString(),
+                        anyInt());
+        // when
+        ItemDto response = itemService.update(userId, itemId, requestDto);
+        // then
+        assertNotEquals(response.getName(), requestDto.getName());
+        assertNotEquals(response.getAvailable(), requestDto.getAvailable());
+        assertEquals(entity.getName(), response.getName());
+        assertEquals(description, response.getDescription());
+        assertEquals(entity.isAvailable(), response.getAvailable());
 
-        ItemDto result = service.update(userId, itemId, itemDtoRequest);
-        assertNotNull(result.getName());
-        assertNotNull(result.getDescription());
-        assertNotNull(result.getAvailable());
+        assertNotNull(response.getName());
+        assertNotNull(response.getDescription());
+        assertNotNull(response.getAvailable());
 
         verify(userRepository, times(1))
                 .existsById(anyInt());
-        verify(repository, times(1))
+        verify(itemRepository, times(1))
                 .findById(anyInt());
-        verify(repository, times(1))
+        verify(itemRepository, times(1))
                 .notExistsByIdAndOwner_Id(itemId, userId);
 
-        verify(repository, never())
-                .updateNameById("name", itemId);
-        verify(repository, never())
-                .updateNameAndDescriptionById("name", description, itemId);
-        verify(repository, never())
-                .updateNameAndAvailableById("name", false, itemId);
-        verify(repository, never())
-                .updateDescriptionAndAvailableById(description, false, itemId);
-        verify(repository, times(1))
-                .updateDescriptionById(description, itemId);
-        verify(repository, never())
-                .updateAvailableById(false, itemId);
-        verify(repository, never())
-                .save(itemRequest);
+        verify(itemRepository, never())
+                .updateNameById(anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateNameAndDescriptionById(anyString(), anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateNameAndAvailableById(anyString(), anyBoolean(), anyInt());
+        verify(itemRepository, never())
+                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyInt());
+        verify(itemRepository, times(1))
+                .updateDescriptionById(anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateAvailableById(anyBoolean(), anyInt());
+        verify(itemRepository, never()).save(any(Item.class));
     }
 
     @Test
-        // A
-    void update_whenAvailableNotNull_thenReturnItemDto() {
+    @DisplayName("Update Available, not Name + Description")
+    void update_whenEditAvailable_thenReturnDto() {
+        // given
+        Item entity = itemRequest;
         final int userId = 1;
-        final int itemId = 1;
+        final int itemId = entity.getId();
 
-        String name = null;
-        String description = null;
-        boolean available = itemRequest.isAvailable();
+        final String setName = "";
+        final String setDescription = "";
+        final Boolean setAvailable = !entity.isAvailable();
+
+        ItemSimpleDto requestDto = ItemMapper.COPY.toSimpleDto(entity);
+
+        requestDto.setName(setName);
+        requestDto.setDescription(setDescription);
+        requestDto.setAvailable(setAvailable);
+
+        Boolean available = requestDto.getAvailable();
 
         when(userRepository.existsById(userId))
                 .thenReturn(true);
 
-        when(repository.findById(itemId))
-                .thenReturn(Optional.ofNullable(itemRequest));
+        when(itemRepository.findById(itemId))
+                .thenReturn(Optional.of(entity));
 
+        when(itemRepository.notExistsByIdAndOwner_Id(itemId, userId))
+                .thenReturn(false);
 
-//        doNothing().when(repository).updateNameById(name, itemId);
-//        doNothing().when(repository).updateNameAndDescriptionById(name, description, itemId);
-//        doNothing().when(repository).updateNameAndAvailableById(name, available, itemId);
-//        doNothing().when(repository).updateDescriptionById(description, itemId);
-//        doNothing().when(repository).updateDescriptionAndAvailableById(description, available, itemId);
-        doNothing().when(repository).updateAvailableById(available, itemId);
-//        when(repository.save(itemRequest))
-//                .thenReturn(itemResponse);
-        when(mapper.toDto(itemResponse))
-                .thenReturn(itemDtoResponse);
+        doNothing()
+                .when(itemRepository)
+                .updateAvailableById(
+                        anyBoolean(),
+                        anyInt());
+        // when
+        ItemDto response = itemService.update(userId, itemId, requestDto);
+        // then
+        assertNotEquals(response.getName(), requestDto.getName());
+        assertNotEquals(response.getDescription(), requestDto.getDescription());
+        assertEquals(entity.getName(), response.getName());
+        assertEquals(entity.getDescription(), response.getDescription());
+        assertEquals(available, response.getAvailable());
 
-        ItemDto result = service.update(userId, itemId, itemDtoRequest);
-        assertNotNull(result.getName());
-        assertNotNull(result.getDescription());
-        assertNotNull(result.getAvailable());
+        assertNotNull(response.getName());
+        assertNotNull(response.getDescription());
+        assertNotNull(response.getAvailable());
 
         verify(userRepository, times(1))
                 .existsById(anyInt());
-        verify(repository, times(1))
+        verify(itemRepository, times(1))
                 .findById(anyInt());
-        verify(repository, times(1))
+        verify(itemRepository, times(1))
                 .notExistsByIdAndOwner_Id(itemId, userId);
 
-        verify(repository, never())
-                .updateNameById(name, itemId);
-        verify(repository, never())
-                .updateNameAndDescriptionById(name, description, itemId);
-        verify(repository, never())
-                .updateNameAndAvailableById(name, available, itemId);
-        verify(repository, never())
-                .updateDescriptionAndAvailableById(description, available, itemId);
-        verify(repository, never())
-                .updateDescriptionById(description, itemId);
-        verify(repository, times(1))
-                .updateAvailableById(available, itemId);
-        verify(repository, never())
-                .save(itemRequest);
+        verify(itemRepository, never())
+                .updateNameById(anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateNameAndDescriptionById(anyString(), anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateNameAndAvailableById(anyString(), anyBoolean(), anyInt());
+        verify(itemRepository, never())
+                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyInt());
+        verify(itemRepository, never())
+                .updateDescriptionById(anyString(), anyInt());
+        verify(itemRepository, times(1))
+                .updateAvailableById(anyBoolean(), anyInt());
+        verify(itemRepository, never()).save(any(Item.class));
     }
-
-// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-//    @Test
-//    void update_TEMPLATE() {
-//        final int userId = 1;
-//        final int itemId = 1;
-//
-//        String name = itemRequest.getName();
-//        String description = itemRequest.getDescription();
-//        boolean available = itemRequest.isAvailable();
-//
-//        when(userRepository.existsById(userId))
-//                .thenReturn(true);
-//
-//        when(repository.findById(itemId))
-//                .thenReturn(Optional.ofNullable(itemRequest));
-//
-////        doNothing().when(repository).updateNameById(name, itemId);
-////        doNothing().when(repository).updateNameAndDescriptionById(name, description, itemId);
-////        doNothing().when(repository).updateNameAndAvailableById(name, available, itemId);
-////        doNothing().when(repository).updateDescriptionById(description, itemId);
-////        doNothing().when(repository).updateDescriptionAndAvailableById(description, available, itemId);
-////        doNothing().when(repository).updateAvailableById(available, itemId);
-////        when(repository.save(itemRequest))
-////                .thenReturn(itemResponse);
-//        when(mapper.toDto(itemResponse))
-//                .thenReturn(itemDtoResponse);
-//
-//        ItemDto result = service.update(userId, itemId, itemDtoRequest);
-//        assertNotNull(result.getName());
-//        assertNotNull(result.getDescription());
-//        assertNotNull(result.getAvailable());
-//
-//        verify(userRepository, times(1))
-//                .existsById(anyInt());
-//        verify(repository, times(1))
-//                .findById(anyInt());
-//        verify(repository, times(1))
-//                .notExistsByIdAndOwner_Id(itemId, userId);
-//
-//        verify(repository, never())
-//                .updateNameById(name, itemId);
-//        verify(repository, never())
-//                .updateNameAndDescriptionById(name, description, itemId);
-//        verify(repository, never())
-//                .updateNameAndAvailableById(name, available, itemId);
-//        verify(repository, never())
-//                .updateDescriptionAndAvailableById(description, available, itemId);
-//        verify(repository, never())
-//                .updateDescriptionById(description, itemId);
-//        verify(repository, never())
-//                .updateAvailableById(available, itemId);
-//        verify(repository, never())
-//                .save(itemRequest);
-//    }
 }
