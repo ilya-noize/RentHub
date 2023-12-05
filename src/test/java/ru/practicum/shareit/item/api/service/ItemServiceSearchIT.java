@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.api;
+package ru.practicum.shareit.item.api.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
 import ru.practicum.shareit.user.api.UserService;
 import ru.practicum.shareit.user.api.dto.UserDto;
+import ru.practicum.shareit.utils.InjectResources;
 
 import java.util.List;
 

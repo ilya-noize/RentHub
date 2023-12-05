@@ -10,13 +10,13 @@ import java.time.LocalDateTime;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
-@Entity
-@Table(name = "bookings", schema = "public")
 @Builder
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
+@Table(name = "bookings", schema = "public")
 public class Booking {
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -42,4 +42,14 @@ public class Booking {
     @Column(nullable = false,
             length = 16)
     private BookingStatus status;
+
+    @Override
+    public String toString() {
+        return "Booking{" +
+                "id=" + id +
+                ", start=" + start +
+                ", end=" + end +
+                ", status=" + status +
+                '}';
+    }
 }

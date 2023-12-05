@@ -1,42 +1,71 @@
 package ru.practicum.shareit.user.api.dto;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import ru.practicum.shareit.user.entity.User;
+import ru.practicum.shareit.utils.InjectResources;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Not worked
  * NPE when running userMapper;
  */
 
-//todo @ExtendWith() ?
-class UserMapperTestIT {
+@SpringBootTest
+class UserMapperTestIT extends InjectResources {
 
     @Autowired
     private UserMapper userMapper;
 
-    @BeforeEach
-    void setUp() {
-
-    }
 
     @Test
     void givenUserToUserDto_whenMaps_thenCorrect() {
-//        User user = new User(1, "user@user.com", "user");
-//
-//        UserDto userDto = userMapper.toDto(user);//NPE
-//
-//        assertEquals(user.getName(), userDto.getName());
-//        assertEquals(user.getEmail(), userDto.getEmail());
+        User user = userStorage.get(1);
+
+        UserDto response = userMapper.toDto(user);
+
+        assertEquals(response.getId(), user.getId());
+        assertEquals(response.getName(), user.getName());
+        assertEquals(response.getEmail(), user.getEmail());
     }
 
     @Test
-    void givenUserDtotoUser_whenMaps_thenCorrect() {
-//        UserDto userDto = new UserDto(1, "user@user.com", "user");
-//
-//        User user = userMapper.toEntity(userDto);//NPE
-//
-//        assertEquals(userDto.getName(), user.getName());
-//        assertEquals(userDto.getEmail(), user.getEmail());
+    void givenUserDtoToUser_whenMaps_thenCorrect() {
+        User user = userStorage.get(1);
+
+        UserDto request = userMapper.toDto(user);
+        User response = userMapper.toEntityFromDto(request);
+
+        assertEquals(response.getId(), request.getId());
+        assertEquals(response.getName(), request.getName());
+        assertEquals(response.getEmail(), request.getEmail());
+    }
+
+    @Test
+    void givenUserSimpleDtoToUser_whenMaps_thenCorrect() {
+        User user = userStorage.get(1);
+        UserSimpleDto request = new UserSimpleDto(user.getEmail(), user.getName());
+
+        User response = userMapper.toEntity(request);
+
+        assertNull(response.getId());
+        assertEquals(response.getEmail(), request.getEmail());
+        assertEquals(response.getName(), request.getName());
+    }
+
+
+    @Test
+    void toEntityFromDto_whenMaps_thenThrow() {
+        User user = null;
+
+        UserDto request = userMapper.toDto(user);
+
+        User response = userMapper.toEntityFromDto(request);
+
+        assertNull(request);
+        assertNull(response);
     }
 }

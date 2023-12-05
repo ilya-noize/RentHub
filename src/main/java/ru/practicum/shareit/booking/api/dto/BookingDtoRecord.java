@@ -26,7 +26,7 @@ public final class BookingDtoRecord {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    static
+    public static
     class ItemDto {
         private Integer id;
         private String name;
@@ -35,7 +35,7 @@ public final class BookingDtoRecord {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    static
+    public static
     class BookerDto {
         private Integer id;
     }

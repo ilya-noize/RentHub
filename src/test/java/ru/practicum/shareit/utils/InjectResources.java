@@ -1,8 +1,6 @@
-package ru.practicum.shareit.item.api;
+package ru.practicum.shareit.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import lombok.Getter;
-import lombok.Setter;
 import org.junit.jupiter.api.BeforeEach;
 import ru.practicum.shareit.item.api.dto.ItemDto;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
@@ -12,18 +10,21 @@ import ru.practicum.shareit.user.api.dto.UserSimpleDto;
 import ru.practicum.shareit.user.entity.User;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
+import static java.util.stream.Collectors.toMap;
 import static ru.practicum.shareit.utils.ResourcePool.*;
 
-@Setter
-@Getter
 public class InjectResources {
+
+    protected Map<Integer, User> userStorage;
     protected List<User> users;
     protected List<Item> items;
     protected List<UserDto> userDtoList;
 
-    protected User userRequest;
-    protected User userResponse;
+    protected User userRequest = readResource(CREATE_USER_ENTITY_REQUEST, User.class);
+    protected User userResponse = readResource(CREATE_USER_ENTITY_RESPONSE, User.class);
 
     protected Item itemRequest;
     protected Item itemResponse;
@@ -43,6 +44,11 @@ public class InjectResources {
         });
         items = readResource(CREATE_ITEM_ENTITIES, new TypeReference<>() {
         });
+
+        userStorage = users.stream()
+                .collect(toMap(User::getId,
+                        Function.identity(),
+                        (first, second) -> first));
         userDtoList = readResource(CREATED_USER_DTO_S, new TypeReference<>() {
         });
 

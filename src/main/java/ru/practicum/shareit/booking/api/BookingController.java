@@ -7,6 +7,7 @@ import ru.practicum.shareit.booking.api.dto.BookingDto;
 import ru.practicum.shareit.booking.api.dto.BookingDtoRecord;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static ru.practicum.shareit.ShareItApp.HEADER_USER_ID;
@@ -97,7 +98,8 @@ public class BookingController {
 
         return service.getAllByUser(
                 bookerId,
-                state.toUpperCase());
+                state.toUpperCase(),
+                LocalDateTime.now());
     }
 
     /**
@@ -114,6 +116,7 @@ public class BookingController {
 
         return service.getAllByOwner(
                 ownerId,
-                state.toUpperCase());
+                state.toUpperCase(),
+                LocalDateTime.now());
     }
 }

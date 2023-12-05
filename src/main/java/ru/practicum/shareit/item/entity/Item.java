@@ -7,22 +7,23 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 
 /**
- * Класс Предмет.
+ * {@link Item}Класс Предмет.
  * <p>
- * {@code id} ID Item <br/>
- * {@code name} Item's name <br/>
- * {@code description} Item's description <br/>
- * {@code available} Item Availability <br/>
- * {@code owner} The owner of the item <br/>
- * {@code request} Request for this item for the user, if there was one <br/>
+ * {@link Item#id} ID Item <br/>
+ * {@link Item#name} Item's name <br/>
+ * {@link Item#description} Item's description <br/>
+ * {@link Item#available} Item Availability <br/>
+ * {@link Item#owner} The owner of the item <br/>
+ * {@link } Request for this item for the user, if there was one <br/>
  */
+
 @Builder
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "items", schema = "public")
-@NoArgsConstructor
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,6 +43,15 @@ public class Item {
 
     public boolean isAvailable() {
         return this.available;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" +
+                "id = " + id + ", " +
+                "name = " + name + ", " +
+                "description = " + description + ", " +
+                "available = " + available + ")";
     }
 }
 

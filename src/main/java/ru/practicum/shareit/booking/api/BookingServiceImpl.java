@@ -21,6 +21,7 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static ru.practicum.shareit.ShareItApp.*;
 import static ru.practicum.shareit.booking.entity.enums.BookingStatus.*;
 
 @Service
@@ -38,8 +39,7 @@ public class BookingServiceImpl implements BookingService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(
                         () -> new NotFoundException(
-                                format("Item with id:%s not found.",
-                                        itemId)));
+                                format(ITEM_WITH_ID_NOT_EXIST, itemId)));
 
         if (!item.isAvailable()) {
             throw new BadRequestException("It is impossible to rent "
@@ -49,8 +49,7 @@ public class BookingServiceImpl implements BookingService {
         User booker = userRepository.findById(bookerId)
                 .orElseThrow(
                         () -> new NotFoundException(
-                                format("User with id:%s not found.",
-                                        bookerId)));
+                                format(USER_WITH_ID_NOT_EXIST, bookerId)));
 
         boolean bookerIsOwnerTheItem = bookerId.equals(item.getOwner().getId());
 
@@ -105,8 +104,7 @@ public class BookingServiceImpl implements BookingService {
         booking = bookingRepository.findById(bookingId)
                 .orElseThrow(
                         () -> new NotFoundException(
-                                format("Booking with ID: %d not found",
-                                        bookingId)));
+                                format(BOOKING_WITH_ID_NOT_EXIST, bookingId)));
 
         isNotWaitingStatus = !WAITING.equals(booking.getStatus());
         if (isNotWaitingStatus) {
@@ -116,8 +114,7 @@ public class BookingServiceImpl implements BookingService {
         isNotExistUser = !userRepository.existsById(ownerId);
         if (isNotExistUser) {
             throw new NotFoundException(
-                    format("User with ID: %d not found",
-                            ownerId));
+                    format(USER_WITH_ID_NOT_EXIST, ownerId));
         }
 
         bookerId = booking.getBooker().getId();
@@ -191,12 +188,12 @@ public class BookingServiceImpl implements BookingService {
      *
      * @param bookerId user ID
      * @param stateIn  Фильтр поиска
+     * @param now      Точное время
      * @return Список бронирования
      */
     @Override
-    public List<BookingDtoRecord> getAllByUser(Integer bookerId, String stateIn) {
+    public List<BookingDtoRecord> getAllByUser(Integer bookerId, String stateIn, LocalDateTime now) {
         List<Booking> bookingList;
-        LocalDateTime now = LocalDateTime.now();
 
         BookingFilterByTemplate state =
                 checkingInputParametersAndReturnEnumBookingFilterByTemplate(bookerId, stateIn);
@@ -238,7 +235,7 @@ public class BookingServiceImpl implements BookingService {
             Integer userId, String stateIn) {
 
         if (!userRepository.existsById(userId)) {
-            throw new NotFoundException(format("User with id:%s not found.", userId));
+            throw new NotFoundException(format(USER_WITH_ID_NOT_EXIST, userId));
         }
         try {
             return Enum.valueOf(BookingFilterByTemplate.class, stateIn);
@@ -261,12 +258,12 @@ public class BookingServiceImpl implements BookingService {
      *
      * @param ownerId user ID
      * @param stateIn Фильтр поиска
+     * @param now     Точное время
      * @return Список бронирования
      */
     @Override
-    public List<BookingDtoRecord> getAllByOwner(Integer ownerId, String stateIn) {
+    public List<BookingDtoRecord> getAllByOwner(Integer ownerId, String stateIn, LocalDateTime now) {
         List<Booking> bookingList;
-        LocalDateTime now = LocalDateTime.now();
 
         BookingFilterByTemplate state =
                 checkingInputParametersAndReturnEnumBookingFilterByTemplate(ownerId, stateIn);

@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.api;
+package ru.practicum.shareit.item.api.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -77,9 +77,9 @@ public class ItemServiceImpl implements ItemService {
      * <p>
      * Restrictions: only the owner of the item can edit it! <br/>
      * <ul>Partial editing is allowed:
-     *     <li>Name</li>
-     *     <li>Description</li>
-     *     <li>Visibility for all users</li>
+     *     <li>{@link ItemDto#name} Name</li>
+     *     <li>{@link ItemDto#description} Description</li>
+     *     <li>{@link ItemDto#available} Visibility for all users</li>
      * </ul>
      *
      * @param userId  Идентификатор владелец предмета

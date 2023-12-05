@@ -1,10 +1,11 @@
-package ru.practicum.shareit.item.api;
+package ru.practicum.shareit.item.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.api.dto.ItemDto;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
+import ru.practicum.shareit.item.api.service.ItemService;
 import ru.practicum.shareit.item.comment.api.dto.CommentDtoRecord;
 import ru.practicum.shareit.item.comment.api.dto.CommentSimpleDto;
 import ru.practicum.shareit.valid.group.Create;

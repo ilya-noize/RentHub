@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.api;
+package ru.practicum.shareit.item.api.service;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +12,7 @@ import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
 import ru.practicum.shareit.item.api.repository.ItemRepository;
 import ru.practicum.shareit.user.api.UserService;
 import ru.practicum.shareit.user.api.dto.UserDto;
+import ru.practicum.shareit.utils.InjectResources;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +82,8 @@ class ItemServiceIT extends InjectResources {
                 InvalidDataAccessApiUsageException.class,
                 () -> itemService.create(userId, itemDtoRequest));
         //then
-        assertTrue(requireNonNull(e.getMessage()).contains("The given id must not be null!"));
+        assertTrue(requireNonNull(e.getMessage())
+                .contains("The given id must not be null!"));
     }
 
     @Test
@@ -257,8 +259,6 @@ class ItemServiceIT extends InjectResources {
         final Integer unknown = -1;
 
         // when
-//        itemService.delete(userIds.get(0), itemsByUser1.get(1).getId());
-//        itemService.delete(userIds.get(1), itemsByUser2.get(1).getId());
         NotFoundException notFoundUser = assertThrows(NotFoundException.class,
                 () -> itemService.delete(unknown, itemIdsByUser1.get(0)));
         NotFoundException notFoundItem = assertThrows(NotFoundException.class,

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.api;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -7,98 +8,126 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.api.InjectResources;
 import ru.practicum.shareit.user.api.dto.UserDto;
 import ru.practicum.shareit.user.api.dto.UserMapper;
 import ru.practicum.shareit.user.api.repository.UserRepository;
 import ru.practicum.shareit.user.entity.User;
+import ru.practicum.shareit.utils.InjectResources;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toMap;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
+import static ru.practicum.shareit.ShareItApp.LOGGING_IS_NEEDED_IN_TEST;
+import static ru.practicum.shareit.ShareItApp.USER_WITH_ID_NOT_EXIST;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest extends InjectResources {
 
+    Map<Integer, User> userStorage;
     @InjectMocks
-    private UserServiceImpl service;
+    private UserServiceImpl userService;
     @Mock
-    private UserRepository repository;
+    private UserRepository userRepository;
     @Mock
-    private UserMapper mapper;
+    private UserMapper userMapper;
+
+    @BeforeEach
+    void createsEnvironmentObjects() {
+
+        if (users.isEmpty()) {
+            throw new RuntimeException("No Users.");
+        }
+
+        if (LOGGING_IS_NEEDED_IN_TEST) {
+            System.out.println("- ".repeat(40));
+            for (User u : users) {
+                System.out.printf("User:[%d]\t%s%n", u.getId(), u);
+            }
+        }
+
+        userStorage = users.stream()
+                .collect(toMap(User::getId,
+                        Function.identity(),
+                        (first, second) -> first));
+    }
 
     @Test
     void create_whenSendValidUserDto_thenReturnUserDto() {
 
-        when(mapper.toEntity(userDtoRequest))
+        when(userMapper.toEntity(userDtoRequest))
                 .thenReturn(userRequest);
 
-        when(repository.save(userRequest))
+        when(userRepository.save(userRequest))
                 .thenReturn(userResponse);
 
-        when(mapper.toDto(userResponse))
+        when(userMapper.toDto(userResponse))
                 .thenReturn(userDtoResponse);
 
-        final UserDto userDto = service.create(userDtoRequest);
+        final UserDto userDto = userService.create(userDtoRequest);
 
         assertEquals(userDtoRequest.getEmail(), userDto.getEmail());
         assertEquals(userDtoRequest.getName(), userDto.getName());
         assertNotNull(userDto.getId());
 
-        verify(mapper, Mockito.times(1))
+        verify(userMapper, Mockito.times(1))
                 .toEntity(userDtoRequest);
-        verify(repository, Mockito.times(1))
+        verify(userRepository, Mockito.times(1))
                 .save(userRequest);
-        verify(mapper, Mockito.times(1))
+        verify(userMapper, Mockito.times(1))
                 .toDto(userResponse);
     }
 
     @Test
     void get_whenGetWithId_thenReturnDto() {
-        when(repository.existsById(anyInt()))
+        when(userRepository.existsById(anyInt()))
                 .thenReturn(true);
-        when(repository.findById(anyInt()))
+        when(userRepository.findById(anyInt()))
                 .thenReturn(Optional.ofNullable(userResponse));
-        when(mapper.toDto(userResponse))
+        when(userMapper.toDto(userResponse))
                 .thenReturn(userDtoResponse);
 
-        service.get(1);
+        userService.get(1);
 
-        verify(repository, times(1))
+        verify(userRepository, times(1))
                 .existsById(anyInt());
-        verify(mapper, Mockito.times(1))
+        verify(userMapper, Mockito.times(1))
                 .toDto(userResponse);
-        verify(repository, times(1))
+        verify(userRepository, times(1))
                 .findById(anyInt());
     }
 
     @Test
     void get_whenGetWithNotExistId_thenReturnThrowException() {
-        final int userId = 100;
-        when(repository.existsById(userId))
+        final int id = userStorage.get(1).getId();
+        when(userRepository.existsById(id))
                 .thenReturn(false);
 
-        assertThrows(NotFoundException.class,
-                () -> service.get(userId),
-                "User with id:(" + userId + ") not exist");
+        NotFoundException e = assertThrows(NotFoundException.class,
+                () -> userService.get(id));
 
-        verify(repository, times(1))
+        assertEquals(e.getMessage(), format(USER_WITH_ID_NOT_EXIST, id));
+
+        verify(userRepository, times(1))
                 .existsById(anyInt());
-        verify(mapper, never())
+        verify(userMapper, never())
                 .toDto(userResponse);
-        verify(repository, never())
+        verify(userRepository, never())
                 .findById(anyInt());
     }
 
     @Test
     void getAll_whenGetAll_thenReturnDtoList() {
 
-        when(repository.findAll()).thenReturn(users);
+        when(userRepository.findAll()).thenReturn(users);
 
-        List<UserDto> getAllUserDto = service.getAll();
+        List<UserDto> getAllUserDto = userService.getAll();
 
         assertFalse(getAllUserDto.isEmpty());
         assertEquals(4, getAllUserDto.size());
@@ -106,58 +135,72 @@ class UserServiceTest extends InjectResources {
 
     @Test
     void delete_whenDeleteByExistId_thenOk() {
-        /*
-        when(repository.existsById(anyInt()))
-                .thenReturn(true);
+        int id = userStorage.get(1).getId();
 
-        doNothing().when(repository).deleteById(anyInt());
-        */
+        when(userRepository.existsById(id)).thenReturn(true);
+
+        doNothing().when(userRepository).deleteById(id);
+
+        userService.delete(id);
+
+        verify(userRepository, times(1))
+                .deleteById(id);
     }
 
     @Test
     void delete_whenDeleteByNotExistId_thenThrowException() {
-        when(repository.existsById(100))
+        int id = userStorage.get(1).getId();
+
+        when(userRepository.existsById(id))
                 .thenReturn(false);
 
-        assertThrows(NotFoundException.class,
-                () -> service.delete(100),
-                "User with id:(100) not exist");
+        NotFoundException e = assertThrows(NotFoundException.class,
+                () -> userService.delete(id));
 
-        verify(repository, times(0))
-                .deleteById(1);
+        assertEquals(e.getMessage(),
+                format(USER_WITH_ID_NOT_EXIST, id));
+
+        verify(userRepository, never())
+                .deleteById(id);
     }
 
     @Test
     void update_whenAllDataNotNull_thenReturnDto() {
         final String nameUpdate = "userUpdate";
+        final String emailUpdate = "userUpdate@user.com";
 
         userDtoResponse.setName(nameUpdate);
         userResponse.setName(nameUpdate);
-        when(repository.existsById(1))
+        userDtoResponse.setEmail(emailUpdate);
+        userResponse.setEmail(emailUpdate);
+
+        when(userRepository.existsById(1))
                 .thenReturn(true);
-        when(repository.getReferenceById(1))
+        when(userRepository.getReferenceById(1))
                 .thenReturn(userRequest);
-        when(mapper.toEntityFromDto(userDtoResponse))
+        when(userMapper.toEntityFromDto(userDtoResponse))
                 .thenReturn(userRequest);
-        when(repository.save(userRequest))
+        when(userRepository.save(userRequest))
                 .thenReturn(userResponse);
-        when(mapper.toDto(userResponse))
+        when(userMapper.toDto(userResponse))
                 .thenReturn(userDtoResponse);
 
         assertNotNull(userDtoRequest.getName());
         assertNotNull(userDtoRequest.getEmail());
 
-        service.update(userDtoResponse);
+        userService.update(userDtoResponse);
+        assertEquals(userDtoResponse.getName(), nameUpdate);
+        assertEquals(userDtoResponse.getEmail(), emailUpdate);
 
-        verify(repository, times(1))
+        verify(userRepository, times(1))
                 .existsById(1);
-        verify(repository, times(1))
+        verify(userRepository, times(1))
                 .getReferenceById(1);
-        verify(mapper, times(1))
+        verify(userMapper, times(1))
                 .toEntityFromDto(any(UserDto.class));
-        verify(repository, times(1))
+        verify(userRepository, times(1))
                 .save(userRequest);
-        verify(mapper, times(1))
+        verify(userMapper, times(1))
                 .toDto(any(User.class));
     }
 
@@ -169,29 +212,33 @@ class UserServiceTest extends InjectResources {
         userDtoRequest.setEmail(null);
         userDtoResponse.setName(nameUpdate);
         userResponse.setName(nameUpdate);
-        when(repository.existsById(1))
+
+        when(userRepository.existsById(1))
                 .thenReturn(true);
-        when(repository.getReferenceById(1))
+        when(userRepository.getReferenceById(1))
                 .thenReturn(userRequest);
-        when(mapper.toEntityFromDto(userDtoResponse))
+        when(userMapper.toEntityFromDto(userDtoResponse))
                 .thenReturn(userRequest);
-        when(repository.save(userRequest))
+        when(userRepository.save(userRequest))
                 .thenReturn(userResponse);
-        when(mapper.toDto(userResponse))
+        when(userMapper.toDto(userResponse))
                 .thenReturn(userDtoResponse);
 
         assertNull(userDtoRequest.getName());
         assertNull(userDtoRequest.getEmail());
 
-        service.update(userDtoResponse);
+        UserDto response = userService.update(userDtoResponse);
 
-        verify(repository, times(1))
+        assertEquals(response.getName(), nameUpdate);
+        assertNotEquals(response.getEmail(), userDtoRequest.getEmail());
+
+        verify(userRepository, times(1))
                 .existsById(1);
-        verify(repository, times(1))
+        verify(userRepository, times(1))
                 .getReferenceById(1);
-        verify(mapper, times(1))
+        verify(userMapper, times(1))
                 .toEntityFromDto(any(UserDto.class));
-        verify(mapper, times(1))
+        verify(userMapper, times(1))
                 .toDto(any(User.class));
     }
 
@@ -203,29 +250,29 @@ class UserServiceTest extends InjectResources {
         userDtoRequest.setEmail("");
         userDtoResponse.setName(nameUpdate);
         userResponse.setName(nameUpdate);
-        when(repository.existsById(1))
+        when(userRepository.existsById(1))
                 .thenReturn(true);
-        when(repository.getReferenceById(1))
+        when(userRepository.getReferenceById(1))
                 .thenReturn(userRequest);
-        when(mapper.toEntityFromDto(userDtoResponse))
+        when(userMapper.toEntityFromDto(userDtoResponse))
                 .thenReturn(userRequest);
-        when(repository.save(userRequest))
+        when(userRepository.save(userRequest))
                 .thenReturn(userResponse);
-        when(mapper.toDto(userResponse))
+        when(userMapper.toDto(userResponse))
                 .thenReturn(userDtoResponse);
 
         assertTrue(userDtoRequest.getName().isBlank());
         assertTrue(userDtoRequest.getEmail().isBlank());
 
-        service.update(userDtoResponse);
+        userService.update(userDtoResponse);
 
-        verify(repository, times(1))
+        verify(userRepository, times(1))
                 .existsById(1);
-        verify(repository, times(1))
+        verify(userRepository, times(1))
                 .getReferenceById(1);
-        verify(mapper, times(1))
+        verify(userMapper, times(1))
                 .toEntityFromDto(any(UserDto.class));
-        verify(mapper, times(1))
+        verify(userMapper, times(1))
                 .toDto(any(User.class));
     }
 }

@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.api;
+package ru.practicum.shareit.item.api.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +12,7 @@ import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
 import ru.practicum.shareit.item.api.repository.ItemRepository;
 import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.user.api.repository.UserRepository;
+import ru.practicum.shareit.utils.InjectResources;
 
 import java.util.Optional;
 

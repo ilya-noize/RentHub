@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.api;
+package ru.practicum.shareit.item.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.practicum.shareit.item.api.dto.ItemDto;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
+import ru.practicum.shareit.item.api.service.ItemService;
 import ru.practicum.shareit.item.comment.api.dto.CommentDtoRecord;
 import ru.practicum.shareit.item.comment.api.dto.CommentSimpleDto;
 
@@ -25,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.ShareItApp.HEADER_USER_ID;
-import static ru.practicum.shareit.item.api.ItemController.*;
+import static ru.practicum.shareit.item.api.controller.ItemController.*;
 
 @WebMvcTest(controllers = ItemController.class)
 class ItemControllerIT {
