@@ -1,13 +1,16 @@
-package ru.practicum.shareit.item.comment.api.dto;
+package ru.practicum.shareit.item.api.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import ru.practicum.shareit.item.comment.entity.CommentEntity;
+import org.mapstruct.factory.Mappers;
+import ru.practicum.shareit.item.entity.CommentEntity;
 
-@Mapper(componentModel = "spring")
+@Mapper()
 public interface CommentMapper {
+    CommentMapper INSTANCE = Mappers.getMapper(CommentMapper.class);
+
     @Mapping(target = "authorName", source = "entity.author.name")
-    CommentDtoRecord toDtoRecord(CommentEntity entity);
+    CommentDto toDto(CommentEntity entity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "item.id", source = "dto.itemId")

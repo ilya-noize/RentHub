@@ -2,6 +2,7 @@ package ru.practicum.shareit.exception.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
@@ -119,19 +120,7 @@ public class ExceptionController {
                 .build();
     }
 
-    @ExceptionHandler(AlreadyExistsException.class)
-    @ResponseStatus(CONFLICT)
-    public ResponseEntity<?> handleAlreadyExistsException(AlreadyExistsException e) {
-        String message = e.getMessage();
 
-        logError(CONFLICT, message, e);
-
-        return ResponseEntity
-                .status(CONFLICT)
-                .lastModified(NOW)
-                .header("Already exists", message)
-                .build();
-    }
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(BAD_REQUEST)
@@ -155,7 +144,9 @@ public class ExceptionController {
         logError(INTERNAL_SERVER_ERROR, message, e);
 
         return ResponseEntity.badRequest()
+                .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorException(400, message));
+        // todo make without ErrorException.class
     }
 
     @ExceptionHandler(BookingException.class)

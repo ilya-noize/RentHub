@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.entity;
 
 import lombok.*;
+import ru.practicum.shareit.request.entity.ItemRequest;
 import ru.practicum.shareit.user.entity.User;
 
 import javax.persistence.*;
@@ -27,7 +28,7 @@ import javax.validation.constraints.Size;
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Size(max = 255)
     private String name;
@@ -38,8 +39,12 @@ public class Item {
     private boolean available;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "OWNER_ID", nullable = false)
+    @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
+
+    @OneToOne
+    @JoinColumn(name = "item_request_id")
+    private ItemRequest request;
 
     public boolean isAvailable() {
         return this.available;

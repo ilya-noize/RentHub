@@ -111,5 +111,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             @Param(value = "id") @NonNull Long id);
 
     // - - - - - - - - - - - - - - - - - - CHECK BOOKING FOR CREATE COMMENT
-    boolean existsByItem_IdAndBooker_IdAndStatusAndEndBefore(int itemId, Integer bookerId, BookingStatus status, LocalDateTime end);
+    @Query("select (count(b) > 0) from Booking b " +
+            "where b.item.id = :itemId and b.booker.id = :bookerId and b.status = :status and b.end < :end")
+    boolean existsByItem_IdAndBooker_IdAndStatusAndEndBefore(
+            @Param("itemId") int itemId,
+            @Param("bookerId") Integer bookerId,
+            @Param("status") BookingStatus status,
+            @Param("end") LocalDateTime end);
 }

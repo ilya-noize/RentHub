@@ -4,13 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.api.dto.BookingDto;
-import ru.practicum.shareit.booking.api.dto.BookingDtoRecord;
+import ru.practicum.shareit.booking.api.dto.BookingSimpleDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ru.practicum.shareit.ShareItApp.HEADER_USER_ID;
+import static ru.practicum.shareit.ShareItApp.*;
 
 @Slf4j
 @RestController
@@ -19,8 +21,8 @@ public class BookingController {
     public static final String CREATE_BOOKING = "/bookings";
     public static final String UPDATE_STATUS_BOOKING = "/bookings/{id}";
     public static final String GET_BOOKING = "/bookings/{id}";
-    public static final String ALL_BOOKING_FOR_USER = "/bookings";
-    public static final String ALL_BOOKING_FOR_OWNER = "/bookings/owner";
+    public static final String GET_ALL_BOOKINGS_FOR_USER = "/bookings";
+    public static final String GET_ALL_BOOKINGS_FOR_OWNER = "/bookings/owner";
     private final BookingService service;
 
     /**
@@ -28,15 +30,15 @@ public class BookingController {
      * а затем подтверждён владельцем вещи.
      */
     @PostMapping(CREATE_BOOKING)
-    public BookingDtoRecord create(
+    public BookingDto create(
             @RequestHeader(HEADER_USER_ID)
             Integer userId,
             @RequestBody
             @Valid
-            BookingDto dto) {
+            BookingSimpleDto dto) {
         log.info("Point: [{}]\nIncoming: Dto:{} UserId:{}", CREATE_BOOKING, dto, userId);
 
-        BookingDtoRecord record = service.create(userId, dto);
+        BookingDto record = service.create(userId, dto);
 
         log.info("[i] CONTROLLER CREATE \n" +
                         "ID:{}, START:{}, " +
@@ -58,10 +60,13 @@ public class BookingController {
      * @param approved Booking status (true = APPROVED / false = REJECTED)
      */
     @PatchMapping(UPDATE_STATUS_BOOKING)
-    public BookingDtoRecord update(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
-            @PathVariable Long id,
-            @RequestParam Boolean approved) {
+    public BookingDto update(
+            @RequestHeader(HEADER_USER_ID)
+            Integer userId,
+            @PathVariable
+            Long id,
+            @RequestParam
+            Boolean approved) {
 
         log.info("[i] UPDATE\n USER_ID:{}, BOOKING_ID:{}, APPROVED:{}",
                 userId, id, approved);
@@ -77,7 +82,7 @@ public class BookingController {
      * @param id     Booking ID
      */
     @GetMapping(GET_BOOKING)
-    public BookingDtoRecord get(
+    public BookingDto get(
             @RequestHeader(HEADER_USER_ID) Integer userId,
             @PathVariable Long id) {
 
@@ -91,15 +96,24 @@ public class BookingController {
      * @param bookerId User ID - Booker
      * @param state    Search filter
      */
-    @GetMapping(ALL_BOOKING_FOR_USER)
-    public List<BookingDtoRecord> getAllByUser(
-            @RequestHeader(HEADER_USER_ID) Integer bookerId,
-            @RequestParam(defaultValue = "ALL") String state) {
+    @GetMapping(GET_ALL_BOOKINGS_FOR_USER)
+    @Valid
+    public List<BookingDto> getAllByUser(
+            @RequestHeader(HEADER_USER_ID)
+            Integer bookerId,
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(required = false, defaultValue = FROM)
+            @PositiveOrZero
+            Integer from,
+            @RequestParam(required = false, defaultValue = SIZE)
+            @Positive
+            Integer size) {
 
         return service.getAllByUser(
                 bookerId,
                 state.toUpperCase(),
-                LocalDateTime.now());
+                LocalDateTime.now(),
+                checkPageable(from, size));
     }
 
     /**
@@ -109,14 +123,21 @@ public class BookingController {
      * @param ownerId User ID - Owner
      * @param state   Search filter
      */
-    @GetMapping(ALL_BOOKING_FOR_OWNER)
-    public List<BookingDtoRecord> getAllByOwner(
-            @RequestHeader(HEADER_USER_ID) Integer ownerId,
-            @RequestParam(defaultValue = "ALL") String state) {
+    @GetMapping(GET_ALL_BOOKINGS_FOR_OWNER)
+    public List<BookingDto> getAllByOwner(
+            @RequestHeader(HEADER_USER_ID)
+            Integer ownerId,
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(required = false, defaultValue = FROM)
+            Integer from,
+            @RequestParam(required = false, defaultValue = SIZE)
+            Integer size) {
+//        Pageable pageable = PageRequest.of(from / size, size);
 
         return service.getAllByOwner(
                 ownerId,
                 state.toUpperCase(),
-                LocalDateTime.now());
+                LocalDateTime.now(),
+                checkPageable(from, size));
     }
 }

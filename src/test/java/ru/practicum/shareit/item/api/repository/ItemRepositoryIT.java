@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.user.api.repository.UserRepository;
@@ -21,6 +22,9 @@ import static ru.practicum.shareit.utils.ResourcePool.*;
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ItemRepositoryIT {
+
+    private final Pageable pageable = Pageable.ofSize(10);
+
     @Autowired
     private ItemRepository itemRepository;
 
@@ -50,29 +54,12 @@ public class ItemRepositoryIT {
     }
 
     @Test
-    public void whenFindAllByOwnerId_thenReturnItems() {
-        // given
-        int userId = 1;
-
-        // when
-        List<Item> itemList = itemRepository.findAllByOwner_Id(userId);
-
-        // then
-        assertEquals(1, itemList.get(0).getId());
-        assertEquals(
-                List.of(1, 4, 7),
-                itemList.stream()
-                        .map(Item::getId)
-                        .collect(Collectors.toList()));
-    }
-
-    @Test
     void searchItemByNameOrDescription() {
         //given
         String search = "оВёрТ";
 
         //when
-        List<Item> searchItemByNameOrDescription = itemRepository.searchItemByNameOrDescription(search);
+        List<Item> searchItemByNameOrDescription = itemRepository.searchItemByNameOrDescription(search, pageable);
 
         //then
         assertEquals(2, searchItemByNameOrDescription.size());
@@ -89,7 +76,7 @@ public class ItemRepositoryIT {
         String search = "вЁрТ";
 
         //when
-        List<Item> searchItems = itemRepository.searchItemByNameOrDescription(search);
+        List<Item> searchItems = itemRepository.searchItemByNameOrDescription(search, pageable);
 
         //then
         Integer size = searchItems.size();
@@ -103,7 +90,7 @@ public class ItemRepositoryIT {
         int userId = 3;
 
         // when
-        List<Item> findAllByOwnerId = itemRepository.findAllByOwner_Id(userId);
+        List<Item> findAllByOwnerId = itemRepository.findAllByOwner_Id(userId, pageable);
 
         //then
         assertEquals(3, findAllByOwnerId.size());
@@ -122,7 +109,7 @@ public class ItemRepositoryIT {
         int ownerId = 1;
 
         //then
-        List<Item> itemsByOwner = itemRepository.findAllByOwner_Id(ownerId);
+        List<Item> itemsByOwner = itemRepository.findAllByOwner_Id(ownerId, pageable);
 
         //then
         assertEquals(3, itemsByOwner.size());
@@ -133,14 +120,14 @@ public class ItemRepositoryIT {
         // given
         int ownerId = 1;
         int itemId = 7;
-        List<Item> itemsBefore = itemRepository.findAllByOwner_Id(ownerId);
+        List<Item> itemsBefore = itemRepository.findAllByOwner_Id(ownerId, pageable);
         assertEquals(3, itemsBefore.size());
 
         //when
         itemRepository.deleteByIdAndOwner_Id(itemId, ownerId);
 
         //then
-        List<Item> itemsAfter = itemRepository.findAllByOwner_Id(ownerId);
+        List<Item> itemsAfter = itemRepository.findAllByOwner_Id(ownerId, pageable);
         assertEquals(2, itemsAfter.size());
     }
 

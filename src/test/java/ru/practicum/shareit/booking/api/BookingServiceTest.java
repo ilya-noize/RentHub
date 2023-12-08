@@ -6,15 +6,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.api.dto.BookingDto;
-import ru.practicum.shareit.booking.api.dto.BookingDtoRecord;
-import ru.practicum.shareit.booking.api.dto.BookingMapper;
+import ru.practicum.shareit.booking.api.dto.BookingSimpleDto;
 import ru.practicum.shareit.booking.api.repository.BookingRepository;
 import ru.practicum.shareit.booking.entity.Booking;
 import ru.practicum.shareit.booking.entity.enums.BookingFilterByTemplate;
 import ru.practicum.shareit.booking.entity.enums.BookingStatus;
+import ru.practicum.shareit.exception.BookingException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.StateException;
 import ru.practicum.shareit.item.api.repository.ItemRepository;
 import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.user.api.repository.UserRepository;
@@ -23,14 +25,11 @@ import ru.practicum.shareit.utils.InjectResources;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toMap;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static ru.practicum.shareit.ShareItApp.*;
 import static ru.practicum.shareit.booking.entity.enums.BookingFilterByTemplate.*;
@@ -41,29 +40,24 @@ import static ru.practicum.shareit.booking.entity.enums.BookingStatus.*;
 @ExtendWith(MockitoExtension.class)
 class BookingServiceTest extends InjectResources {
 
-    private final LocalDateTime now = LocalDateTime
-            // created at 2000 Jan, 1, PM12:00:00.0000
-            .of(2000, 1, 1, 12, 0, 0, 0);
+    private final Pageable pageable = Pageable.ofSize(10);
     private final int days = 7;
     private final int rentTime = 3;
     private final LocalDateTime startNext = now.plusDays(days);
     private final LocalDateTime endNext = startNext.plusDays(rentTime);
 
-    Map<Integer, Item> itemStorage;
-    Map<Integer, User> userStorage;
 
     @InjectMocks
     BookingServiceImpl bookingService;
-    private Booking bookingEntity;
-    private BookingDto nextBookingRequest;
     @Mock
     private BookingRepository bookingRepository;
     @Mock
     private UserRepository userRepository;
     @Mock
     private ItemRepository itemRepository;
-    @Mock
-    private BookingMapper bookingMapper;
+
+    private Booking bookingEntity;
+    private BookingSimpleDto nextBookingRequest;
 
     /**
      * User1 -> Items(1, 4, 7);
@@ -72,110 +66,19 @@ class BookingServiceTest extends InjectResources {
      * User4 -> Items(null);
      */
     @BeforeEach
-    void createsEnvironmentObjects() {
-
-        if (users.isEmpty()) {
-            throw new RuntimeException("No Users Set.");
-        }
-        if (items.isEmpty()) {
-            throw new RuntimeException("No Items Set.");
-        }
-        if (LOGGING_IS_NEEDED_IN_TEST) {
-            System.out.println("- ".repeat(40));
-            for (User u : users) {
-                System.out.printf("User:[%d]\t%s%n", u.getId(), u);
-            }
-            System.out.println("- ".repeat(40));
-            for (Item i : items) {
-                System.out.printf("Item:[%d]\t%s%n", i.getId(), i);
-            }
-        }
-
-        items.forEach(item -> {
-            int itemId = item.getId();
-            if (itemId % 3 == 1) {
-                item.setOwner(users.get(0));
-            } else if (itemId % 3 == 2) {
-                item.setOwner(users.get(1));
-            } else {
-                item.setOwner(users.get(2));
-            }
-        });
-
-        Map<Integer, List<Item>> ownerStorage = items.stream()
-                .collect(Collectors.groupingBy(item -> item.getOwner().getId()));
-
-        itemStorage = items.stream()
-                .collect(toMap(Item::getId,
-                        Function.identity(),
-                        (first, second) -> first));
-
-        userStorage = users.stream()
-                .collect(toMap(User::getId,
-                        Function.identity(),
-                        (first, second) -> first));
-
-        if (LOGGING_IS_NEEDED_IN_TEST) {
-            System.out.println("- ".repeat(40));
-            for (Integer userId : ownerStorage.keySet()) {
-                System.out.printf("OwnerStorage by UserId:[%d]%n", userId);
-                for (Item item : ownerStorage.get(userId)) {
-                    System.out.printf("\tItemId:[%d]\t%s%n", item.getId(), item);
-                }
-            }
-        }
-
+    void createsEnvironmentObjectS() {
         bookingEntity = Booking.builder()
                 .start(startNext)
                 .end(endNext)
-                .item(items.get(0))
-                .booker(users.get(1))
+                .item(items.get(1))
+                .booker(users.get(2))
                 .status(WAITING).build();
 
-        nextBookingRequest = BookingDto.builder()
+        nextBookingRequest = BookingSimpleDto.builder()
                 .id(1L)
                 .itemId(1)
                 .start(startNext)
                 .end(endNext).build();
-    }
-
-    @Test
-    void create_whenValidBooking_thenReturnDtoRecord() {
-        //given
-        Item item = itemStorage.get(1);
-        int itemId = item.getId();
-        User booker = userStorage.get(2);
-        int bookerId = booker.getId();
-
-        BookingDto bookingRequest = nextBookingRequest;
-        BookingDtoRecord bookingResponse;
-        BookingDtoRecord bookingExpected = BookingDtoRecord.builder()
-                .id(1L)
-                .start(bookingRequest.getStart())
-                .end(bookingRequest.getEnd())
-                .status(WAITING)
-                .booker(new BookingDtoRecord.BookerDto(bookerId))
-                .item(new BookingDtoRecord.ItemDto(itemId, item.getName())).build();
-
-        when(itemRepository.findById(itemId))
-                .thenReturn(Optional.of(item));
-        when(userRepository.findById(bookerId))
-                .thenReturn(Optional.of(booker));
-        // validation: booking and start-end dates
-        when(bookingMapper.toEntity(bookingRequest, 2))
-                .thenReturn(bookingEntity);
-        when(bookingRepository.save(bookingEntity))
-                .thenReturn(bookingEntity);
-        when(bookingMapper.toDtoRecord(bookingEntity))
-                .thenReturn(bookingExpected);
-
-        //when
-        bookingResponse = bookingService.create(bookerId, bookingRequest);
-        //then
-        assertNotNull(bookingResponse.getId());
-        assertEquals(bookingResponse.getStatus(), WAITING);
-        assertEquals(bookingResponse.getItem().getId(), itemId);
-        assertEquals(bookingResponse.getBooker().getId(), bookerId);
     }
 
     @Test
@@ -184,7 +87,7 @@ class BookingServiceTest extends InjectResources {
         int itemId = itemStorage.get(1).getId();
         int bookerId = userStorage.get(2).getId();
 
-        BookingDto bookingRequest = nextBookingRequest;
+        BookingSimpleDto bookingRequest = nextBookingRequest;
 
         when(itemRepository.findById(itemId))
                 .thenReturn(Optional.empty());
@@ -204,7 +107,7 @@ class BookingServiceTest extends InjectResources {
         User booker = userStorage.get(2);
         int bookerId = booker.getId();
 
-        BookingDto bookingRequest = nextBookingRequest;
+        BookingSimpleDto bookingRequest = nextBookingRequest;
 
         when(itemRepository.findById(itemId))
                 .thenReturn(Optional.of(item));
@@ -229,27 +132,24 @@ class BookingServiceTest extends InjectResources {
         User booker = userStorage.get(2);
         int bookerId = booker.getId();
 
-        BookingDto bookingRequest = nextBookingRequest;
-        BookingDtoRecord bookingResponse;
-        BookingDtoRecord bookingExpected = BookingDtoRecord.builder()
+        BookingSimpleDto bookingRequest = nextBookingRequest;
+        BookingDto bookingResponse;
+        BookingDto bookingExpected = BookingDto.builder()
                 .id(1L)
                 .start(bookingRequest.getStart())
                 .end(bookingRequest.getEnd())
                 .status(status)
-                .booker(new BookingDtoRecord.BookerDto(bookerId))
-                .item(new BookingDtoRecord.ItemDto(itemId, item.getName())).build();
+                .booker(new BookingDto.BookerDto(bookerId))
+                .item(new BookingDto.ItemDto(itemId, item.getName())).build();
         long bookingId = bookingRequest.getId();
-        Booking bookingUpdate = bookingEntity;
 
         when(bookingRepository.findById(bookingId))
                 .thenReturn(Optional.of(bookingEntity));
         when(userRepository.existsById(ownerId))
                 .thenReturn(true);
         doNothing().when(bookingRepository).updateStatusById(status, bookingId);
-        when(bookingMapper.toDtoRecord(bookingUpdate))
-                .thenReturn(bookingExpected);
 
-        if (LOGGING_IS_NEEDED_IN_TEST) {
+        if (LOGGING_IN_TEST) {
             System.out.printf("itemId: %d, ownerId: %d, bookerId: %d, bookingId: %d%n", itemId, ownerId, bookerId, bookingId);
             System.out.printf("bookingEntity:   %s%n", bookingEntity);
             System.out.printf("bookingRequest:  %s%n", bookingRequest);
@@ -270,7 +170,7 @@ class BookingServiceTest extends InjectResources {
         //given
         int ownerId = itemStorage.get(1).getOwner().getId();
 
-        BookingDto bookingRequest = nextBookingRequest;
+        BookingSimpleDto bookingRequest = nextBookingRequest;
         long bookingId = bookingRequest.getId();
 
         when(bookingRepository.findById(bookingId))
@@ -291,7 +191,7 @@ class BookingServiceTest extends InjectResources {
         //given
         int ownerId = itemStorage.get(1).getOwner().getId();
 
-        BookingDto bookingRequest = nextBookingRequest;
+        BookingSimpleDto bookingRequest = nextBookingRequest;
         long bookingId = bookingRequest.getId();
 
         when(bookingRepository.findById(bookingId))
@@ -319,26 +219,23 @@ class BookingServiceTest extends InjectResources {
         User booker = userStorage.get(2);
         int bookerId = booker.getId();
 
-        BookingDto bookingRequest = nextBookingRequest;
-        BookingDtoRecord bookingResponse;
-        BookingDtoRecord bookingExpected = BookingDtoRecord.builder()
+        BookingSimpleDto bookingRequest = nextBookingRequest;
+        BookingDto bookingResponse;
+        BookingDto bookingExpected = BookingDto.builder()
                 .id(1L)
                 .start(bookingRequest.getStart())
                 .end(bookingRequest.getEnd())
                 .status(status)
-                .booker(new BookingDtoRecord.BookerDto(bookerId))
-                .item(new BookingDtoRecord.ItemDto(itemId, item.getName())).build();
+                .booker(new BookingDto.BookerDto(bookerId))
+                .item(new BookingDto.ItemDto(itemId, item.getName())).build();
         long bookingId = bookingRequest.getId();
-        Booking bookingUpdate = bookingEntity;
 
         when(bookingRepository.findById(bookingId))
                 .thenReturn(Optional.of(bookingEntity));
         when(userRepository.existsById(ownerId))
                 .thenReturn(true);
         doNothing().when(bookingRepository).updateStatusById(status, bookingId);
-        when(bookingMapper.toDtoRecord(bookingUpdate))
-                .thenReturn(bookingExpected);
-        if (LOGGING_IS_NEEDED_IN_TEST) {
+        if (LOGGING_IN_TEST) {
             System.out.printf("itemId: %d, ownerId: %d, bookerId: %d, bookingId: %d%n", itemId, ownerId, bookerId, bookingId);
             System.out.printf("bookingEntity:   %s%n", bookingEntity);
             System.out.printf("bookingRequest:  %s%n", bookingRequest);
@@ -355,69 +252,21 @@ class BookingServiceTest extends InjectResources {
     }
 
     @Test
-    void get_whenBooker_thenReturnDtoRecord() {
-        Item item = itemStorage.get(1);
-        int itemId = item.getId();
-        User booker = userStorage.get(2);
-        int bookerId = booker.getId();
-
-        BookingDto bookingRequest = nextBookingRequest;
-        BookingDtoRecord bookingResponse;
-        BookingDtoRecord bookingExpected = BookingDtoRecord.builder()
-                .id(1L)
-                .start(bookingRequest.getStart())
-                .end(bookingRequest.getEnd())
-                .status(WAITING)
-                .booker(new BookingDtoRecord.BookerDto(bookerId))
-                .item(new BookingDtoRecord.ItemDto(itemId, item.getName())).build();
-        long bookingId = bookingRequest.getId();
-
-        when(bookingRepository.findById(bookingId))
-                .thenReturn(Optional.of(bookingEntity));
-        when(userRepository.existsById(bookerId))
-                .thenReturn(true);
-        when(bookingMapper.toDtoRecord(bookingEntity))
-                .thenReturn(bookingExpected);
-
-        // when
-        bookingResponse = bookingService.get(bookerId, bookingId);
-        // then
-        assertEquals(bookingResponse.getBooker().getId(), bookerId);
-    }
-
-    @Test
     void get_whenOwner_thenReturnDtoRecord() {
         Item item = itemStorage.get(1);
-        int itemId = item.getId();
         User owner = item.getOwner();
         int ownerId = owner.getId();
-        User booker = userStorage.get(2);
-        int bookerId = booker.getId();
 
-        BookingDto bookingRequest = nextBookingRequest;
-        BookingDtoRecord bookingResponse;
-        BookingDtoRecord bookingExpected = BookingDtoRecord.builder()
-                .id(1L)
-                .start(bookingRequest.getStart())
-                .end(bookingRequest.getEnd())
-                .status(WAITING)
-                .booker(new BookingDtoRecord.BookerDto(bookerId))
-                .item(new BookingDtoRecord.ItemDto(itemId, item.getName())).build();
-        long bookingId = bookingRequest.getId();
-
-        when(bookingRepository.findById(bookingId))
+        when(bookingRepository.findById(anyLong()))
                 .thenReturn(Optional.of(bookingEntity));
-        when(userRepository.existsById(ownerId))
+        when(userRepository.existsById(anyInt()))
                 .thenReturn(true);
-        when(bookingMapper.toDtoRecord(bookingEntity))
-                .thenReturn(bookingExpected);
 
         // when
-        bookingResponse = bookingService.get(ownerId, bookingId);
+        BookingException e = assertThrows(BookingException.class, () -> bookingService.get(ownerId, 1L));
         // then
-        int itemIdInBooking = bookingResponse.getItem().getId();
-        int itemOwnerId = itemStorage.get(itemIdInBooking).getOwner().getId();
-        assertEquals(itemOwnerId, ownerId);
+        assertEquals(e.getMessage(), "Access denied.\n" +
+                "You a not the booker/owner of the item");
     }
 
     @Test
@@ -432,8 +281,8 @@ class BookingServiceTest extends InjectResources {
                         bookerId, now, now))
                 .thenReturn(bookingList);
         // when
-        List<BookingDtoRecord> response = bookingService
-                .getAllByUser(bookerId, CURRENT.toString(), now);
+        List<BookingDto> response = bookingService
+                .getAllByUser(bookerId, CURRENT.toString(), now, pageable);
         // then
         assertEquals(1, response.size());
     }
@@ -449,8 +298,8 @@ class BookingServiceTest extends InjectResources {
                 .findAllByBooker_IdAndEndBeforeOrderByStartDesc(bookerId, now))
                 .thenReturn(bookingList);
         // when
-        List<BookingDtoRecord> response = bookingService
-                .getAllByUser(bookerId, PAST.toString(), now);
+        List<BookingDto> response = bookingService
+                .getAllByUser(bookerId, PAST.toString(), now, pageable);
         // then
         assertEquals(1, response.size());
     }
@@ -467,8 +316,8 @@ class BookingServiceTest extends InjectResources {
                 .findAllByBooker_IdOrderByStartDesc(
                         bookerId)).thenReturn(bookingList);
         // when
-        List<BookingDtoRecord> response = bookingService
-                .getAllByUser(bookerId, ALL.toString(), now);
+        List<BookingDto> response = bookingService
+                .getAllByUser(bookerId, ALL.toString(), now, pageable);
         // then
         assertEquals(1, response.size());
     }
@@ -484,8 +333,8 @@ class BookingServiceTest extends InjectResources {
                 .findAllByBooker_IdAndStartAfterOrderByStartDesc(bookerId, now))
                 .thenReturn(bookingList);
         // when
-        List<BookingDtoRecord> response = bookingService
-                .getAllByUser(bookerId, FUTURE.toString(), now);
+        List<BookingDto> response = bookingService
+                .getAllByUser(bookerId, FUTURE.toString(), now, pageable);
         // then
         assertEquals(1, response.size());
     }
@@ -504,8 +353,8 @@ class BookingServiceTest extends InjectResources {
                         bookerId, BookingStatus.WAITING))
                 .thenReturn(bookingList);
         // when
-        List<BookingDtoRecord> response = bookingService
-                .getAllByUser(bookerId, filterByTemplate.toString(), now);
+        List<BookingDto> response = bookingService
+                .getAllByUser(bookerId, filterByTemplate.toString(), now, pageable);
         // then
         assertEquals(1, response.size());
     }
@@ -523,8 +372,11 @@ class BookingServiceTest extends InjectResources {
                         bookerId, BookingStatus.REJECTED))
                 .thenReturn(bookingList);
         // when
-        List<BookingDtoRecord> response = bookingService
-                .getAllByUser(bookerId, BookingFilterByTemplate.REJECTED.toString(), now);
+        List<BookingDto> response = bookingService
+                .getAllByUser(bookerId,
+                        BookingFilterByTemplate.REJECTED.toString(),
+                        now,
+                        pageable);
         // then
         assertEquals(1, response.size());
     }
@@ -537,7 +389,10 @@ class BookingServiceTest extends InjectResources {
         //when
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> bookingService
-                        .getAllByUser(bookerId, BookingFilterByTemplate.REJECTED.toString(), now));
+                        .getAllByUser(bookerId,
+                                BookingFilterByTemplate.REJECTED.toString(),
+                                now,
+                                pageable));
         //then
         assertEquals(e.getMessage(), format(USER_WITH_ID_NOT_EXIST, bookerId));
     }
@@ -553,8 +408,8 @@ class BookingServiceTest extends InjectResources {
                         ownerId, now, now, Sort.by(Sort.Direction.DESC, "start")))
                 .thenReturn(bookingList);
         // when
-        List<BookingDtoRecord> response = bookingService
-                .getAllByOwner(ownerId, CURRENT.toString(), now);
+        List<BookingDto> response = bookingService
+                .getAllByOwner(ownerId, CURRENT.toString(), now, pageable);
         // then
         assertEquals(1, response.size());
     }
@@ -570,8 +425,8 @@ class BookingServiceTest extends InjectResources {
                 .findAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(ownerId, now))
                 .thenReturn(bookingList);
         // when
-        List<BookingDtoRecord> response = bookingService
-                .getAllByOwner(ownerId, PAST.toString(), now);
+        List<BookingDto> response = bookingService
+                .getAllByOwner(ownerId, PAST.toString(), now, pageable);
         // then
         assertEquals(1, response.size());
     }
@@ -586,8 +441,8 @@ class BookingServiceTest extends InjectResources {
                 .findAllByItem_Owner_IdOrderByStartDesc(ownerId))
                 .thenReturn(bookingList);
         // when
-        List<BookingDtoRecord> response = bookingService
-                .getAllByOwner(ownerId, ALL.toString(), now);
+        List<BookingDto> response = bookingService
+                .getAllByOwner(ownerId, ALL.toString(), now, pageable);
         // then
         assertEquals(1, response.size());
     }
@@ -602,8 +457,8 @@ class BookingServiceTest extends InjectResources {
                 .findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(ownerId, now))
                 .thenReturn(bookingList);
         // when
-        List<BookingDtoRecord> response = bookingService
-                .getAllByOwner(ownerId, FUTURE.toString(), now);
+        List<BookingDto> response = bookingService
+                .getAllByOwner(ownerId, FUTURE.toString(), now, pageable);
         // then
         assertEquals(1, response.size());
     }
@@ -619,8 +474,8 @@ class BookingServiceTest extends InjectResources {
                 .findAllByItem_Owner_IdAndStatusOrderByStartDesc(ownerId, WAITING))
                 .thenReturn(bookingList);
         // when
-        List<BookingDtoRecord> response = bookingService
-                .getAllByOwner(ownerId, BookingFilterByTemplate.WAITING.toString(), now);
+        List<BookingDto> response = bookingService
+                .getAllByOwner(ownerId, BookingFilterByTemplate.WAITING.toString(), now, pageable);
         // then
         assertEquals(1, response.size());
     }
@@ -636,8 +491,8 @@ class BookingServiceTest extends InjectResources {
                 .findAllByItem_Owner_IdAndStatusOrderByStartDesc(ownerId, REJECTED))
                 .thenReturn(bookingList);
         // when
-        List<BookingDtoRecord> response = bookingService
-                .getAllByOwner(ownerId, BookingFilterByTemplate.REJECTED.toString(), now);
+        List<BookingDto> response = bookingService
+                .getAllByOwner(ownerId, BookingFilterByTemplate.REJECTED.toString(), now, pageable);
         // then
         assertEquals(1, response.size());
     }
@@ -650,8 +505,25 @@ class BookingServiceTest extends InjectResources {
         //when
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> bookingService
-                        .getAllByOwner(ownerId, BookingFilterByTemplate.REJECTED.toString(), now));
+                        .getAllByOwner(ownerId,
+                                BookingFilterByTemplate.REJECTED.toString(),
+                                now,
+                                pageable));
         //then
         assertEquals(e.getMessage(), format(USER_WITH_ID_NOT_EXIST, ownerId));
+    }
+
+    @Test
+    void getAllByOwner_whenInvalidState_thenReturnThrow() {
+        String state = "UNSUPPORTED";
+        int ownerId = itemStorage.get(1).getOwner().getId();
+
+        when(userRepository.existsById(ownerId)).thenReturn(true);
+        //when
+        StateException e = assertThrows(StateException.class,
+                () -> bookingService
+                        .getAllByOwner(ownerId, state, now, pageable));
+        //then
+        assertEquals(e.getMessage(), format("Unknown state: %s", state));
     }
 }

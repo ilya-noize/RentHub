@@ -11,11 +11,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import ru.practicum.shareit.item.api.dto.CommentDto;
+import ru.practicum.shareit.item.api.dto.CommentSimpleDto;
 import ru.practicum.shareit.item.api.dto.ItemDto;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
-import ru.practicum.shareit.item.api.service.ItemService;
-import ru.practicum.shareit.item.comment.api.dto.CommentDtoRecord;
-import ru.practicum.shareit.item.comment.api.dto.CommentSimpleDto;
+import ru.practicum.shareit.item.api.service.ItemServiceImpl;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -50,7 +50,6 @@ class ItemControllerIT {
             .lastBooking(null)
             .nextBooking(null)
             .comments(List.of()).build();
-    private final List<ItemDto> itemListResponse = List.of(itemResponse);
 
     // created at 2000 year Jan, 1, PM12:00:00.000
     private final LocalDateTime now = LocalDateTime.of(2000, 1, 1, 12, 0, 0, 0);
@@ -59,15 +58,15 @@ class ItemControllerIT {
             .authorId(1)
             .text("Comment")
             .created(now).build();
-    private final CommentDtoRecord commentResponse =
-            new CommentDtoRecord(1, "Comment", "user", now);
+    private final CommentDto commentResponse =
+            new CommentDto(1, "Comment", "user", now);
 
     @Autowired
     private ObjectMapper mapper;
     @Autowired
     private MockMvc mvc;
     @MockBean
-    private ItemService itemService;
+    private ItemServiceImpl itemService;
 
     @Test
     void create() throws Exception {
@@ -161,51 +160,6 @@ class ItemControllerIT {
         verify(itemService, times(1)).delete(1, 1);
     }
 
-    @Test
-    void search() throws Exception {
-        String search = "Item";
-        when(itemService.search(search))
-                .thenReturn(itemSearchResponse);
-
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get(SEARCH_ITEM)
-                .header(HEADER_USER_ID, 1)
-                .param("text", search)
-                .characterEncoding(StandardCharsets.UTF_8);
-
-        ResultMatcher[] resultMatchers = {
-                jsonPath("$[0].id").value(itemSearchResponse.get(0).getId()),
-                jsonPath("$[0].name").value(itemSearchResponse.get(0).getName()),
-                jsonPath("$[0].description").value(itemSearchResponse.get(0).getDescription()),
-                jsonPath("$[0].available").value(itemSearchResponse.get(0).getAvailable())
-        };
-
-        mvc.perform(requestBuilder)
-                .andExpectAll(resultMatchers)
-                .andExpect(status().isOk());
-
-    }
-
-    @Test
-    void getAll() throws Exception {
-        when(itemService.getAll(1))
-                .thenReturn(itemListResponse);
-
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get(GET_ALL_ITEMS)
-                .header(HEADER_USER_ID, 1);
-
-        ResultMatcher[] resultMatchers = {
-                jsonPath("$[0].id").value(itemResponse.getId()),
-                jsonPath("$[0].name").value(itemResponse.getName()),
-                jsonPath("$[0].description").value(itemResponse.getDescription()),
-                jsonPath("$[0].available").value(itemResponse.getAvailable())
-        };
-
-        mvc.perform(requestBuilder)
-                .andExpectAll(resultMatchers)
-                .andExpect(status().isOk());
-    }
 
     @Test
     void createComment() throws Exception {

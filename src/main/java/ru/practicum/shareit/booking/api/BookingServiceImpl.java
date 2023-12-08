@@ -2,11 +2,12 @@ package ru.practicum.shareit.booking.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.api.dto.BookingDto;
-import ru.practicum.shareit.booking.api.dto.BookingDtoRecord;
 import ru.practicum.shareit.booking.api.dto.BookingMapper;
+import ru.practicum.shareit.booking.api.dto.BookingSimpleDto;
 import ru.practicum.shareit.booking.api.repository.BookingRepository;
 import ru.practicum.shareit.booking.entity.Booking;
 import ru.practicum.shareit.booking.entity.enums.BookingFilterByTemplate;
@@ -31,15 +32,13 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
-    private final BookingMapper mapper;
 
     @Override
-    public BookingDtoRecord create(Integer bookerId, BookingDto dto) {
+    public BookingDto create(Integer bookerId, BookingSimpleDto dto) {
         Integer itemId = dto.getItemId();
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                format(ITEM_WITH_ID_NOT_EXIST, itemId)));
+                .orElseThrow(() -> new NotFoundException(
+                        format(ITEM_WITH_ID_NOT_EXIST, itemId)));
 
         if (!item.isAvailable()) {
             throw new BadRequestException("It is impossible to rent "
@@ -47,9 +46,8 @@ public class BookingServiceImpl implements BookingService {
         }
 
         User booker = userRepository.findById(bookerId)
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                format(USER_WITH_ID_NOT_EXIST, bookerId)));
+                .orElseThrow(() -> new NotFoundException(
+                        format(USER_WITH_ID_NOT_EXIST, bookerId)));
 
         boolean bookerIsOwnerTheItem = bookerId.equals(item.getOwner().getId());
 
@@ -74,12 +72,12 @@ public class BookingServiceImpl implements BookingService {
             throw new RentalPeriodException(error);
         }
 
-        Booking booking = mapper.toEntity(dto, bookerId);
+        Booking booking = BookingMapper.INSTANCE.toEntity(dto, bookerId);
         booking.setItem(item);
         booking.setBooker(booker);
         booking.setStatus(WAITING);
 
-        return mapper.toDtoRecord(
+        return BookingMapper.INSTANCE.toDto(
                 bookingRepository.save(booking));
     }
 
@@ -94,7 +92,7 @@ public class BookingServiceImpl implements BookingService {
      * @return Бронирование с новым статусом
      */
     @Override
-    public BookingDtoRecord update(Integer ownerId, Long bookingId, Boolean approved) {
+    public BookingDto update(Integer ownerId, Long bookingId, Boolean approved) {
         Booking booking;
         boolean isNotWaitingStatus;
         boolean isNotExistUser;
@@ -126,11 +124,9 @@ public class BookingServiceImpl implements BookingService {
 
         booking.setStatus(approved ? APPROVED : REJECTED);
         bookingRepository
-                .updateStatusById(
-                        booking.getStatus(),
-                        bookingId);
+                .updateStatusById(booking.getStatus(), bookingId);
 
-        return mapper.toDtoRecord(booking);
+        return BookingMapper.INSTANCE.toDto(booking);
     }
 
     /**
@@ -139,7 +135,7 @@ public class BookingServiceImpl implements BookingService {
      * @return Booking
      */
     @Override
-    public BookingDtoRecord get(Integer userId, Long bookingId) {
+    public BookingDto get(Integer userId, Long bookingId) {
         Booking booking;
         boolean isNotExistUser;
         Integer bookerId;
@@ -171,7 +167,7 @@ public class BookingServiceImpl implements BookingService {
                     + "You a not the booker/owner of the item");
         }
 
-        return mapper.toDtoRecord(booking);
+        return BookingMapper.INSTANCE.toDto(booking);
     }
 
     /**
@@ -189,11 +185,12 @@ public class BookingServiceImpl implements BookingService {
      * @param bookerId user ID
      * @param stateIn  Фильтр поиска
      * @param now      Точное время
+     * @param pageable Постранично
      * @return Список бронирования
      */
     @Override
-    public List<BookingDtoRecord> getAllByUser(Integer bookerId, String stateIn, LocalDateTime now) {
-        List<Booking> bookingList;
+    public List<BookingDto> getAllByUser(Integer bookerId, String stateIn, LocalDateTime now, Pageable pageable) {
+        List<Booking> bookingList = List.of();
 
         BookingFilterByTemplate state =
                 checkingInputParametersAndReturnEnumBookingFilterByTemplate(bookerId, stateIn);
@@ -224,8 +221,6 @@ public class BookingServiceImpl implements BookingService {
                 bookingList = bookingRepository.findAllByBooker_IdAndStatusOrderByStartDesc(
                         bookerId, REJECTED);
                 break;
-            default:
-                bookingList = List.of();
         }
 
         return getListBookingDtoRecord(bookingList);
@@ -256,14 +251,15 @@ public class BookingServiceImpl implements BookingService {
      *     <li>REJECTED - отказы в аренде от владельца предмета (status ==)</li>
      * </ul>
      *
-     * @param ownerId user ID
-     * @param stateIn Фильтр поиска
-     * @param now     Точное время
+     * @param ownerId  user ID
+     * @param stateIn  Фильтр поиска
+     * @param now      Точное время
+     * @param pageable Постранично
      * @return Список бронирования
      */
     @Override
-    public List<BookingDtoRecord> getAllByOwner(Integer ownerId, String stateIn, LocalDateTime now) {
-        List<Booking> bookingList;
+    public List<BookingDto> getAllByOwner(Integer ownerId, String stateIn, LocalDateTime now, Pageable pageable) {
+        List<Booking> bookingList = List.of();
 
         BookingFilterByTemplate state =
                 checkingInputParametersAndReturnEnumBookingFilterByTemplate(ownerId, stateIn);
@@ -298,17 +294,15 @@ public class BookingServiceImpl implements BookingService {
                         .findAllByItem_Owner_IdAndStatusOrderByStartDesc(
                                 ownerId, REJECTED);
                 break;
-            default:
-                bookingList = List.of();
         }
 
         return getListBookingDtoRecord(bookingList);
     }
 
-    private List<BookingDtoRecord> getListBookingDtoRecord(List<Booking> bookingList) {
+    private List<BookingDto> getListBookingDtoRecord(List<Booking> bookingList) {
 
         return bookingList.stream()
-                .map(mapper::toDtoRecord)
+                .map(BookingMapper.INSTANCE::toDto)
                 .collect(toList());
     }
 }

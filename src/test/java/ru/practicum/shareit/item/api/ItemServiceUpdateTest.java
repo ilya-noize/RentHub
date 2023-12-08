@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.api.service;
+package ru.practicum.shareit.item.api;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +10,7 @@ import ru.practicum.shareit.item.api.dto.ItemDto;
 import ru.practicum.shareit.item.api.dto.ItemMapper;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
 import ru.practicum.shareit.item.api.repository.ItemRepository;
+import ru.practicum.shareit.item.api.service.ItemServiceImpl;
 import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.user.api.repository.UserRepository;
 import ru.practicum.shareit.utils.InjectResources;
@@ -17,7 +18,6 @@ import ru.practicum.shareit.utils.InjectResources;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,14 +33,14 @@ class ItemServiceUpdateTest extends InjectResources {
     @DisplayName("Update Name + Description, not Available")
     void update_whenEditNameDescription_thenReturnDto() {
         // given
-        Item entity = itemRequest;
+        Item entity = items.get(0);
         final int userId = 1;
         final int itemId = entity.getId();
 
         final String setName = "setName";
         final String setDescription = "setDescription";
 
-        ItemSimpleDto requestDto = ItemMapper.COPY.toSimpleDto(entity);
+        ItemSimpleDto requestDto = ItemMapper.INSTANCE.toSimpleDto(entity);
 
         requestDto.setName(setName);
         requestDto.setDescription(setDescription);
@@ -103,7 +103,7 @@ class ItemServiceUpdateTest extends InjectResources {
     @DisplayName("Update Name + Available , not Description")
     void update_whenEditNameAvailable_thenReturnItemDto() {
         // given
-        Item entity = itemRequest;
+        Item entity = itemStorage.get(1);
         final int userId = 1;
         final int itemId = entity.getId();
 
@@ -111,7 +111,7 @@ class ItemServiceUpdateTest extends InjectResources {
         final String setDescription = "";
         final Boolean setAvailable = !entity.isAvailable();
 
-        ItemSimpleDto requestDto = ItemMapper.COPY.toSimpleDto(entity);
+        ItemSimpleDto requestDto = ItemMapper.INSTANCE.toSimpleDto(entity);
 
         requestDto.setName(setName);
         requestDto.setDescription(setDescription);
@@ -174,13 +174,13 @@ class ItemServiceUpdateTest extends InjectResources {
     @DisplayName("Update Name , not Description + Available")
     void update_whenEditName_thenReturnItemDto() {
         // given
-        Item entity = itemRequest;
+        Item entity = itemStorage.get(1);
         final int userId = 1;
         final int itemId = entity.getId();
         final String setName = "setName";
         final String setDescription = "";
 
-        ItemSimpleDto requestDto = ItemMapper.COPY.toSimpleDto(entity);
+        ItemSimpleDto requestDto = ItemMapper.INSTANCE.toSimpleDto(entity);
         requestDto.setName(setName);
         requestDto.setDescription(setDescription);
         requestDto.setAvailable(null);
@@ -240,7 +240,7 @@ class ItemServiceUpdateTest extends InjectResources {
     @DisplayName("Update Description + Available, not Name")
     void update_whenEditDescriptionAvailable_thenReturnDto() {
         // given
-        Item entity = itemRequest;
+        Item entity = itemStorage.get(1);
         final int userId = 1;
         final int itemId = entity.getId();
 
@@ -248,7 +248,7 @@ class ItemServiceUpdateTest extends InjectResources {
         final String setDescription = "setDescription";
         final Boolean setAvailable = !entity.isAvailable();
 
-        ItemSimpleDto requestDto = ItemMapper.COPY.toSimpleDto(entity);
+        ItemSimpleDto requestDto = ItemMapper.INSTANCE.toSimpleDto(entity);
 
         requestDto.setName(setName);
         requestDto.setDescription(setDescription);
@@ -311,14 +311,14 @@ class ItemServiceUpdateTest extends InjectResources {
     @DisplayName("Update Description, not Name + Available")
     void update_whenEditDescription_thenReturnDto() {
         // given
-        Item entity = itemRequest;
+        Item entity = itemStorage.get(1);
         final int userId = 1;
         final int itemId = entity.getId();
 
         final String setName = "";
         final String setDescription = "setDescription";
 
-        ItemSimpleDto requestDto = ItemMapper.COPY.toSimpleDto(entity);
+        ItemSimpleDto requestDto = ItemMapper.INSTANCE.toSimpleDto(entity);
 
         requestDto.setName(setName);
         requestDto.setDescription(setDescription);
@@ -379,7 +379,7 @@ class ItemServiceUpdateTest extends InjectResources {
     @DisplayName("Update Available, not Name + Description")
     void update_whenEditAvailable_thenReturnDto() {
         // given
-        Item entity = itemRequest;
+        Item entity = itemStorage.get(1);
         final int userId = 1;
         final int itemId = entity.getId();
 
@@ -387,7 +387,7 @@ class ItemServiceUpdateTest extends InjectResources {
         final String setDescription = "";
         final Boolean setAvailable = !entity.isAvailable();
 
-        ItemSimpleDto requestDto = ItemMapper.COPY.toSimpleDto(entity);
+        ItemSimpleDto requestDto = ItemMapper.INSTANCE.toSimpleDto(entity);
 
         requestDto.setName(setName);
         requestDto.setDescription(setDescription);

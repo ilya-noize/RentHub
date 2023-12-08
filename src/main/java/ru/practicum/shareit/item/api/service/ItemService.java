@@ -1,10 +1,12 @@
 package ru.practicum.shareit.item.api.service;
 
+import org.springframework.data.domain.Pageable;
+import ru.practicum.shareit.item.api.dto.CommentDto;
+import ru.practicum.shareit.item.api.dto.CommentSimpleDto;
 import ru.practicum.shareit.item.api.dto.ItemDto;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
-import ru.practicum.shareit.item.comment.api.dto.CommentDtoRecord;
-import ru.practicum.shareit.item.comment.api.dto.CommentSimpleDto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ItemService {
@@ -14,11 +16,11 @@ public interface ItemService {
 
     ItemDto get(Integer userId, Integer itemId);
 
-    List<ItemDto> getAll(Integer userId);
+    List<ItemDto> getAll(Integer userId, Pageable pageable, LocalDateTime now);
 
     void delete(Integer userId, Integer itemId);
 
-    List<ItemSimpleDto> search(String searchText);
+    List<ItemSimpleDto> search(String searchText, Pageable pageable);
 
-    CommentDtoRecord createComment(CommentSimpleDto commentSimpleDto);
+    CommentDto createComment(CommentSimpleDto commentSimpleDto);
 }

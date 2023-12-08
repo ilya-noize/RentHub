@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.comment.api.dto;
+package ru.practicum.shareit.item.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
-public class CommentDtoRecord {
+public class CommentDto {
     private final Integer id;
     private final String text;
     private final String authorName;

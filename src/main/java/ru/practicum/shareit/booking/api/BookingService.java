@@ -1,20 +1,21 @@
 package ru.practicum.shareit.booking.api;
 
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.api.dto.BookingDto;
-import ru.practicum.shareit.booking.api.dto.BookingDtoRecord;
+import ru.practicum.shareit.booking.api.dto.BookingSimpleDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BookingService {
 
-    BookingDtoRecord create(Integer userId, BookingDto dto);
+    BookingDto create(Integer userId, BookingSimpleDto dto);
 
-    BookingDtoRecord update(Integer userId, Long bookingId, Boolean approved);
+    BookingDto update(Integer userId, Long bookingId, Boolean approved);
 
-    BookingDtoRecord get(Integer userId, Long bookingId);
+    BookingDto get(Integer userId, Long bookingId);
 
-    List<BookingDtoRecord> getAllByUser(Integer userId, String state, LocalDateTime now);
+    List<BookingDto> getAllByUser(Integer userId, String state, LocalDateTime now, Pageable pageable);
 
-    List<BookingDtoRecord> getAllByOwner(Integer bookerId, String state, LocalDateTime now);
+    List<BookingDto> getAllByOwner(Integer bookerId, String state, LocalDateTime now, Pageable pageable);
 }

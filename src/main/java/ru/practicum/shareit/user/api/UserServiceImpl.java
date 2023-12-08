@@ -24,15 +24,13 @@ import static ru.practicum.shareit.ShareItApp.USER_WITH_ID_NOT_EXIST;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final UserMapper mapper;
 
     @Override
     public UserDto create(UserSimpleDto userDto) {
         log.debug("[d] Create user {}", userDto);
+        User user = UserMapper.INSTANTS.toEntity(userDto);
 
-        User user = mapper.toEntity(userDto);
-
-        return mapper.toDto(userRepository.save(user));
+        return UserMapper.INSTANTS.toDto(userRepository.save(user));
     }
 
     /**
@@ -46,19 +44,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto get(Integer id) {
         log.debug("[i] get User by ID:{}", id);
-        isExist(id);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(
                         format(USER_WITH_ID_NOT_EXIST, id)));
-        return mapper.toDto(user);
+
+        return UserMapper.INSTANTS.toDto(user);
     }
 
     @Override
     public List<UserDto> getAll() {
         log.debug("[i] get All Users");
+
         return userRepository.findAll()
                 .stream()
-                .map(mapper::toDto)
+                .map(UserMapper.INSTANTS::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -76,10 +75,9 @@ public class UserServiceImpl implements UserService {
     public UserDto update(UserDto userDto) {
         int id = userDto.getId();
         log.debug("[i] update User:{} by ID:{}", userDto, id);
-        isExist(id);
-
-        userDto.setId(id);
-        User userEntity = userRepository.getReferenceById(id);
+        User userEntity = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(
+                        format(USER_WITH_ID_NOT_EXIST, id)));
         if (userDto.getName() == null || userDto.getName().isBlank()) {
             userDto.setName(userEntity.getName());
         }
@@ -89,10 +87,9 @@ public class UserServiceImpl implements UserService {
             userDto.setEmail(email);
         }
 
-        User user = mapper.toEntityFromDto(userDto);
-
-        user = userRepository.save(user);
-        return mapper.toDto(user);
+        return UserMapper.INSTANTS.toDto(
+                userRepository.save(
+                        UserMapper.INSTANTS.toEntityFromDto(userDto)));
     }
 
     @Override

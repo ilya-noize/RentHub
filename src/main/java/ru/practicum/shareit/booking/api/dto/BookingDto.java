@@ -3,10 +3,9 @@ package ru.practicum.shareit.booking.api.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.practicum.shareit.booking.entity.enums.BookingStatus;
 
-import javax.validation.constraints.Future;
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
@@ -15,17 +14,29 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public final class BookingDto {
     private Long id;
-
-    @NotNull
-    @FutureOrPresent
     private LocalDateTime start;
-
-    @NotNull
-    @Future
     private LocalDateTime end;
+    private BookingStatus status;
+    private ItemDto item;
+    private BookerDto booker;
 
-    @NotNull
-    private Integer itemId;
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static
+    class ItemDto {
+        private Integer id;
+        private String name;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static
+    class BookerDto {
+        private Integer id;
+    }
 }

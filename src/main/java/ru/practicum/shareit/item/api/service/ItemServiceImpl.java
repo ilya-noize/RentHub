@@ -2,24 +2,22 @@ package ru.practicum.shareit.item.api.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.api.dto.BookingItemDto;
 import ru.practicum.shareit.booking.api.dto.BookingMapper;
-import ru.practicum.shareit.booking.api.dto.BookingToItemDto;
 import ru.practicum.shareit.booking.api.repository.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.api.dto.ItemDto;
-import ru.practicum.shareit.item.api.dto.ItemMapper;
-import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
+import ru.practicum.shareit.item.api.dto.*;
+import ru.practicum.shareit.item.api.repository.CommentRepository;
 import ru.practicum.shareit.item.api.repository.ItemRepository;
-import ru.practicum.shareit.item.comment.api.dto.CommentDtoRecord;
-import ru.practicum.shareit.item.comment.api.dto.CommentMapper;
-import ru.practicum.shareit.item.comment.api.dto.CommentSimpleDto;
-import ru.practicum.shareit.item.comment.api.repository.CommentRepository;
-import ru.practicum.shareit.item.comment.entity.CommentEntity;
+import ru.practicum.shareit.item.entity.CommentEntity;
 import ru.practicum.shareit.item.entity.Item;
+import ru.practicum.shareit.request.entity.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.api.repository.UserRepository;
 import ru.practicum.shareit.user.entity.User;
 
@@ -32,8 +30,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.*;
-import static ru.practicum.shareit.ShareItApp.ITEM_WITH_ID_NOT_EXIST;
-import static ru.practicum.shareit.ShareItApp.USER_WITH_ID_NOT_EXIST;
+import static ru.practicum.shareit.ShareItApp.*;
 import static ru.practicum.shareit.booking.entity.enums.BookingStatus.APPROVED;
 
 @Service
@@ -46,11 +43,10 @@ public class ItemServiceImpl implements ItemService {
     private final Sort sortStartDesc =
             Sort.by(Sort.Direction.DESC, "start");
     private final ItemRepository itemRepository;
-    private final ItemMapper itemMapper = ItemMapper.COPY;
+    private final ItemRequestRepository itemRequestRepository;
+
     private final BookingRepository bookingRepository;
-    private final BookingMapper bookingMapper;
     private final CommentRepository commentRepository;
-    private final CommentMapper commentMapper;
     private final UserRepository userRepository;
 
     /**
@@ -67,9 +63,20 @@ public class ItemServiceImpl implements ItemService {
         log.debug("[i] CREATE ITEM:{} by User.id:{}", itemDto, userId);
         checkingExistUserById(userId);
 
-        return itemMapper.toDto(
+        Item item = ItemMapper.INSTANCE.toEntity(itemDto, userId);
+        Integer requestId = itemDto.getRequestId();
+        if (requestId != null) {
+            ItemRequest itemRequest = itemRequestRepository.findById(requestId)
+                    .orElseThrow(() ->
+                            new NotFoundException(
+                                    format(REQUEST_WITH_ID_NOT_EXIST, requestId)));
+            log.debug("[i] add ItemRequest.id:{}", requestId);
+            item.setRequest(itemRequest);
+        }
+
+        return ItemMapper.INSTANCE.toDto(
                 itemRepository.save(
-                        itemMapper.toEntity(itemDto, userId)));
+                        ItemMapper.INSTANCE.toEntity(itemDto, userId)));
     }
 
     /**
@@ -115,7 +122,9 @@ public class ItemServiceImpl implements ItemService {
             if (notNullDescription) {
                 if (available != null) {
 
-                    return itemMapper.toDto(itemRepository.save(itemMapper.toEntity(itemDto, userId)));
+                    return ItemMapper.INSTANCE.toDto(
+                            itemRepository.save(
+                                    ItemMapper.INSTANCE.toEntity(itemDto, userId)));
 
                 } else {
                     log.info("[i] Name = {}, Description = {};", name, description);
@@ -156,7 +165,7 @@ public class ItemServiceImpl implements ItemService {
             }
         }
 
-        return itemMapper.toDto(item);
+        return ItemMapper.INSTANCE.toDto(item);
     }
 
     /**
@@ -176,24 +185,24 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() ->
                         new NotFoundException(String.format(ITEM_WITH_ID_NOT_EXIST, itemId)));
-        ItemDto itemDto = itemMapper.toDto(item);
+        ItemDto itemDto = ItemMapper.INSTANCE.toDto(item);
 
-        BookingToItemDto lastBooking = bookingRepository
+        BookingItemDto lastBooking = bookingRepository
                 .findFirstByItem_IdAndStartLessThanEqualAndStatus(itemId, now, APPROVED, sortStartDesc)
                 .stream()
-                .map(bookingMapper::toItemDto)
+                .map(BookingMapper.INSTANCE::toItemDto)
                 .findFirst()
                 .orElse(null);
-        BookingToItemDto nextBooking = bookingRepository
+        BookingItemDto nextBooking = bookingRepository
                 .findFirstByItem_IdAndStartAfterAndStatus(itemId, now, APPROVED, sortStartAsc)
                 .stream()
-                .map(bookingMapper::toItemDto)
+                .map(BookingMapper.INSTANCE::toItemDto)
                 .findFirst()
                 .orElse(null);
-        List<CommentDtoRecord> comments = commentRepository
+        List<CommentDto> comments = commentRepository
                 .findAllByItem_IdOrderByCreatedDesc(itemId)
                 .stream()
-                .map(commentMapper::toDtoRecord)
+                .map(CommentMapper.INSTANCE::toDto)
                 .collect(Collectors.toList());
 
         boolean isUserByOwnerByItem = item.getOwner().getId().equals(userId);
@@ -211,38 +220,40 @@ public class ItemServiceImpl implements ItemService {
      * for both the owner of the items and users.
      * {@code (/items)}
      *
-     * @param userId User ID
+     * @param userId   User ID
+     * @param pageable Постранично
+     * @param now      Точное время
      * @return List of user's items
      */
 
     @Transactional(readOnly = true)
     @Override
-    public List<ItemDto> getAll(Integer userId) {
-        final LocalDateTime now = LocalDateTime.now();
-        List<ItemDto> itemsDto = itemRepository.findAllByOwner_Id(userId)
+    public List<ItemDto> getAll(Integer userId, Pageable pageable, LocalDateTime now) {
+        checkingExistUserById(userId);
+        List<ItemDto> itemsDto = itemRepository.findAllByOwner_Id(userId, pageable)
                 .stream()
-                .map(itemMapper::toDto)
+                .map(ItemMapper.INSTANCE::toDto)
                 .collect(Collectors.toList());
 
         List<Integer> itemIds = itemsDto.stream()
                 .map(ItemDto::getId)
                 .collect(toList());
 
-        Map<Integer, BookingToItemDto> lastBookingStorage = bookingRepository
+        Map<Integer, BookingItemDto> lastBookingStorage = bookingRepository
                 .findByItem_IdInAndStartLessThanEqualAndStatus(
                         itemIds, now, APPROVED, sortStartDesc)
                 .stream()
-                .map(bookingMapper::toItemDto)
-                .collect(toMap(BookingToItemDto::getItemId,
+                .map(BookingMapper.INSTANCE::toItemDto)
+                .collect(toMap(BookingItemDto::getItemId,
                         Function.identity(),
                         (first, second) -> first));
 
-        Map<Integer, BookingToItemDto> nextBookingStorage = bookingRepository
+        Map<Integer, BookingItemDto> nextBookingStorage = bookingRepository
                 .findByItem_IdInAndStartAfterAndStatus(
                         itemIds, now, APPROVED, sortStartAsc)
                 .stream()
-                .map(bookingMapper::toItemDto)
-                .collect(toMap(BookingToItemDto::getItemId,
+                .map(BookingMapper.INSTANCE::toItemDto)
+                .collect(toMap(BookingItemDto::getItemId,
                         Function.identity(),
                         (first, second) -> first));
 
@@ -256,8 +267,7 @@ public class ItemServiceImpl implements ItemService {
             Integer itemId = itemDto.getId();
             itemDto.setLastBooking(lastBookingStorage.get(itemId));
             itemDto.setNextBooking(nextBookingStorage.get(itemId));
-            itemDto.setComments(
-                    getCommentDtoRecords(commentStorage.get(itemId)));
+            itemDto.setComments(getCommentDto(commentStorage.get(itemId)));
         });
 
         return itemsDto;
@@ -269,7 +279,7 @@ public class ItemServiceImpl implements ItemService {
      * @param comments comments from DB
      * @return list of comments for the backend
      */
-    private List<CommentDtoRecord> getCommentDtoRecords(
+    private List<CommentDto> getCommentDto(
             List<CommentEntity> comments) {
         if (comments == null) {
 
@@ -277,7 +287,7 @@ public class ItemServiceImpl implements ItemService {
         }
 
         return comments.stream()
-                .map(commentMapper::toDtoRecord)
+                .map(CommentMapper.INSTANCE::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -311,10 +321,11 @@ public class ItemServiceImpl implements ItemService {
      * If the query string is empty, output an empty list
      *
      * @param searchText текст для поиска
+     * @param pageable   Постранично
      * @return Список найденных вещей
      */
     @Override
-    public List<ItemSimpleDto> search(String searchText) {
+    public List<ItemSimpleDto> search(String searchText, Pageable pageable) {
         log.debug("[i] SEARCH text:{}", searchText);
         if (searchText.isBlank()) {
 
@@ -322,9 +333,9 @@ public class ItemServiceImpl implements ItemService {
         }
 
         return itemRepository
-                .searchItemByNameOrDescription(searchText)
+                .searchItemByNameOrDescription(searchText, pageable)
                 .stream()
-                .map(itemMapper::toSimpleDto)
+                .map(ItemMapper.INSTANCE::toSimpleDto)
                 .collect(toList());
     }
 
@@ -337,7 +348,7 @@ public class ItemServiceImpl implements ItemService {
      */
     @Transactional
     @Override
-    public CommentDtoRecord createComment(CommentSimpleDto commentSimpleDto) {
+    public CommentDto createComment(CommentSimpleDto commentSimpleDto) {
         String text = commentSimpleDto.getText().trim();
         if (text.isBlank()) {
             throw new BadRequestException("Text comment can't be blank");
@@ -354,7 +365,7 @@ public class ItemServiceImpl implements ItemService {
 
         boolean notExistBooking = !bookingRepository
                 .existsByItem_IdAndBooker_IdAndStatusAndEndBefore(
-                        itemId, authorId, APPROVED, LocalDateTime.now());
+                        itemId, authorId, APPROVED, commentSimpleDto.getCreated());
         if (notExistBooking) {
             throw new BadRequestException(
                     format("User with ID:(%d) has never booked an item with ID:(%d)\n" +
@@ -362,10 +373,10 @@ public class ItemServiceImpl implements ItemService {
                                     "or the user is planning to book this item",
                             authorId, itemId));
         }
-        CommentEntity comment = commentMapper.toEntity(commentSimpleDto);
+        CommentEntity comment = CommentMapper.INSTANCE.toEntity(commentSimpleDto);
         comment.setAuthor(author);
 
-        return commentMapper.toDtoRecord(
+        return CommentMapper.INSTANCE.toDto(
                 commentRepository.save(comment));
     }
 

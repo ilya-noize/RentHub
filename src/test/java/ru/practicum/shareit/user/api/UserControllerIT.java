@@ -14,8 +14,6 @@ import ru.practicum.shareit.user.api.dto.UserSimpleDto;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -25,20 +23,18 @@ import static ru.practicum.shareit.user.api.UserController.*;
 
 @WebMvcTest(controllers = UserController.class)
 class UserControllerIT {
-    @Autowired
-    private ObjectMapper mapper;
-    @Autowired
-    private MockMvc mvc;
-
-    @MockBean
-    private UserService userService;
-
     private final UserSimpleDto userRequestNew = new UserSimpleDto("user@user.com", "user");
     private final UserDto userRequestPatch = new UserDto(1, "userUpdate@user.com", "userUpdate");
     private final UserDto userResponse = new UserDto(1, "user@user.com", "user");
     private final List<UserDto> userResponseList = List.of(
             new UserDto(2, "root@user.com", "root"),
             new UserDto(3, "user@user.com", "user"));
+    @Autowired
+    private ObjectMapper mapper;
+    @Autowired
+    private MockMvc mvc;
+    @MockBean
+    private UserServiceImpl userService;
 
     @SneakyThrows
     @Test

@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.comment.api.dto;
+package ru.practicum.shareit.item.api.dto;
 
 import lombok.*;
 import ru.practicum.shareit.valid.group.Create;
@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class CommentSimpleDto {
     @NotBlank(groups = {Create.class})
     @Size(max = 2048, groups = {Create.class})

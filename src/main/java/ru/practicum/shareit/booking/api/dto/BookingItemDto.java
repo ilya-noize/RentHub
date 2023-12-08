@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Builder
-@JsonPropertyOrder({ "id", "bookerId" })
-public class BookingToItemDto {
+@JsonPropertyOrder({"id", "bookerId"})
+public class BookingItemDto {
     private Long id;
     private Integer itemId;
     private Integer bookerId;

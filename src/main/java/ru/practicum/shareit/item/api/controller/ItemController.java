@@ -1,16 +1,19 @@
 package ru.practicum.shareit.item.api.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.api.dto.CommentDto;
+import ru.practicum.shareit.item.api.dto.CommentSimpleDto;
 import ru.practicum.shareit.item.api.dto.ItemDto;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
 import ru.practicum.shareit.item.api.service.ItemService;
-import ru.practicum.shareit.item.comment.api.dto.CommentDtoRecord;
-import ru.practicum.shareit.item.comment.api.dto.CommentSimpleDto;
 import ru.practicum.shareit.valid.group.Create;
 import ru.practicum.shareit.valid.group.Update;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -65,20 +68,28 @@ public class ItemController {
 
     @GetMapping(SEARCH_ITEM)
     public List<ItemSimpleDto> search(
-            @RequestParam(name = "text") String textSearch) {
+            @RequestParam(name = "text") String textSearch,
+            @RequestParam(required = false, defaultValue = "0")
+            @PositiveOrZero Integer from,
+            @RequestParam(required = false, defaultValue = "50")
+            @Positive Integer size) {
 
-        return service.search(textSearch);
+        return service.search(textSearch, PageRequest.of(from / size, size));
     }
 
     @GetMapping(GET_ALL_ITEMS)
     public List<ItemDto> getAll(
-            @RequestHeader(HEADER_USER_ID) Integer userId) {
+            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestParam(required = false, defaultValue = "0")
+            @PositiveOrZero Integer from,
+            @RequestParam(required = false, defaultValue = "50")
+            @Positive Integer size) {
 
-        return service.getAll(userId);
+        return service.getAll(userId, PageRequest.of(from / size, size), LocalDateTime.now());
     }
 
     @PostMapping(CREATE_COMMENT)
-    public CommentDtoRecord createComment(
+    public CommentDto createComment(
             @RequestHeader(HEADER_USER_ID) Integer userId,
             @PathVariable(name = "id") Integer itemId,
             @RequestBody
