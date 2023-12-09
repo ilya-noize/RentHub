@@ -69,7 +69,7 @@ public class BookingServiceImpl implements BookingService {
             throw new RentalPeriodException(error);
         }
 
-        if (end.isBefore(start)) {
+        if (start.isAfter(end)) {
             String error = "The effective date of the lease agreement"
                     + " after its termination";
             throw new RentalPeriodException(error);
@@ -147,16 +147,13 @@ public class BookingServiceImpl implements BookingService {
         boolean isOwner;
 
         booking = bookingRepository.findById(bookingId)
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                format("Booking with ID: %d not found.",
-                                        bookingId)));
+                .orElseThrow(() -> new NotFoundException(
+                        format(BOOKING_WITH_ID_NOT_EXIST, bookingId)));
 
         isNotExistUser = !userRepository.existsById(userId);
         if (isNotExistUser) {
             throw new NotFoundException(
-                    format("User with ID: %d not found",
-                            userId));
+                    format(USER_WITH_ID_NOT_EXIST, userId));
         }
 
         bookerId = booking.getBooker().getId();

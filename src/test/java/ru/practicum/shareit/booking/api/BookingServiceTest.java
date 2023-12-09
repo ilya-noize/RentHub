@@ -121,6 +121,7 @@ class BookingServiceTest extends InjectResources {
         assertEquals(e.getMessage(), format(USER_WITH_ID_NOT_EXIST, bookerId));
     }
 
+
     @Test
     void update_REJECTED() {
         //given

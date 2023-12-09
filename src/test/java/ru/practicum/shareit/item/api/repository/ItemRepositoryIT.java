@@ -13,7 +13,8 @@ import ru.practicum.shareit.user.entity.User;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static ru.practicum.shareit.ShareItApp.random;
 
 
@@ -46,10 +47,8 @@ public class ItemRepositoryIT {
             int itemId = item.getId();
             if (itemId % 3 == 1) {
                 item.setOwner(users.get(0));
-                item.setName("Столярные инструменты");
             } else if (itemId % 3 == 2) {
                 item.setOwner(users.get(1));
-                item.setDescription("Сетевой шуруповёрт");
             } else {
                 item.setOwner(users.get(2));
                 item.setAvailable(false);
@@ -58,14 +57,37 @@ public class ItemRepositoryIT {
         return itemRepository.saveAll(items);
     }
 
-    private void setUp() {
-        List<User> users = getListUsers();
-        getListItems(users);
+    private User getNewUser() {
+        User owner = random.nextObject(User.class);
+
+        return userRepository.save(owner);
+    }
+
+    private void getNewItem(User owner, String name, String description) {
+        Item item = random.nextObject(Item.class);
+        item.setOwner(owner);
+        item.setName(name);
+        item.setDescription(description);
+        item.setAvailable(true);
+        item.setRequest(null);
+        itemRepository.save(item);
+    }
+
+    private Item getNewItem(User owner) {
+        Item item = random.nextObject(Item.class);
+        item.setOwner(owner);
+        item.setAvailable(true);
+        item.setRequest(null);
+
+        return itemRepository.save(item);
     }
 
     @Test
     void searchItemByNameOrDescription() {
-        setUp();
+        User owner = getNewUser();
+        getNewItem(owner, "Шуруповёрт", "В кейсе");
+        getNewItem(owner, "Гайковёрт", "нету");
+
         //given
         String search = "оВёрТ";
 
@@ -73,7 +95,7 @@ public class ItemRepositoryIT {
         List<Item> searchItemByNameOrDescription = itemRepository.searchItemByNameOrDescription(search, pageable);
 
         //then
-        assertEquals(1, searchItemByNameOrDescription.size());
+        assertEquals(2, searchItemByNameOrDescription.size());
     }
 
     @Test
@@ -131,15 +153,12 @@ public class ItemRepositoryIT {
     @Test
     void updateNameAndAvailableById() {
         //given
-        List<User> users = getListUsers();
-        List<Item> items = getListItems(users);
-        int itemId = items.get(0).getId();
+        User owner = getNewUser();
+        Item item = getNewItem(owner);
+        int itemId = item.getId();
 
         String name = "Шуруповёрт сетевой";
         boolean available = false;
-
-        Item item = itemRepository.getReferenceById(itemId);
-        assertTrue(item.isAvailable());
 
         //when
         itemRepository.updateNameAndAvailableById(name, available, itemId);

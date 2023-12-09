@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.api.dto.CommentDto;
 import ru.practicum.shareit.item.api.dto.CommentSimpleDto;
 import ru.practicum.shareit.item.api.dto.ItemDto;
@@ -34,14 +35,13 @@ class ItemControllerIT {
             .id(1)
             .name("Item")
             .description("Description")
-            .available(true).build();
+            .available(true)
+            .requestId(null).build();
     private final ItemSimpleDto itemRequestPatch = ItemSimpleDto.builder()
             .id(1)
             .name("ItemUpdate")
             .description("DescriptionUpdate")
             .available(false).build();
-    private final List<ItemSimpleDto> itemSearchResponse = List.of(itemRequest);
-
     private final ItemDto itemResponse = ItemDto.builder()
             .id(1)
             .name("Item")
@@ -92,6 +92,52 @@ class ItemControllerIT {
 
         verify(itemService, times(1))
                 .create(1, itemRequest);
+    }
+
+    @Test
+    void create_Throw() throws Exception {
+        itemRequest.setRequestId(1);
+        when(itemService.create(1, itemRequest))
+                .thenThrow(NotFoundException.class);
+
+        RequestBuilder requestBuilder = post(CREATE_ITEM)
+                .content(mapper.writeValueAsString(itemRequest))
+                .header(HEADER_USER_ID, 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+
+        mvc.perform(requestBuilder)
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void create_Throw2() throws Exception {
+        when(itemService.create(1, itemRequest))
+                .thenThrow(NotFoundException.class);
+
+        RequestBuilder requestBuilder = post(CREATE_ITEM)
+                .content(mapper.writeValueAsString(itemRequest))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+
+        mvc.perform(requestBuilder)
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    void create_Throw3() throws Exception {
+        int wrongUserId = 9999;
+        when(itemService.create(wrongUserId, itemRequest))
+                .thenThrow(NotFoundException.class);
+
+        RequestBuilder requestBuilder = post(CREATE_ITEM)
+                .content(mapper.writeValueAsString(itemRequest))
+                .header(HEADER_USER_ID, wrongUserId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+
+        mvc.perform(requestBuilder)
+                .andExpect(status().isNotFound());
     }
 
     @Test
