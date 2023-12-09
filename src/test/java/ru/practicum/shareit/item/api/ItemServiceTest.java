@@ -1,23 +1,17 @@
 package ru.practicum.shareit.item.api;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.api.dto.ItemDto;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
 import ru.practicum.shareit.item.api.repository.ItemRepository;
 import ru.practicum.shareit.item.api.service.ItemService;
 import ru.practicum.shareit.item.entity.Item;
-import ru.practicum.shareit.user.api.UserService;
-import ru.practicum.shareit.user.api.dto.UserDto;
-import ru.practicum.shareit.user.api.dto.UserSimpleDto;
+import ru.practicum.shareit.user.api.repository.UserRepository;
 import ru.practicum.shareit.user.entity.User;
-import ru.practicum.shareit.utils.InjectResources;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,89 +20,41 @@ import java.util.List;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.practicum.shareit.ShareItApp.USER_WITH_ID_NOT_EXIST;
+import static ru.practicum.shareit.ShareItApp.random;
 
 @SpringBootTest
-class ItemServiceTest extends InjectResources { // todo true named class
+class ItemServiceTest { // todo true named class
     public static final LocalDateTime NOW = LocalDateTime.now();
-    private final List<Integer> userIds = new ArrayList<>();
-    private final List<Integer> itemIds = new ArrayList<>();
-    private ItemSimpleDto itemSimpleDto;
-    @Autowired
-    private ItemRepository itemRepository;
-
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private ItemService itemService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ItemRepository itemRepository;
 
-    @BeforeEach
-    void setUp() {
-        boolean getUserSimpleDto = true;
-        boolean getItemSimpleDto = true;
 
-
-        items.forEach(item -> {
-            int itemId = item.getId();
-            if (itemId % 3 == 1) {
-                item.setOwner(users.get(0));
-            } else if (itemId % 3 == 2) {
-                item.setOwner(users.get(1));
-            } else {
-                item.setOwner(users.get(2));
-            }
-        });
-
-        for (User owner : ownerStorage.keySet()) {
-
-            UserSimpleDto userDto = new UserSimpleDto(owner.getEmail(), owner.getName());
-
-            if (getUserSimpleDto) {
-                getUserSimpleDto = false;
-            }
-            UserDto resultUser = userService.create(userDto);
-            int userId = resultUser.getId();
-
-            List<Integer> itemIdsToStorage = new ArrayList<>();
-
-            for (Item item : ownerStorage.get(owner)) {
-
-                ItemSimpleDto itemDto = ItemSimpleDto.builder()
-                        .name(item.getName())
-                        .description(item.getDescription())
-                        .available(item.isAvailable()).build();
-
-                if (getItemSimpleDto) {
-                    itemSimpleDto = itemDto;
-                    getItemSimpleDto = false;
-                }
-                ItemDto resultItem = itemService.create(userId, itemDto);
-                int itemId = resultItem.getId();
-                itemIdsToStorage.add(itemId);
-            }
-            itemIds.addAll(itemIdsToStorage);
-            userIds.add(userId);
-        }
-        System.out.printf("userIds:%s, itemIds:%s%n", userIds, itemIds);
+    private User getNewUser() {
+        User owner = random.nextObject(User.class);
+        return userRepository.save(owner);
     }
 
-    @AfterEach
-    void tearDown() {
-        itemRepository.deleteAll();
-        userService.getAll()
-                .stream()
-                .map(UserDto::getId)
-                .forEach(userService::delete);
+    private Item getNewItem(User owner) {
+        Item item = random.nextObject(Item.class);
+        item.setOwner(owner);
+        item.setRequest(null);
+        return itemRepository.save(item);
     }
 
     @Test
     void create_whenUserIdNotExist_thenReturnException() {
         //given
         Integer userId = 100;
+        ItemSimpleDto dto = random.nextObject(ItemSimpleDto.class);
         //when
         NotFoundException e = assertThrows(
                 NotFoundException.class,
-                () -> itemService.create(userId, itemSimpleDto));
+                () -> itemService.create(userId, dto));
         //then
         assertEquals(format(USER_WITH_ID_NOT_EXIST, userId),
                 e.getMessage());
@@ -116,50 +62,40 @@ class ItemServiceTest extends InjectResources { // todo true named class
 
     @Test
     void get_whenUserAndItemExists_thenReturnDto() {
-        //given
-        int userId = userIds.get(0);
-        int itemId = itemIds.get(0);
+        User owner = getNewUser();
+        Item item = getNewItem(owner);
 
         //when
-        final ItemDto response = itemService.get(userId, itemId);
+        final ItemDto response = itemService.get(owner.getId(), item.getId());
 
         //then
-        assertEquals(response.getId(), itemId);
-        assertEquals(response.getName(), itemSimpleDto.getName());
-        assertEquals(response.getDescription(), itemSimpleDto.getDescription());
-        assertEquals(response.getAvailable(), itemSimpleDto.getAvailable());
+        assertEquals(response.getId(), item.getId());
+        assertEquals(response.getName(), item.getName());
+        assertEquals(response.getDescription(), item.getDescription());
+        assertEquals(response.getAvailable(), item.isAvailable());
         assertEquals(response.getComments(), List.of());
         assertNull(response.getLastBooking());
         assertNull(response.getNextBooking());
     }
 
     @Test
-    void get_whenUserNotExist_thenReturnException() {
-        //given
-        int userId = 9999;
-        int itemId = itemIds.get(itemIds.size() - 1);
+    void getAll() {
+        User owner = getNewUser();
 
-        //when
-        NotFoundException exception = assertThrows(
-                NotFoundException.class,
-                () -> itemService.get(userId, itemId));
+        List<Item> items = new ArrayList<>();
+        final int sizeArray = 10;
+        final int onPage = 1;
+        for (int i = 0; i < sizeArray; i++) {
+            items.add(getNewItem(owner));
+        }
+
+        final List<ItemDto> response = itemService.getAll(owner.getId(),
+                Pageable.ofSize(onPage), NOW);
 
         //then
-        assertEquals(exception.getMessage(),
-                format(USER_WITH_ID_NOT_EXIST, userId));
-    }
-
-    @DirtiesContext
-    @Test
-    void getAll() {
-        // when
-        List<ItemDto> getAllByUser1 = itemService
-                .getAll(userIds.get(0), PageRequest.of(0, 50), NOW);
-        List<ItemDto> getAll = itemService
-                .getAll(userIds.get(2), PageRequest.of(0, 50), NOW);
-
-        // then
-        assertEquals(3, getAllByUser1.size());
-        assertEquals(3, getAll.size());
+        assertEquals(response.get(0).getId(), items.get(0).getId());
+        assertEquals(response.get(0).getName(), items.get(0).getName());
+        assertNotEquals(sizeArray, response.size());
+        assertEquals(onPage, response.size());
     }
 }

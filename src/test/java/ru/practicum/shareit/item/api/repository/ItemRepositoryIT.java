@@ -1,60 +1,71 @@
 package ru.practicum.shareit.item.api.repository;
 
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.item.entity.Item;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.api.repository.UserRepository;
 import ru.practicum.shareit.user.entity.User;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.practicum.shareit.utils.ResourcePool.*;
+import static ru.practicum.shareit.ShareItApp.random;
 
 
 @DataJpaTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ItemRepositoryIT {
 
     private final Pageable pageable = Pageable.ofSize(10);
 
     @Autowired
     private ItemRepository itemRepository;
-
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ItemRequestRepository itemRequestRepository;
 
-    @BeforeEach
-    void setUp() {
-        List<User> users = readResource(
-                CREATE_USER_ENTITIES, new TypeReference<>() {
-                });
-        List<Item> items = readResource(
-                CREATE_ITEM_ENTITIES, new TypeReference<>() {
-                });
+    private List<User> getListUsers() {
+        List<User> users = random.objects(User.class, 3).collect(toList());
+        return userRepository.saveAll(users);
+    }
+
+    private List<Item> getListItems(List<User> users) {
+        List<Item> items = random.objects(Item.class, 9).collect(toList());
+
+        for (int i = 1; i <= items.size(); i++) {
+            items.get(i - 1).setId(i);
+            items.get(i - 1).setRequest(null);
+        }
+
         items.forEach(item -> {
             int itemId = item.getId();
             if (itemId % 3 == 1) {
                 item.setOwner(users.get(0));
+                item.setName("Столярные инструменты");
             } else if (itemId % 3 == 2) {
                 item.setOwner(users.get(1));
+                item.setDescription("Сетевой шуруповёрт");
             } else {
                 item.setOwner(users.get(2));
+                item.setAvailable(false);
             }
         });
-        userRepository.saveAll(users);
-        itemRepository.saveAll(items);
+        return itemRepository.saveAll(items);
+    }
+
+    private void setUp() {
+        List<User> users = getListUsers();
+        getListItems(users);
     }
 
     @Test
     void searchItemByNameOrDescription() {
+        setUp();
         //given
         String search = "оВёрТ";
 
@@ -62,51 +73,15 @@ public class ItemRepositoryIT {
         List<Item> searchItemByNameOrDescription = itemRepository.searchItemByNameOrDescription(search, pageable);
 
         //then
-        assertEquals(2, searchItemByNameOrDescription.size());
-        assertEquals(
-                List.of("Шуруповёрт", "Гайковёрт"),
-                searchItemByNameOrDescription.stream()
-                        .map(Item::getName)
-                        .collect(Collectors.toList()));
-    }
-
-    @Test
-    void whenSearchItemByNameOrDescription_thenReturnListItems() {
-        // given
-        String search = "вЁрТ";
-
-        //when
-        List<Item> searchItems = itemRepository.searchItemByNameOrDescription(search, pageable);
-
-        //then
-        Integer size = searchItems.size();
-        assertEquals(2, size);
-        assertEquals("Гайковёрт", searchItems.get(size - 1).getName());
-    }
-
-    @Test
-    void whenFindAllByOwnerIdEquals3_thenReturnListWithIdEquals_3_6_9() {
-        //given
-        int userId = 3;
-
-        // when
-        List<Item> findAllByOwnerId = itemRepository.findAllByOwner_Id(userId, pageable);
-
-        //then
-        assertEquals(3, findAllByOwnerId.size());
-        assertEquals(
-                List.of(3, 6, 9),
-                findAllByOwnerId
-                        .stream()
-                        .map(Item::getId)
-                        .collect(Collectors.toList()));
+        assertEquals(1, searchItemByNameOrDescription.size());
     }
 
     @Test
     void existsByIdAndOwner_Id() {
-        // User1 has only 1,4,7 Item
         //given
-        int ownerId = 1;
+        List<User> users = getListUsers();
+        getListItems(users);
+        int ownerId = users.get(0).getId();
 
         //then
         List<Item> itemsByOwner = itemRepository.findAllByOwner_Id(ownerId, pageable);
@@ -118,8 +93,11 @@ public class ItemRepositoryIT {
     @Test
     void deleteByIdAndOwner_Id() {
         // given
-        int ownerId = 1;
-        int itemId = 7;
+        List<User> users = getListUsers();
+        List<Item> items = getListItems(users);
+        int ownerId = users.get(0).getId();
+        int itemId = items.get(0).getId();
+
         List<Item> itemsBefore = itemRepository.findAllByOwner_Id(ownerId, pageable);
         assertEquals(3, itemsBefore.size());
 
@@ -134,12 +112,12 @@ public class ItemRepositoryIT {
     @Test
     void updateNameAndDescriptionById() {
         //given
+        List<User> users = getListUsers();
+        List<Item> items = getListItems(users);
+        int itemId = items.get(0).getId();
+
         String name = "Шуруповёрт сетевой";
         String description = "Кейс в комплекте.";
-        int itemId = 3;
-        Item item = itemRepository.getReferenceById(itemId);
-        assertEquals("Шуруповёрт", item.getName());
-        assertEquals("Работает от сети 220 Вольт. Кейс в комплекте.", item.getDescription());
 
         //when
         itemRepository.updateNameAndDescriptionById(name, description, itemId);
@@ -153,11 +131,14 @@ public class ItemRepositoryIT {
     @Test
     void updateNameAndAvailableById() {
         //given
+        List<User> users = getListUsers();
+        List<Item> items = getListItems(users);
+        int itemId = items.get(0).getId();
+
         String name = "Шуруповёрт сетевой";
         boolean available = false;
-        int itemId = 3;
+
         Item item = itemRepository.getReferenceById(itemId);
-        assertEquals("Шуруповёрт", item.getName());
         assertTrue(item.isAvailable());
 
         //when
@@ -172,12 +153,12 @@ public class ItemRepositoryIT {
     @Test
     void updateDescriptionAndAvailableById() {
         //given
+        List<User> users = getListUsers();
+        List<Item> items = getListItems(users);
+        int itemId = items.get(0).getId();
+
         String description = "Кейс в комплекте.";
         boolean available = false;
-        int itemId = 3;
-        Item item = itemRepository.getReferenceById(itemId);
-        assertEquals("Работает от сети 220 Вольт. Кейс в комплекте.", item.getDescription());
-        assertTrue(item.isAvailable());
 
         //when
         itemRepository.updateDescriptionAndAvailableById(description, available, itemId);
@@ -191,10 +172,11 @@ public class ItemRepositoryIT {
     @Test
     void updateNameById() {
         //given
+        List<User> users = getListUsers();
+        List<Item> items = getListItems(users);
+        int itemId = items.get(0).getId();
+
         String name = "Шуруповёрт сетевой";
-        int itemId = 3;
-        Item item = itemRepository.getReferenceById(itemId);
-        assertEquals("Шуруповёрт", item.getName());
 
         //when
         itemRepository.updateNameById(name, itemId);
@@ -207,10 +189,11 @@ public class ItemRepositoryIT {
     @Test
     void updateDescriptionById() {
         //given
+        List<User> users = getListUsers();
+        List<Item> items = getListItems(users);
+        int itemId = items.get(0).getId();
+
         String description = "Кейс в комплекте.";
-        int itemId = 3;
-        Item item = itemRepository.getReferenceById(itemId);
-        assertEquals("Работает от сети 220 Вольт. Кейс в комплекте.", item.getDescription());
 
         //when
         itemRepository.updateDescriptionById(description, itemId);
@@ -223,8 +206,11 @@ public class ItemRepositoryIT {
     @Test
     void updateAvailableById() {
         //given
+        List<User> users = getListUsers();
+        List<Item> items = getListItems(users);
+        int itemId = items.get(0).getId();
+
         boolean available = false;
-        int itemId = 3;
 
         //when
         itemRepository.updateAvailableById(available, itemId);

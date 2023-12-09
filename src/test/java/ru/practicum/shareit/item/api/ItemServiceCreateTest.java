@@ -24,7 +24,7 @@ import static ru.practicum.shareit.ShareItApp.USER_WITH_ID_NOT_EXIST;
 
 
 @ExtendWith(MockitoExtension.class)
-class ItemServiceCreateIT extends InjectResources { // todo true named class
+class ItemServiceCreateTest extends InjectResources { // todo true named class
     @InjectMocks
     private ItemServiceImpl itemService;
     @Mock

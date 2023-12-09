@@ -364,7 +364,7 @@ public class ItemServiceImpl implements ItemService {
         checkingExistItemById(itemId);
 
         boolean notExistBooking = !bookingRepository
-                .existsByItem_IdAndBooker_IdAndStatusAndEndBefore(
+                .existsCompletedBookingByTheUserOfTheItem(
                         itemId, authorId, APPROVED, commentSimpleDto.getCreated());
         if (notExistBooking) {
             throw new BadRequestException(

@@ -29,6 +29,9 @@ import static ru.practicum.shareit.booking.entity.enums.BookingStatus.*;
 @Slf4j
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
+    private final Sort sortStartDesc =
+            Sort.by(Sort.Direction.DESC, "start");
+
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
@@ -267,7 +270,7 @@ public class BookingServiceImpl implements BookingService {
         switch (state) {
             case CURRENT:
                 bookingList = bookingRepository.findAllByItem_Owner_IdAndStartBeforeAndEndAfter(ownerId,
-                        now, now, Sort.by(Sort.Direction.DESC, "start"));
+                        now, now, sortStartDesc);
 
                 break;
             case PAST:
