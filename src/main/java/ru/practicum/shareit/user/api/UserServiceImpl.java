@@ -73,18 +73,22 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserDto update(UserDto userDto) {
-        int id = userDto.getId();
-        log.debug("[i] update User:{} by ID:{}", userDto, id);
-        User userEntity = userRepository.findById(id)
+        int userId = userDto.getId();
+        log.debug("[i] update User:{} by ID:{}", userDto, userId);
+        User userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(
-                        format(USER_NOT_EXISTS, id)));
-        if (userDto.getName() == null || userDto.getName().isBlank()) {
+                        format(USER_NOT_EXISTS, userId)));
+
+        String name = userDto.getName();
+        boolean nameIsNullOrBlank = name == null || name.isBlank();
+        if (nameIsNullOrBlank) {
             userDto.setName(userEntity.getName());
         }
 
-        String email = userEntity.getEmail();
-        if (userDto.getEmail() == null || userDto.getEmail().isBlank()) {
-            userDto.setEmail(email);
+        String email = userDto.getEmail();
+        boolean emailIsNullOrBlank = email == null || email.isBlank();
+        if (emailIsNullOrBlank) {
+            userDto.setEmail(userEntity.getEmail());
         }
 
         return UserMapper.INSTANTS.toDto(

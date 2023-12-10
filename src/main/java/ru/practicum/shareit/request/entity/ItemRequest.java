@@ -12,10 +12,10 @@ import java.util.List;
 /**
  * A class of user requests for items
  * <p>
- * {@code id} ID request <br/>
- * {@code created} Date of creation <br/>
- * {@code description} Request text <br/>
- * {@code requester} The author of the request <br/>
+ * {@link #id} ID request <br/>
+ * {@link #created} Date of creation <br/>
+ * {@link #description} Request text <br/>
+ * {@link #requester} The author of the request <br/>
  */
 @Builder
 @Getter

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.api.service;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,7 +31,7 @@ import static ru.practicum.shareit.booking.entity.enums.BookingStatus.APPROVED;
 
 @SpringBootTest
 @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
-class ItemServiceImplTest {
+class ItemServiceCommentsIT {
     private final LocalDateTime now = LocalDateTime.now();
     @Autowired
     private UserService userService;
@@ -112,7 +113,44 @@ class ItemServiceImplTest {
         commentSimpleDto.setItemId(itemId);
         commentSimpleDto.setCreated(now.plusDays(publishCommentNDaysAgo));
         itemService.createComment(commentSimpleDto);
+    }
 
+
+    @Test
+    @Disabled
+    void createComment_wrongBooking_Throw() {
+        LocalDateTime now = LocalDateTime.now();
+        int requestSendNDaysAgo = 64;
+        int rentStartNDaysAgo = requestSendNDaysAgo - 32;
+        int rentFinishNDaysAgo = rentStartNDaysAgo - 16;
+        int publishCommentNDaysAgo = 0;
+
+        if (theSequenceOfActionsInTimeIsWrong(
+                requestSendNDaysAgo,
+                rentStartNDaysAgo,
+                rentFinishNDaysAgo,
+                publishCommentNDaysAgo)) {
+            System.out.println("Something wrong in roadmap by create comment.");
+        }
+
+        int authorId = getUserId();
+        int ownerId = getUserId();
+        int itemId = getItemId(ownerId, authorId, requestSendNDaysAgo);
+        getBookingId(ownerId, itemId, authorId,
+                rentStartNDaysAgo, rentFinishNDaysAgo);
+// должно быть true
+        assertFalse(bookingRepository
+                .existsCompletedBookingByTheUserOfTheItem(
+                        itemId, ownerId,
+                        APPROVED,
+                        now.minusDays(publishCommentNDaysAgo)));
+
+        CommentSimpleDto commentSimpleDto = RANDOM.nextObject(CommentSimpleDto.class);
+        commentSimpleDto.setAuthorId(authorId);
+        commentSimpleDto.setItemId(itemId);
+        commentSimpleDto.setCreated(now.plusDays(publishCommentNDaysAgo));
+        itemService.createComment(commentSimpleDto);
+//
 //        BadRequestException e = assertThrows(BadRequestException.class,
 //                () -> itemService.createComment(commentSimpleDto));
 //        System.out.printf("Пользователь с идентификатором:(%d) никогда не бронировал предмет с идентификатором:(%d)\n"
@@ -189,8 +227,8 @@ class ItemServiceImplTest {
     private int getItemId(int ownerId, int authorId, int requestItemDaysAgo) {
         ItemSimpleDto requestItem = RANDOM.nextObject(ItemSimpleDto.class);
         requestItem.setRequestId(getRequestByItem(authorId, requestItemDaysAgo));
-        // todo requestItem.setAvailable(false);
-        //  in Booking: BadRequestException: It is impossible to rent an item to which access is closed.
+        // requestItem.setAvailable(false);
+        // in Booking: BadRequestException: It is impossible to rent an item to which access is closed.
         requestItem.setAvailable(true);
         ItemDto itemDto = itemService.create(ownerId, requestItem);
         return itemDto.getId();

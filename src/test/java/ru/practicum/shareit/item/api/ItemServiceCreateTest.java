@@ -12,23 +12,28 @@ import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
 import ru.practicum.shareit.item.api.repository.ItemRepository;
 import ru.practicum.shareit.item.api.service.ItemServiceImpl;
 import ru.practicum.shareit.item.entity.Item;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.api.repository.UserRepository;
 import ru.practicum.shareit.user.entity.User;
 import ru.practicum.shareit.utils.InjectResources;
+
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-import static ru.practicum.shareit.ShareItApp.USER_NOT_EXISTS;
+import static ru.practicum.shareit.ShareItApp.*;
 
 
 @ExtendWith(MockitoExtension.class)
-class ItemServiceCreateTest extends InjectResources { // todo true named class
+class ItemServiceCreateTest extends InjectResources {
     @InjectMocks
     private ItemServiceImpl itemService;
     @Mock
     private ItemRepository itemRepository;
+    @Mock
+    private ItemRequestRepository itemRequestRepository;
     @Mock
     private UserRepository userRepository;
 
@@ -47,6 +52,30 @@ class ItemServiceCreateTest extends InjectResources { // todo true named class
                 () -> itemService.create(userId, request));
 
         assertEquals(e.getMessage(), format(USER_NOT_EXISTS, userId));
+
+        verify(itemRepository, never()).save(item);
+    }
+
+    @Test
+    @DisplayName("ITEM CREATE _ THROW IF REQUEST NOT EXIST")
+    void create_whenRequestNotExists_thenReturnException() {
+        Item item = RANDOM.nextObject(Item.class);
+        final User owner = item.getOwner();
+        item.setRequest(null);
+        final ItemSimpleDto simpleDto = ItemMapper.INSTANCE.toSimpleDto(item);
+        final int userId = owner.getId();
+        final int requestId = 1;
+        simpleDto.setRequestId(requestId);
+
+        when(userRepository.existsById(userId))
+                .thenReturn(true);
+        when(itemRequestRepository.findById(requestId))
+                .thenReturn(Optional.empty())
+                .thenThrow(new NotFoundException(
+                        format(REQUEST_NOT_EXISTS, requestId)));
+        assertThrows(NotFoundException.class,
+                () -> itemService.create(userId, simpleDto),
+                format(REQUEST_NOT_EXISTS, requestId));
 
         verify(itemRepository, never()).save(item);
     }

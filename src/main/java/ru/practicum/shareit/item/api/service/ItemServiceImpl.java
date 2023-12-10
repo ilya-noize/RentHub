@@ -89,7 +89,8 @@ public class ItemServiceImpl implements ItemService {
      *     <li>{@link ItemDto#available} Visibility for all users</li>
      * </ul>
      *
-     * @param userId  Идентификатор владелец предмета
+     * @param ownerId Идентификатор владелец предмета
+     * @param itemId  Идентификатор предмета
      * @param itemDto ITEM DTO
      *                Название предмета
      *                Описание предмета
@@ -97,20 +98,20 @@ public class ItemServiceImpl implements ItemService {
      * @return itemDTO
      */
     @Override
-    public ItemDto update(Integer userId, Integer itemId, ItemSimpleDto itemDto) {
+    public ItemDto update(Integer ownerId, Integer itemId, ItemSimpleDto itemDto) {
         log.info("[i] UPDATE ITEM");
         String name = itemDto.getName();
         String description = itemDto.getDescription();
         Boolean available = itemDto.getAvailable();
 
-        checkingExistUserById(userId);
+        checkingExistUserById(ownerId);
 
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(
                         () -> new NotFoundException(
                                 format(ITEM_NOT_EXISTS, itemId)));
 
-        boolean isNotOwner = itemRepository.notExistsByIdAndOwner_Id(itemId, userId);
+        boolean isNotOwner = itemRepository.notExistsByIdAndOwner_Id(itemId, ownerId);
         if (isNotOwner) {
             throw new BadRequestException("Editing an item is only allowed to the owner of that item.");
         }
@@ -118,20 +119,19 @@ public class ItemServiceImpl implements ItemService {
         boolean notNullDescription = !(description == null || description.isEmpty());
         boolean notNullName = !(name == null || name.isBlank());
 
+        if (notNullName && notNullDescription && available != null) {
+            return ItemMapper.INSTANCE.toDto(
+                    itemRepository.save(
+                            ItemMapper.INSTANCE.toEntity(itemDto, ownerId)));
+        }
+
+
         if (notNullName) {
             if (notNullDescription) {
-                if (available != null) {
-
-                    return ItemMapper.INSTANCE.toDto(
-                            itemRepository.save(
-                                    ItemMapper.INSTANCE.toEntity(itemDto, userId)));
-
-                } else {
-                    log.info("[i] Name = {}, Description = {};", name, description);
-                    itemRepository.updateNameAndDescriptionById(name, description, itemId);
-                    item.setName(name);
-                    item.setDescription(description);
-                }
+                log.info("[i] Name = {}, Description = {};", name, description);
+                itemRepository.updateNameAndDescriptionById(name, description, itemId);
+                item.setName(name);
+                item.setDescription(description);
             } else {
                 if (available != null) {
                     log.info("[i] Name = {}, Available = {};", name, available);

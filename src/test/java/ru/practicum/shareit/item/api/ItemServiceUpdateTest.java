@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.api.dto.ItemDto;
 import ru.practicum.shareit.item.api.dto.ItemMapper;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
@@ -13,12 +14,16 @@ import ru.practicum.shareit.item.api.repository.ItemRepository;
 import ru.practicum.shareit.item.api.service.ItemServiceImpl;
 import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.user.api.repository.UserRepository;
+import ru.practicum.shareit.user.entity.User;
 import ru.practicum.shareit.utils.InjectResources;
 
 import java.util.Optional;
 
+import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static ru.practicum.shareit.ShareItApp.ITEM_NOT_EXISTS;
+import static ru.practicum.shareit.ShareItApp.USER_NOT_EXISTS;
 
 @ExtendWith(MockitoExtension.class)
 class ItemServiceUpdateTest extends InjectResources {
@@ -28,6 +33,174 @@ class ItemServiceUpdateTest extends InjectResources {
     private ItemRepository itemRepository;
     @Mock
     private UserRepository userRepository;
+
+    @Test
+    @DisplayName("Update impossible - Owner not found")
+    void update_whenUserNotExists_thenReturnException() {
+        User owner = random.nextObject(User.class);
+        owner.setId(10);
+        Item item = random.nextObject(Item.class);
+        item.setOwner(owner);
+        final int wrongUserId = random.nextInt(5);
+        final int itemId = item.getId();
+
+        ItemSimpleDto itemDtoRequest = ItemMapper.INSTANCE.toSimpleDto(item);
+        String name = itemDtoRequest.getName();
+        String description = itemDtoRequest.getDescription();
+        Boolean available = itemDtoRequest.getAvailable();
+
+        when(userRepository.existsById(wrongUserId))
+                .thenReturn(false);
+
+        assertThrows(NotFoundException.class,
+                () -> itemService.update(wrongUserId, itemId, itemDtoRequest),
+                format(USER_NOT_EXISTS, wrongUserId));
+
+        verify(userRepository, times(1))
+                .existsById(anyInt());
+        verify(itemRepository, never())
+                .findById(anyInt());
+
+        verify(itemRepository, never())
+                .updateNameById(name, itemId);
+        verify(itemRepository, never())
+                .updateNameAndDescriptionById(name, description, itemId);
+        verify(itemRepository, never())
+                .updateNameAndAvailableById(name, available, itemId);
+        verify(itemRepository, never())
+                .updateDescriptionAndAvailableById(description, available, itemId);
+        verify(itemRepository, never())
+                .updateDescriptionById(description, itemId);
+        verify(itemRepository, never())
+                .updateAvailableById(available, itemId);
+
+        verify(itemRepository, never()).save(item);
+    }
+
+    @Test
+    @DisplayName("Update impossible - Item not found")
+    void update_whenItemNotExists_thenReturnException() {
+
+        User owner = random.nextObject(User.class);
+        owner.setId(10);
+        Item item = random.nextObject(Item.class);
+        final int itemId = item.getId();
+
+        item.setOwner(owner);
+        final int userId = random.nextInt(5);
+
+        ItemSimpleDto itemDtoRequest = ItemMapper.INSTANCE.toSimpleDto(item);
+        String name = itemDtoRequest.getName();
+        String description = itemDtoRequest.getDescription();
+        Boolean available = itemDtoRequest.getAvailable();
+
+        when(userRepository.existsById(userId))
+                .thenReturn(true);
+
+        when(itemRepository.findById(itemId))
+                .thenReturn(Optional.empty())
+                .thenThrow(new NotFoundException(
+                        format(ITEM_NOT_EXISTS, itemId)));
+
+        assertThrows(NotFoundException.class,
+                () -> itemService.update(userId, itemId, itemDtoRequest),
+                format(ITEM_NOT_EXISTS, userId));
+
+        verify(userRepository, times(1))
+                .existsById(anyInt());
+        verify(itemRepository, times(1))
+                .findById(anyInt());
+
+        verify(itemRepository, never())
+                .updateNameById(name, itemId);
+        verify(itemRepository, never())
+                .updateNameAndDescriptionById(name, description, itemId);
+        verify(itemRepository, never())
+                .updateNameAndAvailableById(name, available, itemId);
+        verify(itemRepository, never())
+                .updateDescriptionAndAvailableById(description, available, itemId);
+        verify(itemRepository, never())
+                .updateDescriptionById(description, itemId);
+        verify(itemRepository, never())
+                .updateAvailableById(available, itemId);
+
+        verify(itemRepository, never()).save(item);
+
+    }
+
+    @Test
+    @DisplayName("Update Name + Description + Available")
+    void update() {
+        // given
+        User owner = random.nextObject(User.class);
+        final int userId = owner.getId();
+        Item entity = random.nextObject(Item.class);
+        final int itemId = entity.getId();
+        entity.setAvailable(false);
+        entity.setOwner(owner);
+
+        final String setName = "setName";
+        final String setDescription = "setDescription";
+        final boolean setAvailable = true;
+        Item updateEntity = Item.builder()
+                .id(itemId)
+                .name(setName)
+                .description(setDescription)
+                .available(setAvailable)
+                .owner(owner)
+                .request(null).build();
+
+        ItemSimpleDto requestDto = ItemMapper.INSTANCE.toSimpleDto(updateEntity);
+
+        // when
+        when(userRepository.existsById(userId))
+                .thenReturn(true);
+
+        when(itemRepository.findById(itemId))
+                .thenReturn(Optional.of(entity));
+
+        when(itemRepository.notExistsByIdAndOwner_Id(itemId, userId))
+                .thenReturn(false);
+
+        when(itemRepository.save(any(Item.class)))
+                .thenReturn(updateEntity);
+
+        ItemDto response = itemService.update(userId, itemId, requestDto);
+
+        // then
+        assertEquals(setName, response.getName());
+        assertEquals(setDescription, response.getDescription());
+        assertEquals(setAvailable, requestDto.getAvailable());
+        assertNotEquals(entity.getName(), response.getName());
+        assertNotEquals(entity.getDescription(), response.getDescription());
+        assertNotEquals(entity.isAvailable(), response.getAvailable());
+
+        assertNotNull(response.getName());
+        assertNotNull(response.getDescription());
+        assertNotNull(response.getAvailable());
+
+        verify(userRepository, times(1))
+                .existsById(userId);
+        verify(itemRepository, times(1))
+                .notExistsByIdAndOwner_Id(itemId, userId);
+        verify(itemRepository, times(1))
+                .findById(itemId);
+
+        verify(itemRepository, never())
+                .updateNameById(anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateNameAndDescriptionById(anyString(), anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateNameAndAvailableById(anyString(), anyBoolean(), anyInt());
+        verify(itemRepository, never())
+                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyInt());
+        verify(itemRepository, never())
+                .updateDescriptionById(anyString(), anyInt());
+        verify(itemRepository, never())
+                .updateAvailableById(anyBoolean(), anyInt());
+        verify(itemRepository, times(1))
+                .save(any(Item.class));
+    }
 
     @Test
     @DisplayName("Update Name + Description, not Available")

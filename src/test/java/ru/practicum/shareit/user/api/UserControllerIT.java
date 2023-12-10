@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -23,6 +24,7 @@ import static ru.practicum.shareit.user.api.UserController.*;
 
 @WebMvcTest(controllers = UserController.class)
 @AutoConfigureMockMvc
+@AutoConfigureWebMvc
 class UserControllerIT {
     private final UserSimpleDto userRequestNew = new UserSimpleDto("user@user.com", "user");
     private final UserDto userRequestPatch = new UserDto(1, "userUpdate@user.com", "userUpdate");

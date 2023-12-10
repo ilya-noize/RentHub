@@ -31,7 +31,6 @@ public class ItemRequestController {
     public ItemRequestDto create(
             @RequestHeader(HEADER_USER_ID)
             int userId,
-            //todo [!] Received the status 400 BAD_REQUEST Error: null
             @RequestBody @Validated(Create.class)
             ItemRequestSimpleDto itemRequestSimpleDto) {
 

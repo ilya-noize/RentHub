@@ -110,7 +110,7 @@ class ItemControllerIT {
                 .accept(MediaType.APPLICATION_JSON);
 
         mvc.perform(requestBuilder)
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -140,7 +140,7 @@ class ItemControllerIT {
                 .accept(MediaType.APPLICATION_JSON);
 
         mvc.perform(requestBuilder)
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test

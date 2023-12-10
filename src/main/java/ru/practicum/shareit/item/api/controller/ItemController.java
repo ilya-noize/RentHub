@@ -17,7 +17,7 @@ import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ru.practicum.shareit.ShareItApp.HEADER_USER_ID;
+import static ru.practicum.shareit.ShareItApp.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -60,9 +60,9 @@ public class ItemController {
     @GetMapping(SEARCH_ITEM)
     public List<ItemSimpleDto> search(
             @RequestParam(name = "text") String textSearch,
-            @RequestParam(required = false, defaultValue = "0")
+            @RequestParam(required = false, defaultValue = FROM)
             @PositiveOrZero Integer from,
-            @RequestParam(required = false, defaultValue = "50")
+            @RequestParam(required = false, defaultValue = SIZE)
             @Positive Integer size) {
 
         return service.search(textSearch, PageRequest.of(from / size, size));
@@ -71,9 +71,9 @@ public class ItemController {
     @GetMapping(GET_ALL_ITEMS)
     public List<ItemDto> getAll(
             @RequestHeader(HEADER_USER_ID) Integer userId,
-            @RequestParam(required = false, defaultValue = "0")
+            @RequestParam(required = false, defaultValue = FROM)
             @PositiveOrZero Integer from,
-            @RequestParam(required = false, defaultValue = "50")
+            @RequestParam(required = false, defaultValue = SIZE)
             @Positive Integer size) {
 
         return service.getAll(userId, PageRequest.of(from / size, size), LocalDateTime.now());

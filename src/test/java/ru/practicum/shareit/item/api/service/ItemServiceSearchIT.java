@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.api;
+package ru.practicum.shareit.item.api.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
-import ru.practicum.shareit.item.api.service.ItemService;
 import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.user.api.UserService;
 import ru.practicum.shareit.user.api.dto.UserSimpleDto;
