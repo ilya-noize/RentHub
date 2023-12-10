@@ -39,13 +39,4 @@ public class ItemRequest {
 
     @Transient
     private List<Item> items;
-
-    @Override
-    public String toString() {
-        return "ItemRequest{" +
-                "id=" + id +
-                ", description='" + description + '\'' +
-                ", created=" + created +
-                '}';
-    }
 }

@@ -23,8 +23,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static ru.practicum.shareit.user.api.UserController.*;
 
 @WebMvcTest(controllers = UserController.class)
-@AutoConfigureMockMvc
 @AutoConfigureWebMvc
+@AutoConfigureMockMvc
 class UserControllerIT {
     private final UserSimpleDto userRequestNew = new UserSimpleDto("user@user.com", "user");
     private final UserDto userRequestPatch = new UserDto(1, "userUpdate@user.com", "userUpdate");

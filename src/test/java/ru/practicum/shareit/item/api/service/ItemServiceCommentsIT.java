@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.api.service;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -117,7 +116,6 @@ class ItemServiceCommentsIT {
 
 
     @Test
-    @Disabled
     void createComment_wrongBooking_Throw() {
         LocalDateTime now = LocalDateTime.now();
         int requestSendNDaysAgo = 64;
@@ -150,18 +148,6 @@ class ItemServiceCommentsIT {
         commentSimpleDto.setItemId(itemId);
         commentSimpleDto.setCreated(now.plusDays(publishCommentNDaysAgo));
         itemService.createComment(commentSimpleDto);
-//
-//        BadRequestException e = assertThrows(BadRequestException.class,
-//                () -> itemService.createComment(commentSimpleDto));
-//        System.out.printf("Пользователь с идентификатором:(%d) никогда не бронировал предмет с идентификатором:(%d)\n"
-//                        + "либо пользователь еще не завершил бронирование\n"
-//                        + "либо пользователь планирует забронировать этот предмет%n",
-//                authorId, itemId);
-//        assertEquals(e.getMessage(),
-//                format("User with ID:(%d) has never booked an item with ID:(%d)\n"
-//                                + "either the user has not completed the booking yet\n"
-//                                + "or the user is planning to book this item",
-//                        authorId, itemId));
     }
 
     /**

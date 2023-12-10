@@ -12,9 +12,6 @@ import javax.persistence.*;
  * {@code email} User's email <br/>
  */
 
-
-@ToString
-
 @Builder
 @Getter
 @Setter

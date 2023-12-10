@@ -13,7 +13,6 @@ import ru.practicum.shareit.user.api.dto.UserMapper;
 import ru.practicum.shareit.user.api.dto.UserSimpleDto;
 import ru.practicum.shareit.user.api.repository.UserRepository;
 import ru.practicum.shareit.user.entity.User;
-import ru.practicum.shareit.utils.InjectResources;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,8 +24,8 @@ import static ru.practicum.shareit.ShareItApp.RANDOM;
 import static ru.practicum.shareit.ShareItApp.USER_NOT_EXISTS;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest extends InjectResources {
-    private final User user = random.nextObject(User.class);
+class UserServiceTest {
+    private final User user = RANDOM.nextObject(User.class);
     private UserSimpleDto requestDto;
 
     @InjectMocks
@@ -56,9 +55,9 @@ class UserServiceTest extends InjectResources {
     }
 
     @Test
-    void get() {
+    void get_ok() {
         when(userRepository.findById(anyInt()))
-                .thenReturn(Optional.ofNullable(user));
+                .thenReturn(Optional.of(user));
 
         userService.get(1);
 
