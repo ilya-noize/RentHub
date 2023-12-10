@@ -20,7 +20,7 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static ru.practicum.shareit.ShareItApp.USER_WITH_ID_NOT_EXIST;
+import static ru.practicum.shareit.ShareItApp.USER_NOT_EXISTS;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest extends InjectResources {
@@ -103,7 +103,7 @@ class UserServiceTest extends InjectResources {
                 () -> userService.delete(id));
 
         assertEquals(e.getMessage(),
-                format(USER_WITH_ID_NOT_EXIST, id));
+                format(USER_NOT_EXISTS, id));
 
         verify(userRepository, never())
                 .deleteById(id);

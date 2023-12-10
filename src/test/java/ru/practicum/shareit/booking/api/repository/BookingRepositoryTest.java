@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.practicum.shareit.ShareItApp.random;
+import static ru.practicum.shareit.ShareItApp.RANDOM;
 import static ru.practicum.shareit.booking.entity.enums.BookingStatus.*;
 
 
@@ -35,12 +35,12 @@ class BookingRepositoryTest {
     private BookingRepository bookingRepository;
 
     private User getNewUser() {
-        User owner = random.nextObject(User.class);
+        User owner = RANDOM.nextObject(User.class);
         return userRepository.save(owner);
     }
 
     private Item getNewItem(User owner) {
-        Item item = random.nextObject(Item.class);
+        Item item = RANDOM.nextObject(Item.class);
         item.setOwner(owner);
         item.setRequest(null);
         return itemRepository.save(item);

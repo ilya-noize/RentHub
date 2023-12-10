@@ -15,7 +15,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static ru.practicum.shareit.ShareItApp.random;
+import static ru.practicum.shareit.ShareItApp.RANDOM;
 
 
 @DataJpaTest
@@ -31,12 +31,12 @@ public class ItemRepositoryIT {
     private ItemRequestRepository itemRequestRepository;
 
     private List<User> getListUsers() {
-        List<User> users = random.objects(User.class, 3).collect(toList());
+        List<User> users = RANDOM.objects(User.class, 3).collect(toList());
         return userRepository.saveAll(users);
     }
 
     private List<Item> getListItems(List<User> users) {
-        List<Item> items = random.objects(Item.class, 9).collect(toList());
+        List<Item> items = RANDOM.objects(Item.class, 9).collect(toList());
 
         for (int i = 1; i <= items.size(); i++) {
             items.get(i - 1).setId(i);
@@ -58,13 +58,13 @@ public class ItemRepositoryIT {
     }
 
     private User getNewUser() {
-        User owner = random.nextObject(User.class);
+        User owner = RANDOM.nextObject(User.class);
 
         return userRepository.save(owner);
     }
 
     private void getNewItem(User owner, String name, String description) {
-        Item item = random.nextObject(Item.class);
+        Item item = RANDOM.nextObject(Item.class);
         item.setOwner(owner);
         item.setName(name);
         item.setDescription(description);
@@ -74,7 +74,7 @@ public class ItemRepositoryIT {
     }
 
     private Item getNewItem(User owner) {
-        Item item = random.nextObject(Item.class);
+        Item item = RANDOM.nextObject(Item.class);
         item.setOwner(owner);
         item.setAvailable(true);
         item.setRequest(null);

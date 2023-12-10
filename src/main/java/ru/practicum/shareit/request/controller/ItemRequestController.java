@@ -13,8 +13,7 @@ import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ru.practicum.shareit.ShareItApp.HEADER_USER_ID;
-import static ru.practicum.shareit.ShareItApp.checkPageable;
+import static ru.practicum.shareit.ShareItApp.*;
 
 /**
  *
@@ -52,13 +51,12 @@ public class ItemRequestController {
     public List<ItemRequestDto> getAll(
             @RequestHeader(HEADER_USER_ID)
             Integer userId,
-            @RequestParam(required = false, defaultValue = "0")
+            @RequestParam(required = false, defaultValue = FROM)
             @PositiveOrZero
             Integer from,
-            @RequestParam(required = false, defaultValue = "50")
+            @RequestParam(required = false, defaultValue = SIZE)
             @Positive
             Integer size) {
-//        Pageable pageable = PageRequest.of(from / size, size);
 
         return itemRequestService.getAll(userId, checkPageable(from, size));
     }

@@ -5,7 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.item.entity.Item;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.practicum.shareit.ShareItApp.random;
+import static ru.practicum.shareit.ShareItApp.RANDOM;
 
 @SpringBootTest
 class ItemMapperTest {
@@ -13,7 +13,7 @@ class ItemMapperTest {
 
     @Test
     void toSimpleDto() {
-        Item item = random.nextObject(Item.class);
+        Item item = RANDOM.nextObject(Item.class);
 
         ItemSimpleDto result = itemMapper.toSimpleDto(item);
 
@@ -31,7 +31,7 @@ class ItemMapperTest {
 
     @Test
     void toDto() {
-        Item item = random.nextObject(Item.class);
+        Item item = RANDOM.nextObject(Item.class);
 
         ItemDto result = itemMapper.toDto(item);
 
@@ -49,7 +49,7 @@ class ItemMapperTest {
 
     @Test
     void toEntity() {
-        ItemSimpleDto dto = random.nextObject(ItemSimpleDto.class);
+        ItemSimpleDto dto = RANDOM.nextObject(ItemSimpleDto.class);
 
         Item result = itemMapper.toEntity(dto, 1);
 

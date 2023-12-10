@@ -25,7 +25,6 @@ public class ItemController {
     public static final String CREATE_ITEM = "/items";
     public static final String UPDATE_ITEM = "/items/{id}";
     public static final String GET_ITEM = "/items/{id}";
-    public static final String DELETE_ITEM = "/items/{id}";
     public static final String SEARCH_ITEM = "/items/search";
     public static final String GET_ALL_ITEMS = "/items";
     public static final String CREATE_COMMENT = "/items/{id}/comment";
@@ -56,14 +55,6 @@ public class ItemController {
             @PathVariable(name = "id") Integer itemId) {
 
         return service.get(userId, itemId);
-    }
-
-    @DeleteMapping(DELETE_ITEM)
-    public void delete(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
-            @PathVariable(name = "id") Integer itemId) {
-
-        service.delete(userId, itemId);
     }
 
     @GetMapping(SEARCH_ITEM)

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static ru.practicum.shareit.ShareItApp.random;
+import static ru.practicum.shareit.ShareItApp.RANDOM;
 
 @DataJpaTest
 class CommentRepositoryTest {
@@ -27,19 +27,19 @@ class CommentRepositoryTest {
     private CommentRepository commentRepository;
 
     private User getNewUser() {
-        User user = random.nextObject(User.class);
+        User user = RANDOM.nextObject(User.class);
         return userRepository.save(user);
     }
 
     private Item getNewItem(User owner) {
-        Item item = random.nextObject(Item.class);
+        Item item = RANDOM.nextObject(Item.class);
         item.setOwner(owner);
         item.setRequest(null);
         return itemRepository.save(item);
     }
 
     private void getNewComment(User author, Item item) {
-        CommentEntity comment = random.nextObject(CommentEntity.class);
+        CommentEntity comment = RANDOM.nextObject(CommentEntity.class);
         comment.setAuthor(author);
         comment.setItem(item);
         comment.setCreated(now);

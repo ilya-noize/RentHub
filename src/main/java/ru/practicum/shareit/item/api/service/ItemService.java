@@ -18,8 +18,6 @@ public interface ItemService {
 
     List<ItemDto> getAll(Integer userId, Pageable pageable, LocalDateTime now);
 
-    void delete(Integer userId, Integer itemId);
-
     List<ItemSimpleDto> search(String searchText, Pageable pageable);
 
     CommentDto createComment(CommentSimpleDto commentSimpleDto);

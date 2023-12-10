@@ -69,7 +69,7 @@ class ItemServiceImplTest {
                         APPROVED,
                         now.minusDays(publishCommentNDaysAgo)));
 
-        CommentSimpleDto commentSimpleDto = random.nextObject(CommentSimpleDto.class);
+        CommentSimpleDto commentSimpleDto = RANDOM.nextObject(CommentSimpleDto.class);
         commentSimpleDto.setAuthorId(authorId);
         commentSimpleDto.setItemId(itemId);
         commentSimpleDto.setCreated(now.plusDays(publishCommentNDaysAgo));
@@ -107,7 +107,7 @@ class ItemServiceImplTest {
                         APPROVED,
                         now.minusDays(publishCommentNDaysAgo)));
 
-        CommentSimpleDto commentSimpleDto = random.nextObject(CommentSimpleDto.class);
+        CommentSimpleDto commentSimpleDto = RANDOM.nextObject(CommentSimpleDto.class);
         commentSimpleDto.setAuthorId(authorId);
         commentSimpleDto.setItemId(itemId);
         commentSimpleDto.setCreated(now.plusDays(publishCommentNDaysAgo));
@@ -161,7 +161,7 @@ class ItemServiceImplTest {
 
     @Test
     void createComment_wrongText_Throw() {
-        CommentSimpleDto wrongText = random.nextObject(CommentSimpleDto.class);
+        CommentSimpleDto wrongText = RANDOM.nextObject(CommentSimpleDto.class);
         wrongText.setText("   ");
         BadRequestException e = assertThrows(BadRequestException.class,
                 () -> itemService.createComment(wrongText));
@@ -171,14 +171,14 @@ class ItemServiceImplTest {
 
     @Transactional
     private int getUserId() {
-        UserSimpleDto requestUser = random.nextObject(UserSimpleDto.class);
+        UserSimpleDto requestUser = RANDOM.nextObject(UserSimpleDto.class);
         UserDto authorDto = userService.create(requestUser);
         return authorDto.getId();
     }
 
     @Transactional
     private int getRequestByItem(int requesterId, int requestItemDaysAgo) {
-        ItemRequestSimpleDto requestSimpleDto = random.nextObject(ItemRequestSimpleDto.class);
+        ItemRequestSimpleDto requestSimpleDto = RANDOM.nextObject(ItemRequestSimpleDto.class);
         LocalDateTime requestTime = LocalDateTime.now().minusDays(requestItemDaysAgo);
         ItemRequestDto requestDto = itemRequestService
                 .create(requesterId, requestSimpleDto, requestTime);
@@ -187,7 +187,7 @@ class ItemServiceImplTest {
 
     @Transactional
     private int getItemId(int ownerId, int authorId, int requestItemDaysAgo) {
-        ItemSimpleDto requestItem = random.nextObject(ItemSimpleDto.class);
+        ItemSimpleDto requestItem = RANDOM.nextObject(ItemSimpleDto.class);
         requestItem.setRequestId(getRequestByItem(authorId, requestItemDaysAgo));
         // todo requestItem.setAvailable(false);
         //  in Booking: BadRequestException: It is impossible to rent an item to which access is closed.
@@ -198,7 +198,7 @@ class ItemServiceImplTest {
 
     @Transactional
     private void getBookingId(int ownerId, int itemId, int authorId, int rentStartNDaysAgo, int rentFinishNDaysAgo) {
-        BookingSimpleDto requestBooking = random.nextObject(BookingSimpleDto.class);
+        BookingSimpleDto requestBooking = RANDOM.nextObject(BookingSimpleDto.class);
         requestBooking.setItemId(itemId);
         requestBooking.setStart(now.minusDays(rentStartNDaysAgo));
         requestBooking.setEnd(now.minusDays(rentFinishNDaysAgo));
@@ -212,7 +212,7 @@ class ItemServiceImplTest {
         int authorId = getUserId();
         int itemId = Integer.MAX_VALUE;//getItemId(ownerId, authorId, 3);
 
-        CommentSimpleDto commentSimpleDto = random.nextObject(CommentSimpleDto.class);
+        CommentSimpleDto commentSimpleDto = RANDOM.nextObject(CommentSimpleDto.class);
         commentSimpleDto.setAuthorId(authorId);
         commentSimpleDto.setItemId(itemId);
         commentSimpleDto.setCreated(now);
@@ -224,7 +224,7 @@ class ItemServiceImplTest {
 
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> itemService.createComment(commentSimpleDto));
-        assertEquals(e.getMessage(), format(ITEM_WITH_ID_NOT_EXIST, itemId));
+        assertEquals(e.getMessage(), format(ITEM_NOT_EXISTS, itemId));
     }
 
 
@@ -240,6 +240,6 @@ class ItemServiceImplTest {
 
         //then
         assertEquals(exception.getMessage(),
-                format(USER_WITH_ID_NOT_EXIST, userId));
+                format(USER_NOT_EXISTS, userId));
     }
 }

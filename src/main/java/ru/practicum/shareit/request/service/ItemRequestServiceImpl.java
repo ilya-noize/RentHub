@@ -22,8 +22,8 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
-import static ru.practicum.shareit.ShareItApp.REQUEST_WITH_ID_NOT_EXIST;
-import static ru.practicum.shareit.ShareItApp.USER_WITH_ID_NOT_EXIST;
+import static ru.practicum.shareit.ShareItApp.REQUEST_NOT_EXISTS;
+import static ru.practicum.shareit.ShareItApp.USER_NOT_EXISTS;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +36,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public ItemRequestDto create(Integer userId, ItemRequestSimpleDto dto, LocalDateTime now) {
         User requester = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(
-                        format(USER_WITH_ID_NOT_EXIST, userId)));
+                        format(USER_NOT_EXISTS, userId)));
         ItemRequest itemRequest = ItemRequestMapper.INSTANCE.toEntity(dto);
         itemRequest.setRequester(requester);
         itemRequest.setCreated(now);
@@ -58,7 +58,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                     return ItemRequestMapper.INSTANCE.toDto(itemRequest);
                 })
                 .orElseThrow(() -> new NotFoundException(
-                        format(REQUEST_WITH_ID_NOT_EXIST, itemRequestId)));
+                        format(REQUEST_NOT_EXISTS, itemRequestId)));
     }
 
     @Override
@@ -95,7 +95,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private void checkingUserExists(Integer userId) {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException(
-                    format(USER_WITH_ID_NOT_EXIST, userId));
+                    format(USER_NOT_EXISTS, userId));
         }
     }
 }

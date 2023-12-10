@@ -20,7 +20,7 @@ import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-import static ru.practicum.shareit.ShareItApp.USER_WITH_ID_NOT_EXIST;
+import static ru.practicum.shareit.ShareItApp.USER_NOT_EXISTS;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -46,7 +46,7 @@ class ItemServiceCreateTest extends InjectResources { // todo true named class
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> itemService.create(userId, request));
 
-        assertEquals(e.getMessage(), format(USER_WITH_ID_NOT_EXIST, userId));
+        assertEquals(e.getMessage(), format(USER_NOT_EXISTS, userId));
 
         verify(itemRepository, never()).save(item);
     }

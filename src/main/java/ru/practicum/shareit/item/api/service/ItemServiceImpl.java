@@ -69,7 +69,7 @@ public class ItemServiceImpl implements ItemService {
             ItemRequest itemRequest = itemRequestRepository.findById(requestId)
                     .orElseThrow(() ->
                             new NotFoundException(
-                                    format(REQUEST_WITH_ID_NOT_EXIST, requestId)));
+                                    format(REQUEST_NOT_EXISTS, requestId)));
             log.debug("[i] add ItemRequest.id:{}", requestId);
             item.setRequest(itemRequest);
         }
@@ -108,7 +108,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(
                         () -> new NotFoundException(
-                                format(ITEM_WITH_ID_NOT_EXIST, itemId)));
+                                format(ITEM_NOT_EXISTS, itemId)));
 
         boolean isNotOwner = itemRepository.notExistsByIdAndOwner_Id(itemId, userId);
         if (isNotOwner) {
@@ -184,7 +184,7 @@ public class ItemServiceImpl implements ItemService {
         LocalDateTime now = LocalDateTime.now();
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() ->
-                        new NotFoundException(String.format(ITEM_WITH_ID_NOT_EXIST, itemId)));
+                        new NotFoundException(String.format(ITEM_NOT_EXISTS, itemId)));
         ItemDto itemDto = ItemMapper.INSTANCE.toDto(item);
 
         BookingItemDto lastBooking = bookingRepository
@@ -292,30 +292,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     /**
-     * Deleting a user's item
-     * <p>
-     * Exception: only the owner of the item can delete it!
-     *
-     * @param userId Идентификатор пользователя
-     * @param itemId Идентификатор предмета
-     */
-    @Override
-    public void delete(Integer userId, Integer itemId) {
-        log.debug("[i] DELETE Item.Id:{} by User.Id:{}", itemId, userId);
-
-        checkingExistItemById(itemId);
-        checkingExistUserById(userId);
-
-        boolean isNotOwnerThisItem = !itemRepository.notExistsByIdAndOwner_Id(itemId, userId);
-        if (isNotOwnerThisItem) {
-            throw new BadRequestException(
-                    "Edit or remove an item is only allowed to the owner of that item.");
-        }
-
-        itemRepository.deleteByIdAndOwner_Id(itemId, userId);
-    }
-
-    /**
      * Search for an item in the repository
      * <p>
      * If the query string is empty, output an empty list
@@ -360,7 +336,7 @@ public class ItemServiceImpl implements ItemService {
 
         User author = userRepository.findById(authorId)
                 .orElseThrow(() -> new NotFoundException(
-                        format(USER_WITH_ID_NOT_EXIST, authorId)));
+                        format(USER_NOT_EXISTS, authorId)));
         checkingExistItemById(itemId);
 
         boolean notExistBooking = !bookingRepository
@@ -388,7 +364,7 @@ public class ItemServiceImpl implements ItemService {
     private void checkingExistUserById(Integer userId) {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException(
-                    format(USER_WITH_ID_NOT_EXIST, userId));
+                    format(USER_NOT_EXISTS, userId));
         }
     }
 
@@ -400,7 +376,7 @@ public class ItemServiceImpl implements ItemService {
     private void checkingExistItemById(Integer itemId) {
         if (!itemRepository.existsById(itemId)) {
             throw new NotFoundException(
-                    format(ITEM_WITH_ID_NOT_EXIST, itemId));
+                    format(ITEM_NOT_EXISTS, itemId));
         }
     }
 }

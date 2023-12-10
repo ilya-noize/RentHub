@@ -96,7 +96,7 @@ class BookingServiceTest extends InjectResources {
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> bookingService.create(bookerId, bookingRequest));
         //then
-        assertEquals(e.getMessage(), format(ITEM_WITH_ID_NOT_EXIST, itemId));
+        assertEquals(e.getMessage(), format(ITEM_NOT_EXISTS, itemId));
     }
 
     @Test
@@ -118,7 +118,7 @@ class BookingServiceTest extends InjectResources {
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> bookingService.create(bookerId, bookingRequest));
         //then
-        assertEquals(e.getMessage(), format(USER_WITH_ID_NOT_EXIST, bookerId));
+        assertEquals(e.getMessage(), format(USER_NOT_EXISTS, bookerId));
     }
 
 
@@ -180,7 +180,7 @@ class BookingServiceTest extends InjectResources {
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> bookingService.update(ownerId, bookingId, false));
         //then
-        assertEquals(e.getMessage(), format(BOOKING_WITH_ID_NOT_EXIST, bookingId));
+        assertEquals(e.getMessage(), format(BOOKING_NOT_EXISTS, bookingId));
 
         verify(bookingRepository, never())
                 .updateStatusById(BookingStatus.REJECTED, bookingId);
@@ -203,7 +203,7 @@ class BookingServiceTest extends InjectResources {
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> bookingService.update(ownerId, bookingId, false));
         //then
-        assertEquals(e.getMessage(), format(USER_WITH_ID_NOT_EXIST, ownerId));
+        assertEquals(e.getMessage(), format(USER_NOT_EXISTS, ownerId));
 
         verify(bookingRepository, never())
                 .updateStatusById(BookingStatus.REJECTED, bookingId);
@@ -395,7 +395,7 @@ class BookingServiceTest extends InjectResources {
                                 now,
                                 pageable));
         //then
-        assertEquals(e.getMessage(), format(USER_WITH_ID_NOT_EXIST, bookerId));
+        assertEquals(e.getMessage(), format(USER_NOT_EXISTS, bookerId));
     }
 
     @Test
@@ -511,7 +511,7 @@ class BookingServiceTest extends InjectResources {
                                 now,
                                 pageable));
         //then
-        assertEquals(e.getMessage(), format(USER_WITH_ID_NOT_EXIST, ownerId));
+        assertEquals(e.getMessage(), format(USER_NOT_EXISTS, ownerId));
     }
 
     @Test

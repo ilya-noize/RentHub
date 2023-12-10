@@ -38,12 +38,12 @@ class BookingServiceImplIT {
     private BookingService bookingService;
 
     private User getNewUser() {
-        User owner = random.nextObject(User.class);
+        User owner = RANDOM.nextObject(User.class);
         return userRepository.save(owner);
     }
 
     private Item getNewItem(User owner, boolean available) {
-        Item item = random.nextObject(Item.class);
+        Item item = RANDOM.nextObject(Item.class);
         item.setOwner(owner);
         item.setAvailable(available);
         item.setRequest(null);
@@ -74,7 +74,7 @@ class BookingServiceImplIT {
 
         assertThrows(NotFoundException.class, () ->
                         bookingService.create(booker.getId(), bookingSimpleDto),
-                format(ITEM_WITH_ID_NOT_EXIST, itemId));
+                format(ITEM_NOT_EXISTS, itemId));
     }
 
     @Test
@@ -179,7 +179,7 @@ class BookingServiceImplIT {
 
         assertThrows(NotFoundException.class, () ->
                         bookingService.update(bookerId, bookingId, true),
-                format(BOOKING_WITH_ID_NOT_EXIST, bookingId));
+                format(BOOKING_NOT_EXISTS, bookingId));
     }
 
 
@@ -222,7 +222,7 @@ class BookingServiceImplIT {
 
         assertThrows(NotFoundException.class, () ->
                         bookingService.update(bookerId, bookingId, true),
-                format(USER_WITH_ID_NOT_EXIST, bookerId));
+                format(USER_NOT_EXISTS, bookerId));
     }
 
     @Test
@@ -297,7 +297,7 @@ class BookingServiceImplIT {
 
         assertThrows(NotFoundException.class, () ->
                         bookingService.get(bookerId, bookingId),
-                format(BOOKING_WITH_ID_NOT_EXIST, bookingId));
+                format(BOOKING_NOT_EXISTS, bookingId));
     }
 
     @Test
@@ -318,7 +318,7 @@ class BookingServiceImplIT {
 
         assertThrows(NotFoundException.class, () ->
                         bookingService.get(bookerId, bookingId),
-                format(USER_WITH_ID_NOT_EXIST, bookingId));
+                format(USER_NOT_EXISTS, bookingId));
     }
 
     @Test

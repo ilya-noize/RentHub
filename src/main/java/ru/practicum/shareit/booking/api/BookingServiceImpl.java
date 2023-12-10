@@ -41,7 +41,7 @@ public class BookingServiceImpl implements BookingService {
         Integer itemId = dto.getItemId();
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(
-                        format(ITEM_WITH_ID_NOT_EXIST, itemId)));
+                        format(ITEM_NOT_EXISTS, itemId)));
 
         if (!item.isAvailable()) {
             throw new BadRequestException("It is impossible to rent "
@@ -50,7 +50,7 @@ public class BookingServiceImpl implements BookingService {
 
         User booker = userRepository.findById(bookerId)
                 .orElseThrow(() -> new NotFoundException(
-                        format(USER_WITH_ID_NOT_EXIST, bookerId)));
+                        format(USER_NOT_EXISTS, bookerId)));
 
         boolean bookerIsOwnerTheItem = bookerId.equals(item.getOwner().getId());
 
@@ -105,7 +105,7 @@ public class BookingServiceImpl implements BookingService {
         booking = bookingRepository.findById(bookingId)
                 .orElseThrow(
                         () -> new NotFoundException(
-                                format(BOOKING_WITH_ID_NOT_EXIST, bookingId)));
+                                format(BOOKING_NOT_EXISTS, bookingId)));
 
         isNotWaitingStatus = !WAITING.equals(booking.getStatus());
         if (isNotWaitingStatus) {
@@ -115,7 +115,7 @@ public class BookingServiceImpl implements BookingService {
         isNotExistUser = !userRepository.existsById(ownerId);
         if (isNotExistUser) {
             throw new NotFoundException(
-                    format(USER_WITH_ID_NOT_EXIST, ownerId));
+                    format(USER_NOT_EXISTS, ownerId));
         }
 
         bookerId = booking.getBooker().getId();
@@ -148,12 +148,12 @@ public class BookingServiceImpl implements BookingService {
 
         booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException(
-                        format(BOOKING_WITH_ID_NOT_EXIST, bookingId)));
+                        format(BOOKING_NOT_EXISTS, bookingId)));
 
         isNotExistUser = !userRepository.existsById(userId);
         if (isNotExistUser) {
             throw new NotFoundException(
-                    format(USER_WITH_ID_NOT_EXIST, userId));
+                    format(USER_NOT_EXISTS, userId));
         }
 
         bookerId = booking.getBooker().getId();
@@ -230,7 +230,7 @@ public class BookingServiceImpl implements BookingService {
             Integer userId, String stateIn) {
 
         if (!userRepository.existsById(userId)) {
-            throw new NotFoundException(format(USER_WITH_ID_NOT_EXIST, userId));
+            throw new NotFoundException(format(USER_NOT_EXISTS, userId));
         }
         try {
             return Enum.valueOf(BookingFilterByTemplate.class, stateIn);

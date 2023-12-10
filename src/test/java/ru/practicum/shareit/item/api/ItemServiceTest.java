@@ -19,8 +19,8 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.practicum.shareit.ShareItApp.USER_WITH_ID_NOT_EXIST;
-import static ru.practicum.shareit.ShareItApp.random;
+import static ru.practicum.shareit.ShareItApp.RANDOM;
+import static ru.practicum.shareit.ShareItApp.USER_NOT_EXISTS;
 
 @SpringBootTest
 class ItemServiceTest { // todo true named class
@@ -35,12 +35,12 @@ class ItemServiceTest { // todo true named class
 
 
     private User getNewUser() {
-        User owner = random.nextObject(User.class);
+        User owner = RANDOM.nextObject(User.class);
         return userRepository.save(owner);
     }
 
     private Item getNewItem(User owner) {
-        Item item = random.nextObject(Item.class);
+        Item item = RANDOM.nextObject(Item.class);
         item.setOwner(owner);
         item.setRequest(null);
         return itemRepository.save(item);
@@ -50,13 +50,13 @@ class ItemServiceTest { // todo true named class
     void create_whenUserIdNotExist_thenReturnException() {
         //given
         Integer userId = 100;
-        ItemSimpleDto dto = random.nextObject(ItemSimpleDto.class);
+        ItemSimpleDto dto = RANDOM.nextObject(ItemSimpleDto.class);
         //when
         NotFoundException e = assertThrows(
                 NotFoundException.class,
                 () -> itemService.create(userId, dto));
         //then
-        assertEquals(format(USER_WITH_ID_NOT_EXIST, userId),
+        assertEquals(format(USER_NOT_EXISTS, userId),
                 e.getMessage());
     }
 

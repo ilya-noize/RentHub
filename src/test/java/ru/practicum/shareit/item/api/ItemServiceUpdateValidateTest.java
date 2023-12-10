@@ -17,7 +17,7 @@ import ru.practicum.shareit.utils.InjectResources;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-import static ru.practicum.shareit.ShareItApp.USER_WITH_ID_NOT_EXIST;
+import static ru.practicum.shareit.ShareItApp.USER_NOT_EXISTS;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -56,7 +56,7 @@ class ItemServiceUpdateValidateTest extends InjectResources {
 
         assertThrows(NotFoundException.class,
                 () -> itemService.update(userId, itemId, itemDtoRequest),
-                format(USER_WITH_ID_NOT_EXIST, userId));
+                format(USER_NOT_EXISTS, userId));
 
         verify(userRepository, times(1))
                 .existsById(anyInt());

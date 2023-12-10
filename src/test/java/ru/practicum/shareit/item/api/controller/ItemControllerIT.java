@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -30,6 +32,8 @@ import static ru.practicum.shareit.ShareItApp.HEADER_USER_ID;
 import static ru.practicum.shareit.item.api.controller.ItemController.*;
 
 @WebMvcTest(controllers = ItemController.class)
+@AutoConfigureWebMvc
+@AutoConfigureMockMvc
 class ItemControllerIT {
     private final ItemSimpleDto itemRequest = ItemSimpleDto.builder()
             .id(1)
@@ -92,6 +96,21 @@ class ItemControllerIT {
 
         verify(itemService, times(1))
                 .create(1, itemRequest);
+    }
+
+    @Test
+    void create_null_Throw() throws Exception {
+        when(itemService.create(1, null))
+                .thenThrow(NullPointerException.class);
+
+        RequestBuilder requestBuilder = post(CREATE_ITEM)
+                .content(mapper.writeValueAsString(null))
+                .header(HEADER_USER_ID, 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+
+        mvc.perform(requestBuilder)
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
@@ -191,21 +210,6 @@ class ItemControllerIT {
                 .andExpectAll(resultMatchers)
                 .andExpect(status().isOk());
     }
-
-    @Test
-    void delete() throws Exception {
-        doNothing().when(itemService).delete(1, 1);
-
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .delete(DELETE_ITEM, 1)
-                .header(HEADER_USER_ID, 1);
-
-        mvc.perform(requestBuilder)
-                .andExpect(status().isOk());
-
-        verify(itemService, times(1)).delete(1, 1);
-    }
-
 
     @Test
     void createComment() throws Exception {

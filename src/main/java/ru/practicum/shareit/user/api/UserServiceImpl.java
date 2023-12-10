@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static ru.practicum.shareit.ShareItApp.USER_WITH_ID_NOT_EXIST;
+import static ru.practicum.shareit.ShareItApp.USER_NOT_EXISTS;
 
 /**
  * DTO processing class before saving to memory
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
         log.debug("[i] get User by ID:{}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(
-                        format(USER_WITH_ID_NOT_EXIST, id)));
+                        format(USER_NOT_EXISTS, id)));
 
         return UserMapper.INSTANTS.toDto(user);
     }
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
         log.debug("[i] update User:{} by ID:{}", userDto, id);
         User userEntity = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(
-                        format(USER_WITH_ID_NOT_EXIST, id)));
+                        format(USER_NOT_EXISTS, id)));
         if (userDto.getName() == null || userDto.getName().isBlank()) {
             userDto.setName(userEntity.getName());
         }
@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService {
         log.debug("[i] is exist User by ID:{}", id);
         if (!userRepository.existsById(id)) {
             throw new NotFoundException(
-                    String.format(USER_WITH_ID_NOT_EXIST, id));
+                    String.format(USER_NOT_EXISTS, id));
         }
     }
 }
