@@ -199,27 +199,27 @@ public class BookingServiceImpl implements BookingService {
             case CURRENT:
                 bookingList = bookingRepository
                         .findAllByBooker_IdAndStartBeforeAndEndAfterOrderByStartDesc(bookerId,
-                                now, now);
+                                now, now, pageable);
                 break;
             case PAST:
                 bookingList = bookingRepository.findAllByBooker_IdAndEndBeforeOrderByStartDesc(
-                        bookerId, now);
+                        bookerId, now, pageable);
                 break;
             case ALL:
                 bookingList = bookingRepository.findAllByBooker_IdOrderByStartDesc(
-                        bookerId);
+                        bookerId, pageable);
                 break;
             case FUTURE:
                 bookingList = bookingRepository.findAllByBooker_IdAndStartAfterOrderByStartDesc(
-                        bookerId, now);
+                        bookerId, now, pageable);
                 break;
             case WAITING:
                 bookingList = bookingRepository.findAllByBooker_IdAndStatusOrderByStartDesc(
-                        bookerId, WAITING);
+                        bookerId, WAITING, pageable);
                 break;
             case REJECTED:
                 bookingList = bookingRepository.findAllByBooker_IdAndStatusOrderByStartDesc(
-                        bookerId, REJECTED);
+                        bookerId, REJECTED, pageable);
                 break;
         }
 
@@ -267,32 +267,32 @@ public class BookingServiceImpl implements BookingService {
         switch (state) {
             case CURRENT:
                 bookingList = bookingRepository.findAllByItem_Owner_IdAndStartBeforeAndEndAfter(ownerId,
-                        now, now, sortStartDesc);
+                        now, now, pageable);
 
                 break;
             case PAST:
                 bookingList = bookingRepository.findAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(
-                        ownerId, now);
+                        ownerId, now, pageable);
                 break;
             case ALL:
                 bookingList = bookingRepository
                         .findAllByItem_Owner_IdOrderByStartDesc(
-                                ownerId);
+                                ownerId, pageable);
                 break;
             case FUTURE:
                 bookingList = bookingRepository
                         .findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(
-                                ownerId, now);
+                                ownerId, now, pageable);
                 break;
             case WAITING:
                 bookingList = bookingRepository
                         .findAllByItem_Owner_IdAndStatusOrderByStartDesc(
-                                ownerId, WAITING);
+                                ownerId, WAITING, pageable);
                 break;
             case REJECTED:
                 bookingList = bookingRepository
                         .findAllByItem_Owner_IdAndStatusOrderByStartDesc(
-                                ownerId, REJECTED);
+                                ownerId, REJECTED, pageable);
                 break;
         }
 

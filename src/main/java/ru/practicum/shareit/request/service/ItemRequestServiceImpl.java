@@ -33,11 +33,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRepository itemRepository;
 
     @Override
-    public ItemRequestDto create(Integer userId, ItemRequestSimpleDto dto, LocalDateTime now) {
-        User requester = userRepository.findById(userId)
+    public ItemRequestDto create(Integer requesterId, ItemRequestSimpleDto dto, LocalDateTime now) {
+        User requester = userRepository.findById(requesterId)
                 .orElseThrow(() -> new NotFoundException(
-                        format(USER_NOT_EXISTS, userId)));
-        ItemRequest itemRequest = ItemRequestMapper.INSTANCE.toEntity(dto);
+                        format(USER_NOT_EXISTS, requesterId)));
+        ItemRequest itemRequest = ItemRequestMapper.INSTANCE.toEntity(dto, requesterId);
         itemRequest.setRequester(requester);
         itemRequest.setCreated(now);
 
@@ -46,28 +46,18 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public ItemRequestDto get(Integer userId, Integer itemRequestId) {
-        checkingUserExists(userId);
+    public ItemRequestDto get(Integer requesterId, Integer itemRequestId) {
+        checkingUserExists(requesterId);
+        List<ItemRequest> itemRequests = itemRequestRepository
+                .findByRequesterIdNot(requesterId);
 
         return itemRequestRepository.findById(itemRequestId)
                 .map(itemRequest -> {
-                    itemRequest.setItems(itemRepository
-                            .findItemsByRequestId(itemRequest.getId())
-                            .orElse(List.of()));
-
+                    itemRequest.setItems(itemRepository.getByRequest_Id(itemRequest.getId()));
                     return ItemRequestMapper.INSTANCE.toDto(itemRequest);
                 })
                 .orElseThrow(() -> new NotFoundException(
                         format(REQUEST_NOT_EXISTS, itemRequestId)));
-    }
-
-    @Override
-    public List<ItemRequestDto> getAll(Integer userId, Pageable pageable) {
-        checkingUserExists(userId);
-        List<ItemRequest> itemRequests = itemRequestRepository
-                .findByRequesterIdNot(userId, pageable);
-
-        return getItemRequestDtoRecordList(itemRequests);
     }
 
     @Override
@@ -79,23 +69,31 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return getItemRequestDtoRecordList(itemRequests);
     }
 
+    @Override
+    public List<ItemRequestDto> getAll(Integer requesterId, Pageable pageable) {
+        checkingUserExists(requesterId);
+        List<ItemRequest> itemRequests = itemRequestRepository
+                .findByRequesterIdNot(requesterId);
+
+        return getItemRequestDtoRecordList(itemRequests);
+    }
+
     private List<ItemRequestDto> getItemRequestDtoRecordList(List<ItemRequest> requests) {
-        Map<ItemRequest, List<Item>> requestListMap = itemRepository
-                .findItemsByRequestIn(requests)
+        Map<ItemRequest, List<Item>> requestListMap = itemRepository.findByRequestIn(requests)
                 .stream()
                 .collect(groupingBy(Item::getRequest, toList()));
 
-        requests.forEach(itemRequest ->
-                itemRequest.setItems(
-                        requestListMap.getOrDefault(itemRequest, emptyList())));
+        requests.forEach(request ->
+                request.setItems(
+                        requestListMap.getOrDefault(request, emptyList())));
 
         return requests.stream().map(ItemRequestMapper.INSTANCE::toDto).collect(toList());
     }
 
-    private void checkingUserExists(Integer userId) {
-        if (!userRepository.existsById(userId)) {
+    private void checkingUserExists(Integer requesterId) {
+        if (!userRepository.existsById(requesterId)) {
             throw new NotFoundException(
-                    format(USER_NOT_EXISTS, userId));
+                    format(USER_NOT_EXISTS, requesterId));
         }
     }
 }

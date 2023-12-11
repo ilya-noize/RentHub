@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.entity.Booking;
 import ru.practicum.shareit.booking.entity.enums.BookingStatus;
@@ -22,6 +23,7 @@ import static ru.practicum.shareit.booking.entity.enums.BookingStatus.*;
 
 @DataJpaTest
 class BookingRepositoryTest {
+    private final Pageable pageable = Pageable.ofSize(10);
     private final LocalDateTime now = LocalDateTime.of(2000, 1, 1, 12, 0, 0, 0);
     private final Sort sortStartAsc =
             Sort.by(Sort.Direction.ASC, "start");
@@ -155,7 +157,7 @@ class BookingRepositoryTest {
         prepareBooking(item1, item2);
 
         assertEquals(3, bookingRepository
-                .findAllByItem_Owner_IdOrderByStartDesc(owner.getId())
+                .findAllByItem_Owner_IdOrderByStartDesc(owner.getId(), pageable)
                 .size());
     }
 
@@ -173,7 +175,7 @@ class BookingRepositoryTest {
 
         assertEquals(3, bookingRepository
                 .findAllByItem_Owner_IdAndStatusOrderByStartDesc(
-                        owner.getId(), APPROVED)
+                        owner.getId(), APPROVED, pageable)
                 .size());
     }
 
@@ -190,8 +192,7 @@ class BookingRepositoryTest {
         getNewBookingInFuture(item2, booker, WAITING);
 
         assertEquals(1, bookingRepository
-                .findAllByItem_Owner_IdAndStatusOrderByStartDesc(
-                        owner.getId(), WAITING)
+                .findAllByItem_Owner_IdAndStatusOrderByStartDesc(owner.getId(), WAITING, pageable)
                 .size());
     }
 
@@ -207,9 +208,8 @@ class BookingRepositoryTest {
         getNewBookingNearPresent(item2, booker);
         getNewBookingInFuture(item2, booker, APPROVED);
 
-        assertEquals(0, bookingRepository
-                .findAllByItem_Owner_IdAndStatusOrderByStartDesc(
-                        booker.getId(), APPROVED)
+        assertEquals(3, bookingRepository
+                .findAllByBooker_IdAndStatusOrderByStartDesc(booker.getId(), APPROVED, pageable)
                 .size());
     }
 
@@ -225,9 +225,8 @@ class BookingRepositoryTest {
         getNewBookingNearPresent(item2, booker);
         getNewBookingInFuture(item2, booker, WAITING);
 
-        assertEquals(0, bookingRepository
-                .findAllByItem_Owner_IdAndStatusOrderByStartDesc(
-                        booker.getId(), WAITING)
+        assertEquals(1, bookingRepository
+                .findAllByBooker_IdAndStatusOrderByStartDesc(booker.getId(), WAITING, pageable)
                 .size());
     }
 
@@ -244,8 +243,7 @@ class BookingRepositoryTest {
         getNewBookingInFuture(item2, booker, WAITING);
 
         assertEquals(1, bookingRepository
-                .findAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(
-                        owner.getId(), now)
+                .findAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(owner.getId(), now, pageable)
                 .size());
     }
 
@@ -262,8 +260,7 @@ class BookingRepositoryTest {
         getNewBookingInFuture(item2, booker, WAITING);
 
         assertEquals(1, bookingRepository
-                .findAllByBooker_IdAndEndBeforeOrderByStartDesc(
-                        booker.getId(), now)
+                .findAllByBooker_IdAndEndBeforeOrderByStartDesc(booker.getId(), now, pageable)
                 .size());
     }
 
@@ -280,8 +277,7 @@ class BookingRepositoryTest {
         getNewBookingInFuture(item2, booker, WAITING);
 
         assertEquals(1, bookingRepository
-                .findAllByBooker_IdAndStartAfterOrderByStartDesc(
-                        booker.getId(), now)
+                .findAllByBooker_IdAndStartAfterOrderByStartDesc(booker.getId(), now, pageable)
                 .size());
     }
 
@@ -298,8 +294,7 @@ class BookingRepositoryTest {
         getNewBookingInFuture(item2, booker, WAITING);
 
         assertEquals(1, bookingRepository
-                .findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(
-                        owner.getId(), now)
+                .findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(owner.getId(), now, pageable)
                 .size());
     }
 
@@ -316,8 +311,7 @@ class BookingRepositoryTest {
         getNewBookingInFuture(item2, booker, WAITING);
 
         assertEquals(1, bookingRepository
-                .findAllByBooker_IdAndStartBeforeAndEndAfterOrderByStartDesc(
-                        booker.getId(), now, now)
+                .findAllByBooker_IdAndStartBeforeAndEndAfterOrderByStartDesc(booker.getId(), now, now, pageable)
                 .size());
     }
 
@@ -335,7 +329,7 @@ class BookingRepositoryTest {
 
         assertEquals(1, bookingRepository
                 .findAllByItem_Owner_IdAndStartBeforeAndEndAfter(
-                        owner.getId(), now, now, sortStartDesc)
+                        owner.getId(), now, now, pageable)
                 .size());
     }
 

@@ -73,10 +73,10 @@ public class ItemServiceImpl implements ItemService {
             log.debug("[i] add ItemRequest.id:{}", requestId);
             item.setRequest(itemRequest);
         }
+        ItemDto dto = ItemMapper.INSTANCE.toDto(itemRepository.save(item));
+//        dto.setRequestId(requestId);
 
-        return ItemMapper.INSTANCE.toDto(
-                itemRepository.save(
-                        ItemMapper.INSTANCE.toEntity(itemDto, userId)));
+        return dto;
     }
 
     /**

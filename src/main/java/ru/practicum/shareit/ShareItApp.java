@@ -3,6 +3,9 @@ package ru.practicum.shareit;
 import org.jeasy.random.EasyRandom;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import ru.practicum.shareit.exception.BadRequestException;
 
 /**
  * <h1>GLOBAL VARIABLES</h1>
@@ -40,5 +43,12 @@ public class ShareItApp {
 
     public static void main(String[] args) {
         SpringApplication.run(ShareItApp.class, args);
+    }
+
+    public static Pageable checkPageable(Integer from, Integer size) {
+        if (from < 0 || size <= 0) {
+            throw new BadRequestException("Pageable incorrect");
+        }
+        return PageRequest.of(from / size, size);
     }
 }

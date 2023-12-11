@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.api.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.api.dto.CommentDto;
@@ -12,7 +11,8 @@ import ru.practicum.shareit.item.api.service.ItemService;
 import ru.practicum.shareit.valid.group.Create;
 import ru.practicum.shareit.valid.group.Update;
 
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -60,22 +60,23 @@ public class ItemController {
     public List<ItemSimpleDto> search(
             @RequestParam(name = "text") String textSearch,
             @RequestParam(required = false, defaultValue = FROM)
-            @Min(0) Integer from,
+            @PositiveOrZero Integer from,
             @RequestParam(required = false, defaultValue = SIZE)
-            @Min(1) Integer size) {
+            @Positive Integer size) {
 
-        return service.search(textSearch, PageRequest.of(from / size, size));
+        return service.search(textSearch, checkPageable(from, size));
     }
 
     @GetMapping(GET_ALL_ITEMS)
     public List<ItemDto> getAll(
             @RequestHeader(HEADER_USER_ID) Integer userId,
             @RequestParam(required = false, defaultValue = FROM)
-            @Min(0) Integer from,
-            @RequestParam(required = false, defaultValue = SIZE)
-            @Min(1) Integer size) {
+            @PositiveOrZero Integer from,
 
-        return service.getAll(userId, PageRequest.of(from / size, size), LocalDateTime.now());
+            @RequestParam(required = false, defaultValue = SIZE)
+            @Positive Integer size) {
+
+        return service.getAll(userId, checkPageable(from, size), LocalDateTime.now());
     }
 
     @PostMapping(CREATE_COMMENT)

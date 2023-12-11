@@ -6,7 +6,10 @@ import org.mapstruct.factory.Mappers;
 import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.request.dto.ItemRequestMapper;
 
-@Mapper(uses = {CommentMapper.class, ItemRequestMapper.class})
+import static org.mapstruct.InjectionStrategy.CONSTRUCTOR;
+
+@Mapper(uses = {CommentMapper.class, ItemRequestMapper.class},
+        injectionStrategy = CONSTRUCTOR)
 public interface ItemMapper {
     ItemMapper INSTANCE = Mappers.getMapper(ItemMapper.class);
 

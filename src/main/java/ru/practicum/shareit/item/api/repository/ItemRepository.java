@@ -10,7 +10,6 @@ import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.request.entity.ItemRequest;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, Integer> {
     @Query("select i from Item i where i.owner.id = ?1")
@@ -78,9 +77,9 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
             @Param("id") int id);
 
     @Query("select i from Item i where i.request.id = ?1")
-    Optional<List<Item>> findItemsByRequestId(int requestId);
+    List<Item> getByRequest_Id(Integer id);
 
     @Query("select i from Item i where i.request in ?1")
-    List<Item> findItemsByRequestIn(List<ItemRequest> itemRequests);
+    List<Item> findByRequestIn(List<ItemRequest> requests);
 }
 

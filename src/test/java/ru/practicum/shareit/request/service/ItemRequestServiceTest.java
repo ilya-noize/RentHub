@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,7 +51,7 @@ class ItemRequestServiceTest {
     void create() {
         User requester = RANDOM.nextObject(User.class);
         ItemRequestSimpleDto request = RANDOM.nextObject(ItemRequestSimpleDto.class);
-        ItemRequest entity = ItemRequestMapper.INSTANCE.toEntity(request);
+        ItemRequest entity = ItemRequestMapper.INSTANCE.toEntity(request, requester.getId());
         ItemRequestDto expected = ItemRequestMapper.INSTANCE.toDto(entity);
 
         when(userRepository.findById(anyInt()))
@@ -95,8 +96,8 @@ class ItemRequestServiceTest {
                 .thenReturn(true);
         when(itemRequestRepository.findById(anyInt()))
                 .thenReturn(Optional.of(itemRequest));
-        when(itemRepository.findItemsByRequestId(itemRequest.getId()))
-                .thenReturn(Optional.empty());
+        when(itemRepository.getByRequest_Id(itemRequest.getId()))
+                .thenReturn(emptyList());
 
         ItemRequestDto response = itemRequestService.get(user.getId(), itemRequest.getId());
         assertEquals(expected, response);
@@ -133,9 +134,9 @@ class ItemRequestServiceTest {
         when(userRepository.existsById(anyInt()))
                 .thenReturn(true);
         when(itemRequestRepository.findByRequesterIdNot(
-                anyInt(), any(Pageable.class)))
+                anyInt())) // todo , any(Pageable.class)))
                 .thenReturn(List.of(itemRequest));
-        when(itemRepository.findItemsByRequestIn(anyList()))
+        when(itemRepository.findByRequestIn(anyList()))
                 .thenReturn(List.of());
 
         List<ItemRequestDto> response = itemRequestService.getAll(requesterId,

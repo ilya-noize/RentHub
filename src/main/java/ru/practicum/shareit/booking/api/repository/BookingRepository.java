@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.api.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -45,54 +46,63 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     // - - - - - - - - - - - - - - - - - - ALL OWNER
 
     @Query("select b from Booking b where b.item.owner.id = ?1 order by b.start DESC")
-    List<Booking> findAllByItem_Owner_IdOrderByStartDesc(Integer id);
+    List<Booking> findAllByItem_Owner_IdOrderByStartDesc(Integer id,
+                                                         Pageable pageable);
     // - - - - - - - - - - - - - - - - - - ALL BOOKER
 
     @Query("select b from Booking b where b.booker.id = ?1 order by b.start DESC")
-    List<Booking> findAllByBooker_IdOrderByStartDesc(Integer id);
+    List<Booking> findAllByBooker_IdOrderByStartDesc(Integer id,
+                                                     Pageable pageable);
     // - - - - - - - - - - - - - - - - - - APPROVED, WAITING OWNER
 
     @Query("select b from Booking b where b.item.owner.id = ?1 and b.status = ?2 order by b.start DESC")
     List<Booking> findAllByItem_Owner_IdAndStatusOrderByStartDesc(
             Integer id,
-            BookingStatus status);
+            BookingStatus status,
+            Pageable pageable);
     // - - - - - - - - - - - - - - - - - - APPROVED, WAITING BOOKER
 
     @Query("select b from Booking b where b.booker.id = ?1 and b.status = ?2 order by b.start DESC")
     List<Booking> findAllByBooker_IdAndStatusOrderByStartDesc(
             Integer id,
-            BookingStatus status);
+            BookingStatus status,
+            Pageable pageable);
     // - - - - - - - - - - - - - - - - - - PAST OWNER
 
     @Query("select b from Booking b where b.item.owner.id = ?1 and b.end < ?2 order by b.start DESC")
     List<Booking> findAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(
             Integer ownerId,
-            LocalDateTime end);
+            LocalDateTime end,
+            Pageable pageable);
     // - - - - - - - - - - - - - - - - - - PAST BOOKER
 
     @Query("select b from Booking b where b.booker.id = ?1 and b.end < ?2 order by b.start DESC")
     List<Booking> findAllByBooker_IdAndEndBeforeOrderByStartDesc(
             Integer bookerId,
-            LocalDateTime now);
+            LocalDateTime now,
+            Pageable pageable);
     // - - - - - - - - - - - - - - - - - - FUTURE BOOKER
 
     @Query("select b from Booking b where b.booker.id = ?1 and b.start > ?2 order by b.start DESC")
     List<Booking> findAllByBooker_IdAndStartAfterOrderByStartDesc(
             Integer id,
-            LocalDateTime start);
+            LocalDateTime start,
+            Pageable pageable);
     // - - - - - - - - - - - - - - - - - - FUTURE OWNER
 
     @Query("select b from Booking b where b.item.owner.id = ?1 and b.start > ?2 order by b.start DESC")
     List<Booking> findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(
             Integer id,
-            LocalDateTime start);
+            LocalDateTime start,
+            Pageable pageable);
     // - - - - - - - - - - - - - - - - - - CURRENT BOOKER
 
     @Query("select b from Booking b where b.booker.id = ?1 and b.start < ?2 and b.end > ?3 order by b.start DESC")
     List<Booking> findAllByBooker_IdAndStartBeforeAndEndAfterOrderByStartDesc(
             Integer bookerId,
             LocalDateTime start,
-            LocalDateTime end);
+            LocalDateTime end,
+            Pageable pageable);
     // - - - - - - - - - - - - - - - - - - CURRENT OWNER
 
     @Query("select b from Booking b where b.item.owner.id = ?1 and b.start < ?2 and b.end > ?3")
@@ -100,7 +110,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             Integer ownerId,
             LocalDateTime start,
             LocalDateTime end,
-            Sort sort);
+            Pageable pageable);
+    //    Pageable pageable, Sort sort);
 
     // - - - - - - - - - - - - - - - - - - UPDATE STATUS RIGHT NOW
     @Transactional

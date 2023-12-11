@@ -7,7 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.api.dto.BookingDto;
 import ru.practicum.shareit.booking.api.dto.BookingSimpleDto;
 import ru.practicum.shareit.booking.api.repository.BookingRepository;
@@ -274,7 +273,7 @@ class BookingServiceTest extends InjectResources {
         when(userRepository.existsById(bookerId)).thenReturn(true);
         when(bookingRepository // CURRENT
                 .findAllByBooker_IdAndStartBeforeAndEndAfterOrderByStartDesc(
-                        bookerId, now, now))
+                        bookerId, now, now, pageable))
                 .thenReturn(bookingList);
         // when
         List<BookingDto> response = bookingService
@@ -291,7 +290,7 @@ class BookingServiceTest extends InjectResources {
 
         when(userRepository.existsById(bookerId)).thenReturn(true);
         when(bookingRepository // PAST
-                .findAllByBooker_IdAndEndBeforeOrderByStartDesc(bookerId, now))
+                .findAllByBooker_IdAndEndBeforeOrderByStartDesc(bookerId, now, pageable))
                 .thenReturn(bookingList);
         // when
         List<BookingDto> response = bookingService
@@ -309,8 +308,8 @@ class BookingServiceTest extends InjectResources {
 
         when(userRepository.existsById(bookerId)).thenReturn(true);
         when(bookingRepository // ALL
-                .findAllByBooker_IdOrderByStartDesc(
-                        bookerId)).thenReturn(bookingList);
+                .findAllByBooker_IdOrderByStartDesc(bookerId, pageable))
+                .thenReturn(bookingList);
         // when
         List<BookingDto> response = bookingService
                 .getAllByUser(bookerId, ALL.toString(), now, pageable);
@@ -326,7 +325,7 @@ class BookingServiceTest extends InjectResources {
 
         when(userRepository.existsById(bookerId)).thenReturn(true);
         when(bookingRepository // FUTURE
-                .findAllByBooker_IdAndStartAfterOrderByStartDesc(bookerId, now))
+                .findAllByBooker_IdAndStartAfterOrderByStartDesc(bookerId, now, pageable))
                 .thenReturn(bookingList);
         // when
         List<BookingDto> response = bookingService
@@ -346,7 +345,7 @@ class BookingServiceTest extends InjectResources {
         when(userRepository.existsById(bookerId)).thenReturn(true);
         when(bookingRepository // WAITING
                 .findAllByBooker_IdAndStatusOrderByStartDesc(
-                        bookerId, BookingStatus.WAITING))
+                        bookerId, BookingStatus.WAITING, pageable))
                 .thenReturn(bookingList);
         // when
         List<BookingDto> response = bookingService
@@ -365,7 +364,7 @@ class BookingServiceTest extends InjectResources {
         when(userRepository.existsById(bookerId)).thenReturn(true);
         when(bookingRepository // REJECTED
                 .findAllByBooker_IdAndStatusOrderByStartDesc(
-                        bookerId, BookingStatus.REJECTED))
+                        bookerId, BookingStatus.REJECTED, pageable))
                 .thenReturn(bookingList);
         // when
         List<BookingDto> response = bookingService
@@ -401,7 +400,7 @@ class BookingServiceTest extends InjectResources {
         when(userRepository.existsById(ownerId)).thenReturn(true);
         when(bookingRepository // CURRENT
                 .findAllByItem_Owner_IdAndStartBeforeAndEndAfter(
-                        ownerId, now, now, Sort.by(Sort.Direction.DESC, "start")))
+                        ownerId, now, now, pageable))
                 .thenReturn(bookingList);
         // when
         List<BookingDto> response = bookingService
@@ -418,7 +417,7 @@ class BookingServiceTest extends InjectResources {
         when(userRepository.existsById(ownerId)).thenReturn(true);
 
         when(bookingRepository // PAST
-                .findAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(ownerId, now))
+                .findAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(ownerId, now, pageable))
                 .thenReturn(bookingList);
         // when
         List<BookingDto> response = bookingService
@@ -434,7 +433,7 @@ class BookingServiceTest extends InjectResources {
 
         when(userRepository.existsById(ownerId)).thenReturn(true);
         when(bookingRepository // ALL
-                .findAllByItem_Owner_IdOrderByStartDesc(ownerId))
+                .findAllByItem_Owner_IdOrderByStartDesc(ownerId, pageable))
                 .thenReturn(bookingList);
         // when
         List<BookingDto> response = bookingService
@@ -450,7 +449,7 @@ class BookingServiceTest extends InjectResources {
 
         when(userRepository.existsById(ownerId)).thenReturn(true);
         when(bookingRepository // FUTURE
-                .findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(ownerId, now))
+                .findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(ownerId, now, pageable))
                 .thenReturn(bookingList);
         // when
         List<BookingDto> response = bookingService
@@ -467,7 +466,7 @@ class BookingServiceTest extends InjectResources {
         when(userRepository.existsById(ownerId)).thenReturn(true);
 
         when(bookingRepository // WAITING
-                .findAllByItem_Owner_IdAndStatusOrderByStartDesc(ownerId, WAITING))
+                .findAllByItem_Owner_IdAndStatusOrderByStartDesc(ownerId, WAITING, pageable))
                 .thenReturn(bookingList);
         // when
         List<BookingDto> response = bookingService
@@ -484,7 +483,7 @@ class BookingServiceTest extends InjectResources {
         when(userRepository.existsById(ownerId)).thenReturn(true);
 
         when(bookingRepository // REJECTED
-                .findAllByItem_Owner_IdAndStatusOrderByStartDesc(ownerId, REJECTED))
+                .findAllByItem_Owner_IdAndStatusOrderByStartDesc(ownerId, REJECTED, pageable))
                 .thenReturn(bookingList);
         // when
         List<BookingDto> response = bookingService
