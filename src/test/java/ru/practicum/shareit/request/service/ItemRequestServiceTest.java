@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request.service;
 
-import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.api.repository.ItemRepository;
-import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestMapper;
 import ru.practicum.shareit.request.dto.ItemRequestSimpleDto;
@@ -20,22 +18,20 @@ import ru.practicum.shareit.user.api.repository.UserRepository;
 import ru.practicum.shareit.user.entity.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
-import static ru.practicum.shareit.ShareItApp.USER_NOT_EXISTS;
+import static ru.practicum.shareit.ShareItApp.*;
 
 @ExtendWith(MockitoExtension.class)
-class ItemRequestServiceImplTest {
-    private final EasyRandom random = new EasyRandom();
-
+class ItemRequestServiceTest {
     @InjectMocks
     private ItemRequestServiceImpl itemRequestService;
     @Mock
@@ -52,8 +48,8 @@ class ItemRequestServiceImplTest {
 
     @Test
     void create() {
-        User requester = random.nextObject(User.class);
-        ItemRequestSimpleDto request = random.nextObject(ItemRequestSimpleDto.class);
+        User requester = RANDOM.nextObject(User.class);
+        ItemRequestSimpleDto request = RANDOM.nextObject(ItemRequestSimpleDto.class);
         ItemRequest entity = ItemRequestMapper.INSTANCE.toEntity(request);
         ItemRequestDto expected = ItemRequestMapper.INSTANCE.toDto(entity);
 
@@ -72,9 +68,9 @@ class ItemRequestServiceImplTest {
 
     @Test
     void create_Throw() {
-        int requesterId = random.nextInt();
+        int requesterId = RANDOM.nextInt();
         System.out.println("requesterId = " + requesterId);
-        ItemRequestSimpleDto request = random.nextObject(ItemRequestSimpleDto.class);
+        ItemRequestSimpleDto request = RANDOM.nextObject(ItemRequestSimpleDto.class);
 
         when(userRepository.findById(anyInt()))
                 .thenReturn(Optional.empty());
@@ -90,28 +86,44 @@ class ItemRequestServiceImplTest {
 
     @Test
     void get() {
-        User user = random.nextObject(User.class);
-        ItemRequest itemRequest = random.nextObject(ItemRequest.class);
+        User user = RANDOM.nextObject(User.class);
+        ItemRequest itemRequest = RANDOM.nextObject(ItemRequest.class);
+        itemRequest.setItems(new ArrayList<>());
         ItemRequestDto expected = ItemRequestMapper.INSTANCE.toDto(itemRequest);
-        Item item = random.nextObject(Item.class);
 
         when(userRepository.existsById(anyInt()))
                 .thenReturn(true);
         when(itemRequestRepository.findById(anyInt()))
                 .thenReturn(Optional.of(itemRequest));
         when(itemRepository.findItemsByRequestId(itemRequest.getId()))
-                .thenReturn(Optional.of(List.of(item)));
+                .thenReturn(Optional.empty());
 
         ItemRequestDto response = itemRequestService.get(user.getId(), itemRequest.getId());
         assertEquals(expected, response);
     }
 
     @Test
+    void get_Throw() {
+        User user = RANDOM.nextObject(User.class);
+        ItemRequest itemRequest = RANDOM.nextObject(ItemRequest.class);
+        itemRequest.setItems(new ArrayList<>());
+        int itemRequestId = itemRequest.getId();
+        when(userRepository.existsById(anyInt()))
+                .thenReturn(true);
+        when(itemRequestRepository.findById(itemRequestId))
+                .thenReturn(Optional.empty())
+                .thenThrow(new NotFoundException(
+                        format(REQUEST_NOT_EXISTS, itemRequestId)));
+
+        assertThrows(NotFoundException.class,
+                () -> itemRequestService.get(user.getId(), itemRequestId),
+                format(REQUEST_NOT_EXISTS, itemRequestId));
+    }
+
+    @Test
     void getAll() {
-        ItemRequest itemRequest = random.nextObject(ItemRequest.class);
-        List<Item> items = random.objects(Item.class, 1)
-                .collect(toList());
-        itemRequest.setItems(items);
+        ItemRequest itemRequest = RANDOM.nextObject(ItemRequest.class);
+        itemRequest.setItems(new ArrayList<>());
 
         List<ItemRequestDto> expected = List.of(
                 ItemRequestMapper.INSTANCE.toDto(itemRequest));
@@ -124,7 +136,7 @@ class ItemRequestServiceImplTest {
                 anyInt(), any(Pageable.class)))
                 .thenReturn(List.of(itemRequest));
         when(itemRepository.findItemsByRequestIn(anyList()))
-                .thenReturn(items);
+                .thenReturn(List.of());
 
         List<ItemRequestDto> response = itemRequestService.getAll(requesterId,
                 Pageable.ofSize(10));
@@ -134,22 +146,21 @@ class ItemRequestServiceImplTest {
 
     @Test
     void getAll_Throw() {
-        ItemRequest itemRequest = random.nextObject(ItemRequest.class);
+        ItemRequest itemRequest = RANDOM.nextObject(ItemRequest.class);
         int requesterId = itemRequest.getRequester().getId();
 
         when(userRepository.existsById(anyInt()))
                 .thenReturn(false);
 
-        NotFoundException e = assertThrows(NotFoundException.class,
-                () -> itemRequestService
-                        .getAll(requesterId, Pageable.ofSize(10)));
-
-        assertEquals(e.getMessage(), format(USER_NOT_EXISTS, requesterId));
+        assertThrows(NotFoundException.class,
+                () -> itemRequestService.getAll(requesterId, Pageable.ofSize(10)),
+                format(USER_NOT_EXISTS, requesterId));
     }
 
     @Test
     void getByRequesterId() {
-        ItemRequest itemRequest = random.nextObject(ItemRequest.class);
+        ItemRequest itemRequest = RANDOM.nextObject(ItemRequest.class);
+        itemRequest.setItems(new ArrayList<>());
         int requesterId = itemRequest.getRequester().getId();
         List<ItemRequestDto> expected = List.of(
                 ItemRequestMapper.INSTANCE.toDto(itemRequest));
