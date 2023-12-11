@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user.api;
+package ru.practicum.shareit.user.api.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.user.api.UserServiceImpl;
 import ru.practicum.shareit.user.api.dto.UserDto;
 import ru.practicum.shareit.user.api.dto.UserMapper;
 import ru.practicum.shareit.user.api.dto.UserSimpleDto;

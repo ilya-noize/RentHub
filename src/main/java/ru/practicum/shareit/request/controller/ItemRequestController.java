@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -8,8 +9,7 @@ import ru.practicum.shareit.request.dto.ItemRequestSimpleDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.valid.group.Create;
 
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -51,13 +51,13 @@ public class ItemRequestController {
             @RequestHeader(HEADER_USER_ID)
             Integer userId,
             @RequestParam(required = false, defaultValue = FROM)
-            @PositiveOrZero
+            @Min(0)
             Integer from,
             @RequestParam(required = false, defaultValue = SIZE)
-            @Positive
+            @Min(1)
             Integer size) {
 
-        return itemRequestService.getAll(userId, checkPageable(from, size));
+        return itemRequestService.getAll(userId, PageRequest.of(from / size, size));
     }
 
     @GetMapping(GET_REQUEST)

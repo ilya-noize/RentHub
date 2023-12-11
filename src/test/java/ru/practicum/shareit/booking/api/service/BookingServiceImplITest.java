@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking.api;
+package ru.practicum.shareit.booking.api.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ import static ru.practicum.shareit.ShareItApp.*;
 import static ru.practicum.shareit.booking.entity.enums.BookingStatus.*;
 
 @SpringBootTest
-class BookingServiceImplIT {
+class BookingServiceImplITest {
     private final LocalDateTime now = LocalDateTime.now();
 
     @Autowired

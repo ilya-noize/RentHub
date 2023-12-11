@@ -34,7 +34,7 @@ import static ru.practicum.shareit.item.api.controller.ItemController.*;
 @WebMvcTest(controllers = ItemController.class)
 @AutoConfigureWebMvc
 @AutoConfigureMockMvc
-class ItemControllerIT {
+class ItemControllerTest {
     private final ItemSimpleDto itemRequest = ItemSimpleDto.builder()
             .id(1)
             .name("Item")

@@ -12,8 +12,7 @@ import ru.practicum.shareit.item.api.service.ItemService;
 import ru.practicum.shareit.valid.group.Create;
 import ru.practicum.shareit.valid.group.Update;
 
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -61,9 +60,9 @@ public class ItemController {
     public List<ItemSimpleDto> search(
             @RequestParam(name = "text") String textSearch,
             @RequestParam(required = false, defaultValue = FROM)
-            @PositiveOrZero Integer from,
+            @Min(0) Integer from,
             @RequestParam(required = false, defaultValue = SIZE)
-            @Positive Integer size) {
+            @Min(1) Integer size) {
 
         return service.search(textSearch, PageRequest.of(from / size, size));
     }
@@ -72,9 +71,9 @@ public class ItemController {
     public List<ItemDto> getAll(
             @RequestHeader(HEADER_USER_ID) Integer userId,
             @RequestParam(required = false, defaultValue = FROM)
-            @PositiveOrZero Integer from,
+            @Min(0) Integer from,
             @RequestParam(required = false, defaultValue = SIZE)
-            @Positive Integer size) {
+            @Min(1) Integer size) {
 
         return service.getAll(userId, PageRequest.of(from / size, size), LocalDateTime.now());
     }

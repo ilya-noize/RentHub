@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking.api;
+package ru.practicum.shareit.booking.api.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

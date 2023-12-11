@@ -22,7 +22,7 @@ import static ru.practicum.shareit.ShareItApp.SEPARATOR_LINE;
 @SpringBootTest
 @Transactional
 @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-class ItemRequestServiceIT {
+class ItemRequestServiceITest {
     User owner;
     int ownerId;
     User requester;

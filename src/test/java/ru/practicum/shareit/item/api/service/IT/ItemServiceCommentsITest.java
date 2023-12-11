@@ -1,19 +1,20 @@
-package ru.practicum.shareit.item.api.service;
+package ru.practicum.shareit.item.api.service.IT;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.booking.api.BookingService;
 import ru.practicum.shareit.booking.api.dto.BookingSimpleDto;
 import ru.practicum.shareit.booking.api.repository.BookingRepository;
+import ru.practicum.shareit.booking.api.service.BookingService;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.api.dto.CommentDto;
 import ru.practicum.shareit.item.api.dto.CommentSimpleDto;
 import ru.practicum.shareit.item.api.dto.ItemDto;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
+import ru.practicum.shareit.item.api.service.ItemService;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestSimpleDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
@@ -30,7 +31,7 @@ import static ru.practicum.shareit.booking.entity.enums.BookingStatus.APPROVED;
 
 @SpringBootTest
 @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
-class ItemServiceCommentsIT {
+class ItemServiceCommentsITest {
     private final LocalDateTime now = LocalDateTime.now();
     @Autowired
     private UserService userService;

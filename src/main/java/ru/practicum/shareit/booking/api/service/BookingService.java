@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking.api;
+package ru.practicum.shareit.booking.api.service;
 
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.api.dto.BookingDto;

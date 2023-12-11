@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking.api;
+package ru.practicum.shareit.booking.api.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,12 +59,7 @@ class BookingServiceTest extends InjectResources {
     private Booking bookingEntity;
     private BookingSimpleDto nextBookingRequest;
 
-    /**
-     * User1 -> Items(1, 4, 7);
-     * User2 -> Items(2, 5, 8);
-     * User3 -> Items(3, 6, 9);
-     * User4 -> Items(null);
-     */
+
     @BeforeEach
     void createsEnvironmentObjectS() {
         bookingEntity = Booking.builder()

@@ -1,14 +1,15 @@
-package ru.practicum.shareit.booking.api;
+package ru.practicum.shareit.booking.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.api.dto.BookingDto;
 import ru.practicum.shareit.booking.api.dto.BookingSimpleDto;
+import ru.practicum.shareit.booking.api.service.BookingService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -103,17 +104,15 @@ public class BookingController {
             Integer bookerId,
             @RequestParam(defaultValue = "ALL") String state,
             @RequestParam(required = false, defaultValue = FROM)
-            @PositiveOrZero
-            Integer from,
+            @Min(0) Integer from,
             @RequestParam(required = false, defaultValue = SIZE)
-            @Positive
-            Integer size) {
+            @Min(1) Integer size) {
 
         return service.getAllByUser(
                 bookerId,
                 state.toUpperCase(),
                 LocalDateTime.now(),
-                checkPageable(from, size));
+                PageRequest.of(from / size, size));
     }
 
     /**
@@ -129,15 +128,15 @@ public class BookingController {
             Integer ownerId,
             @RequestParam(defaultValue = "ALL") String state,
             @RequestParam(required = false, defaultValue = FROM)
-            Integer from,
+            @Min(0) Integer from,
             @RequestParam(required = false, defaultValue = SIZE)
-            Integer size) {
+            @Min(1) Integer size) {
 //        Pageable pageable = PageRequest.of(from / size, size);
 
         return service.getAllByOwner(
                 ownerId,
                 state.toUpperCase(),
                 LocalDateTime.now(),
-                checkPageable(from, size));
+                PageRequest.of(from / size, size));
     }
 }

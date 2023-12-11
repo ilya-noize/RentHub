@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking.api;
+package ru.practicum.shareit.booking.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.api.dto.BookingDto;
 import ru.practicum.shareit.booking.api.dto.BookingMapper;
 import ru.practicum.shareit.booking.api.dto.BookingSimpleDto;
+import ru.practicum.shareit.booking.api.service.BookingService;
 import ru.practicum.shareit.booking.entity.Booking;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.BookingException;
@@ -34,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.ShareItApp.HEADER_USER_ID;
 import static ru.practicum.shareit.ShareItApp.RANDOM;
-import static ru.practicum.shareit.booking.api.BookingController.*;
+import static ru.practicum.shareit.booking.api.controller.BookingController.*;
 
 @WebMvcTest(controllers = BookingController.class)
 @AutoConfigureWebMvc

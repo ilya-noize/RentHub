@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user.api;
+package ru.practicum.shareit.user.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -10,6 +10,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import ru.practicum.shareit.user.api.UserController;
+import ru.practicum.shareit.user.api.UserServiceImpl;
 import ru.practicum.shareit.user.api.dto.UserDto;
 import ru.practicum.shareit.user.api.dto.UserSimpleDto;
 
@@ -25,7 +27,7 @@ import static ru.practicum.shareit.user.api.UserController.*;
 @WebMvcTest(controllers = UserController.class)
 @AutoConfigureWebMvc
 @AutoConfigureMockMvc
-class UserControllerIT {
+class UserControllerITest {
     private final UserSimpleDto userRequestNew = new UserSimpleDto("user@user.com", "user");
     private final UserDto userRequestPatch = new UserDto(1, "userUpdate@user.com", "userUpdate");
     private final UserDto userResponse = new UserDto(1, "user@user.com", "user");

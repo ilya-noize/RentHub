@@ -19,7 +19,7 @@ import static ru.practicum.shareit.ShareItApp.RANDOM;
 
 
 @DataJpaTest
-public class ItemRepositoryIT {
+public class ItemRepositoryITest {
 
     private final Pageable pageable = Pageable.ofSize(10);
 
