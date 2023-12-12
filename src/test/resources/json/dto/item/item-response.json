@@ -1,9 +1,0 @@
-{
-  "id": 1,
-  "name": "Стол",
-  "description": "Размер: метр на 60. Высота 75.",
-  "available": true,
-  "lastBooking": null,
-  "nextBooking": null,
-  "comments": []
-}
