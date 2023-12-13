@@ -18,15 +18,20 @@ import ru.practicum.shareit.item.api.service.ItemService;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestSimpleDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
-import ru.practicum.shareit.user.api.UserService;
 import ru.practicum.shareit.user.api.dto.UserDto;
 import ru.practicum.shareit.user.api.dto.UserSimpleDto;
+import ru.practicum.shareit.user.api.service.UserService;
 
 import java.time.LocalDateTime;
 
 import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.*;
-import static ru.practicum.shareit.ShareItApp.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static ru.practicum.shareit.ShareItApp.ITEM_NOT_EXISTS;
+import static ru.practicum.shareit.ShareItApp.RANDOM;
+import static ru.practicum.shareit.ShareItApp.USER_NOT_EXISTS;
 import static ru.practicum.shareit.booking.entity.enums.BookingStatus.APPROVED;
 
 @SpringBootTest

@@ -8,8 +8,8 @@ import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
 import ru.practicum.shareit.item.api.service.ItemService;
 import ru.practicum.shareit.item.entity.Item;
-import ru.practicum.shareit.user.api.UserService;
 import ru.practicum.shareit.user.api.dto.UserSimpleDto;
+import ru.practicum.shareit.user.api.service.UserService;
 import ru.practicum.shareit.user.entity.User;
 import ru.practicum.shareit.utils.InjectResources;
 

@@ -1,10 +1,18 @@
-package ru.practicum.shareit.user.api;
+package ru.practicum.shareit.user.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.constants.Constants;
 import ru.practicum.shareit.user.api.dto.UserDto;
 import ru.practicum.shareit.user.api.dto.UserSimpleDto;
+import ru.practicum.shareit.user.api.service.UserService;
 import ru.practicum.shareit.valid.group.Create;
 import ru.practicum.shareit.valid.group.Update;
 
@@ -14,21 +22,16 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class UserController {
-    public static final String CREATE_USER = "/users";
-    public static final String UPDATE_USER = "/users/{id}";
-    public static final String GET_USER = "/users/{id}";
-    public static final String DELETE_USER = "/users/{id}";
-    public static final String GET_ALL_USERS = "/users";
     private final UserService service;
 
-    @PostMapping(CREATE_USER)
+    @PostMapping(Constants.CREATE_USER)
     public UserDto create(
             @RequestBody @Validated(Create.class) UserSimpleDto userDto) {
 
         return service.create(userDto);
     }
 
-    @PatchMapping(UPDATE_USER)
+    @PatchMapping(Constants.UPDATE_USER)
     public UserDto update(
             @PathVariable @Positive Integer id,
             @RequestBody @Validated(Update.class) UserDto userDto) {
@@ -36,7 +39,7 @@ public class UserController {
         return service.update(userDto);
     }
 
-    @GetMapping(GET_USER)
+    @GetMapping(Constants.GET_USER)
     @Validated
     public UserDto get(
             @PathVariable @Positive Integer id) {
@@ -44,13 +47,13 @@ public class UserController {
         return service.get(id);
     }
 
-    @GetMapping(GET_ALL_USERS)
+    @GetMapping(Constants.GET_ALL_USERS)
     public List<UserDto> getAll() {
 
         return service.getAll();
     }
 
-    @DeleteMapping(DELETE_USER)
+    @DeleteMapping(Constants.DELETE_USER)
     @Validated
     public void delete(
             @PathVariable @Positive Integer id) {

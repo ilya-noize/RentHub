@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user.api;
+package ru.practicum.shareit.user.api.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static ru.practicum.shareit.ShareItApp.USER_NOT_EXISTS;
+import static ru.practicum.shareit.constants.Constants.USER_NOT_EXISTS;
 
 /**
  * DTO processing class before saving to memory

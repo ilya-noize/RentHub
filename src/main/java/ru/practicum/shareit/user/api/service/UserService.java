@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user.api;
+package ru.practicum.shareit.user.api.service;
 
 import ru.practicum.shareit.user.api.dto.UserDto;
 import ru.practicum.shareit.user.api.dto.UserSimpleDto;
