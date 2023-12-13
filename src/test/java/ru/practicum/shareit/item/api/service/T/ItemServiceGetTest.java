@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import ru.practicum.shareit.constants.Constants;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.api.repository.ItemRepository;
 import ru.practicum.shareit.item.api.service.ItemServiceImpl;
@@ -17,7 +18,6 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
-import static ru.practicum.shareit.ShareItApp.*;
 
 @SpringBootTest
 class ItemServiceGetTest {
@@ -27,7 +27,6 @@ class ItemServiceGetTest {
     private UserRepository userRepository;
     @Mock
     private ItemRepository itemRepository;
-
 
     @Test
     @DisplayName("ITEM GET _ THROW IF USER NOT EXIST")
@@ -39,15 +38,15 @@ class ItemServiceGetTest {
 
         assertThrows(NotFoundException.class,
                 () -> itemService.get(userId, itemId),
-                format(USER_NOT_EXISTS, userId));
+                format(Constants.USER_NOT_EXISTS, userId));
     }
 
     @Test
     @DisplayName("ITEM GET _ THROW IF ITEM NOT EXIST")
     void get_whenItemNotExists_thenReturnException() {
-        User owner = RANDOM.nextObject(User.class);
+        User owner = Constants.RANDOM.nextObject(User.class);
         int ownerId = owner.getId();
-        Item item = RANDOM.nextObject(Item.class);
+        Item item = Constants.RANDOM.nextObject(Item.class);
         item.setOwner(owner);
         int itemId = item.getId();
 
@@ -55,10 +54,10 @@ class ItemServiceGetTest {
                 .thenReturn(true);
         when(itemRepository.findById(itemId))
                 .thenReturn(Optional.empty())
-                .thenThrow(new NotFoundException(format(ITEM_NOT_EXISTS, itemId)));
+                .thenThrow(new NotFoundException(format(Constants.ITEM_NOT_EXISTS, itemId)));
 
         assertThrows(NotFoundException.class,
                 () -> itemService.get(ownerId, itemId),
-                format(ITEM_NOT_EXISTS, ownerId));
+                format(Constants.ITEM_NOT_EXISTS, ownerId));
     }
 }

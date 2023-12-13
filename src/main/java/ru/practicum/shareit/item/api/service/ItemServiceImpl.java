@@ -9,9 +9,15 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.api.dto.BookingItemDto;
 import ru.practicum.shareit.booking.api.dto.BookingMapper;
 import ru.practicum.shareit.booking.api.repository.BookingRepository;
+import ru.practicum.shareit.constants.Constants;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.api.dto.*;
+import ru.practicum.shareit.item.api.dto.CommentDto;
+import ru.practicum.shareit.item.api.dto.CommentMapper;
+import ru.practicum.shareit.item.api.dto.CommentSimpleDto;
+import ru.practicum.shareit.item.api.dto.ItemDto;
+import ru.practicum.shareit.item.api.dto.ItemMapper;
+import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
 import ru.practicum.shareit.item.api.repository.CommentRepository;
 import ru.practicum.shareit.item.api.repository.ItemRepository;
 import ru.practicum.shareit.item.entity.CommentEntity;
@@ -29,8 +35,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.*;
-import static ru.practicum.shareit.ShareItApp.*;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static ru.practicum.shareit.booking.entity.enums.BookingStatus.APPROVED;
 
 @Service
@@ -69,14 +76,12 @@ public class ItemServiceImpl implements ItemService {
             ItemRequest itemRequest = itemRequestRepository.findById(requestId)
                     .orElseThrow(() ->
                             new NotFoundException(
-                                    format(REQUEST_NOT_EXISTS, requestId)));
+                                    format(Constants.REQUEST_NOT_EXISTS, requestId)));
             log.debug("[i] add ItemRequest.id:{}", requestId);
             item.setRequest(itemRequest);
         }
-        ItemDto dto = ItemMapper.INSTANCE.toDto(itemRepository.save(item));
-//        dto.setRequestId(requestId);
 
-        return dto;
+        return ItemMapper.INSTANCE.toDto(itemRepository.save(item));
     }
 
     /**
@@ -99,7 +104,7 @@ public class ItemServiceImpl implements ItemService {
      */
     @Override
     public ItemDto update(Integer ownerId, Integer itemId, ItemSimpleDto itemDto) {
-        log.info("[i] UPDATE ITEM");
+        log.debug("[i] UPDATE ITEM");
         String name = itemDto.getName();
         String description = itemDto.getDescription();
         Boolean available = itemDto.getAvailable();
@@ -109,7 +114,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(
                         () -> new NotFoundException(
-                                format(ITEM_NOT_EXISTS, itemId)));
+                                format(Constants.ITEM_NOT_EXISTS, itemId)));
 
         boolean isNotOwner = itemRepository.notExistsByIdAndOwner_Id(itemId, ownerId);
         if (isNotOwner) {
@@ -120,52 +125,14 @@ public class ItemServiceImpl implements ItemService {
         boolean notNullName = !(name == null || name.isBlank());
 
         if (notNullName && notNullDescription && available != null) {
+
             return ItemMapper.INSTANCE.toDto(
                     itemRepository.save(
                             ItemMapper.INSTANCE.toEntity(itemDto, ownerId)));
         }
 
-
-        if (notNullName) {
-            if (notNullDescription) {
-                log.info("[i] Name = {}, Description = {};", name, description);
-                itemRepository.updateNameAndDescriptionById(name, description, itemId);
-                item.setName(name);
-                item.setDescription(description);
-            } else {
-                if (available != null) {
-                    log.info("[i] Name = {}, Available = {};", name, available);
-                    itemRepository.updateNameAndAvailableById(name, available, itemId);
-                    item.setName(name);
-                    item.setAvailable(available);
-                } else {
-                    log.info("[i] Name = {};", name);
-                    itemRepository.updateNameById(name, itemId);
-                    item.setName(name);
-                }
-            }
-        } else {
-            if (notNullDescription) {
-                if (available != null) {
-                    log.info("[i] Update Description = {}, Available = {};", description, available);
-                    itemRepository.updateDescriptionAndAvailableById(description, available, itemId);
-                    item.setDescription(description);
-                    item.setAvailable(available);
-                } else {
-                    log.info("[i] Description = {};", description);
-                    itemRepository.updateDescriptionById(description, itemId);
-                    item.setDescription(description);
-                }
-            } else {
-                if (available != null) {
-                    log.info("[i] Available = {};", available);
-                    itemRepository.updateAvailableById(available, itemId);
-                    item.setAvailable(available);
-                }
-            }
-        }
-
-        return ItemMapper.INSTANCE.toDto(item);
+        return ItemMapper.INSTANCE.toDto(
+                partiallyUpdated(itemId, name, description, available, item));
     }
 
     /**
@@ -184,7 +151,7 @@ public class ItemServiceImpl implements ItemService {
         LocalDateTime now = LocalDateTime.now();
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() ->
-                        new NotFoundException(String.format(ITEM_NOT_EXISTS, itemId)));
+                        new NotFoundException(String.format(Constants.ITEM_NOT_EXISTS, itemId)));
         ItemDto itemDto = ItemMapper.INSTANCE.toDto(item);
 
         BookingItemDto lastBooking = bookingRepository
@@ -332,11 +299,11 @@ public class ItemServiceImpl implements ItemService {
         Integer authorId = commentSimpleDto.getAuthorId();
         Integer itemId = commentSimpleDto.getItemId();
         commentSimpleDto.setText(text);
-        log.info("[i] CREATE COMMENT USER_ID:{}, ITEM_ID:{}, DTO:{}", authorId, itemId, commentSimpleDto);
+        log.debug("[i] CREATE COMMENT USER_ID:{}, ITEM_ID:{}, DTO:{}", authorId, itemId, commentSimpleDto);
 
         User author = userRepository.findById(authorId)
                 .orElseThrow(() -> new NotFoundException(
-                        format(USER_NOT_EXISTS, authorId)));
+                        format(Constants.USER_NOT_EXISTS, authorId)));
         checkingExistItemById(itemId);
 
         boolean notExistBooking = !bookingRepository
@@ -364,7 +331,7 @@ public class ItemServiceImpl implements ItemService {
     private void checkingExistUserById(Integer userId) {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException(
-                    format(USER_NOT_EXISTS, userId));
+                    format(Constants.USER_NOT_EXISTS, userId));
         }
     }
 
@@ -376,7 +343,53 @@ public class ItemServiceImpl implements ItemService {
     private void checkingExistItemById(Integer itemId) {
         if (!itemRepository.existsById(itemId)) {
             throw new NotFoundException(
-                    format(ITEM_NOT_EXISTS, itemId));
+                    format(Constants.ITEM_NOT_EXISTS, itemId));
         }
+    }
+
+    private Item partiallyUpdated(Integer itemId, String name, String description, Boolean available, Item item) {
+        boolean notNullName = !(name == null || name.isBlank());
+        boolean notNullDescription = !(description == null || description.isEmpty());
+
+        if (notNullName) {
+            if (notNullDescription) {
+                log.debug("[i] Name = {}, Description = {};", name, description);
+                itemRepository.updateNameAndDescriptionById(name, description, itemId);
+                item.setName(name);
+                item.setDescription(description);
+            } else {
+                if (available != null) {
+                    log.debug("[i] Name = {}, Available = {};", name, available);
+                    itemRepository.updateNameAndAvailableById(name, available, itemId);
+                    item.setName(name);
+                    item.setAvailable(available);
+                } else {
+                    log.debug("[i] Name = {};", name);
+                    itemRepository.updateNameById(name, itemId);
+                    item.setName(name);
+                }
+            }
+        } else {
+            if (notNullDescription) {
+                if (available != null) {
+                    log.debug("[i] Update Description = {}, Available = {};", description, available);
+                    itemRepository.updateDescriptionAndAvailableById(description, available, itemId);
+                    item.setDescription(description);
+                    item.setAvailable(available);
+                } else {
+                    log.debug("[i] Description = {};", description);
+                    itemRepository.updateDescriptionById(description, itemId);
+                    item.setDescription(description);
+                }
+            } else {
+                if (available != null) {
+                    log.debug("[i] Available = {};", available);
+                    itemRepository.updateAvailableById(available, itemId);
+                    item.setAvailable(available);
+                }
+            }
+        }
+
+        return item;
     }
 }

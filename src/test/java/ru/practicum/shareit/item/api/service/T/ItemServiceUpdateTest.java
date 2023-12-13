@@ -20,10 +20,21 @@ import ru.practicum.shareit.utils.InjectResources;
 import java.util.Optional;
 
 import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static ru.practicum.shareit.ShareItApp.ITEM_NOT_EXISTS;
-import static ru.practicum.shareit.ShareItApp.USER_NOT_EXISTS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static ru.practicum.shareit.constants.Constants.ITEM_NOT_EXISTS;
+import static ru.practicum.shareit.constants.Constants.USER_NOT_EXISTS;
 
 @ExtendWith(MockitoExtension.class)
 class ItemServiceUpdateTest extends InjectResources {

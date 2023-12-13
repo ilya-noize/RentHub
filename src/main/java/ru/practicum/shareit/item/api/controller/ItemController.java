@@ -2,12 +2,21 @@ package ru.practicum.shareit.item.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.constants.Constants;
 import ru.practicum.shareit.item.api.dto.CommentDto;
 import ru.practicum.shareit.item.api.dto.CommentSimpleDto;
 import ru.practicum.shareit.item.api.dto.ItemDto;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
 import ru.practicum.shareit.item.api.service.ItemService;
+import ru.practicum.shareit.valid.Checking;
 import ru.practicum.shareit.valid.group.Create;
 import ru.practicum.shareit.valid.group.Update;
 
@@ -16,31 +25,23 @@ import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ru.practicum.shareit.ShareItApp.*;
-
 @RestController
 @RequiredArgsConstructor
 public class ItemController {
-    public static final String CREATE_ITEM = "/items";
-    public static final String UPDATE_ITEM = "/items/{id}";
-    public static final String GET_ITEM = "/items/{id}";
-    public static final String SEARCH_ITEM = "/items/search";
-    public static final String GET_ALL_ITEMS = "/items";
-    public static final String CREATE_COMMENT = "/items/{id}/comment";
     private final ItemService service;
 
-    @PostMapping(CREATE_ITEM)
+    @PostMapping(Constants.CREATE_ITEM)
     public ItemDto create(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(Constants.HEADER_USER_ID) Integer userId,
             @RequestBody
             @Validated(Create.class) ItemSimpleDto itemDto) {
 
         return service.create(userId, itemDto);
     }
 
-    @PatchMapping(UPDATE_ITEM)
+    @PatchMapping(Constants.UPDATE_ITEM)
     public ItemDto update(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(Constants.HEADER_USER_ID) Integer userId,
             @PathVariable(name = "id") Integer itemId,
             @RequestBody
             @Validated(Update.class) ItemSimpleDto itemDto) {
@@ -48,40 +49,40 @@ public class ItemController {
         return service.update(userId, itemId, itemDto);
     }
 
-    @GetMapping(GET_ITEM)
+    @GetMapping(Constants.GET_ITEM)
     public ItemDto get(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(Constants.HEADER_USER_ID) Integer userId,
             @PathVariable(name = "id") Integer itemId) {
 
         return service.get(userId, itemId);
     }
 
-    @GetMapping(SEARCH_ITEM)
+    @GetMapping(Constants.SEARCH_ITEM)
     public List<ItemSimpleDto> search(
             @RequestParam(name = "text") String textSearch,
-            @RequestParam(required = false, defaultValue = FROM)
+            @RequestParam(required = false, defaultValue = Constants.FROM)
             @PositiveOrZero Integer from,
-            @RequestParam(required = false, defaultValue = SIZE)
+            @RequestParam(required = false, defaultValue = Constants.SIZE)
             @Positive Integer size) {
 
-        return service.search(textSearch, checkPageable(from, size));
+        return service.search(textSearch, Checking.checkPageable(from, size));
     }
 
-    @GetMapping(GET_ALL_ITEMS)
+    @GetMapping(Constants.GET_ALL_ITEMS)
     public List<ItemDto> getAll(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
-            @RequestParam(required = false, defaultValue = FROM)
+            @RequestHeader(Constants.HEADER_USER_ID) Integer userId,
+            @RequestParam(required = false, defaultValue = Constants.FROM)
             @PositiveOrZero Integer from,
 
-            @RequestParam(required = false, defaultValue = SIZE)
+            @RequestParam(required = false, defaultValue = Constants.SIZE)
             @Positive Integer size) {
 
-        return service.getAll(userId, checkPageable(from, size), LocalDateTime.now());
+        return service.getAll(userId, Checking.checkPageable(from, size), LocalDateTime.now());
     }
 
-    @PostMapping(CREATE_COMMENT)
+    @PostMapping(Constants.CREATE_COMMENT)
     public CommentDto createComment(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(Constants.HEADER_USER_ID) Integer userId,
             @PathVariable(name = "id") Integer itemId,
             @RequestBody
             @Validated(Create.class) CommentSimpleDto commentSimpleDto) {

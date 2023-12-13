@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.api.service.IT;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.api.dto.BookingSimpleDto;
 import ru.practicum.shareit.booking.api.repository.BookingRepository;
 import ru.practicum.shareit.booking.api.service.BookingService;
+import ru.practicum.shareit.constants.Constants;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.api.dto.CommentDto;
@@ -29,9 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static ru.practicum.shareit.ShareItApp.ITEM_NOT_EXISTS;
-import static ru.practicum.shareit.ShareItApp.RANDOM;
-import static ru.practicum.shareit.ShareItApp.USER_NOT_EXISTS;
 import static ru.practicum.shareit.booking.entity.enums.BookingStatus.APPROVED;
 
 @SpringBootTest
@@ -51,12 +50,13 @@ class ItemServiceCommentsITest {
 
 
     @Test
+    @DisplayName("POST Create comment - Return: DTO")
     void createComment() {
         LocalDateTime now = LocalDateTime.now();
         int requestSendNDaysAgo = 64;
         int rentStartNDaysAgo = requestSendNDaysAgo - 32;
         int rentFinishNDaysAgo = rentStartNDaysAgo - 16;
-        int publishCommentNDaysAgo = 4;// 128
+        int publishCommentNDaysAgo = 4;
 
         if (theSequenceOfActionsInTimeIsWrong(requestSendNDaysAgo, rentStartNDaysAgo, rentFinishNDaysAgo, publishCommentNDaysAgo)) {
             throw new BadRequestException("Something wrong in roadmap by create comment.");
@@ -75,7 +75,7 @@ class ItemServiceCommentsITest {
                         APPROVED,
                         now.minusDays(publishCommentNDaysAgo)));
 
-        CommentSimpleDto commentSimpleDto = RANDOM.nextObject(CommentSimpleDto.class);
+        CommentSimpleDto commentSimpleDto = Constants.RANDOM.nextObject(CommentSimpleDto.class);
         commentSimpleDto.setAuthorId(authorId);
         commentSimpleDto.setItemId(itemId);
         commentSimpleDto.setCreated(now.plusDays(publishCommentNDaysAgo));
@@ -113,7 +113,7 @@ class ItemServiceCommentsITest {
                         APPROVED,
                         now.minusDays(publishCommentNDaysAgo)));
 
-        CommentSimpleDto commentSimpleDto = RANDOM.nextObject(CommentSimpleDto.class);
+        CommentSimpleDto commentSimpleDto = Constants.RANDOM.nextObject(CommentSimpleDto.class);
         commentSimpleDto.setAuthorId(authorId);
         commentSimpleDto.setItemId(itemId);
         commentSimpleDto.setCreated(now.plusDays(publishCommentNDaysAgo));
@@ -149,7 +149,7 @@ class ItemServiceCommentsITest {
                         APPROVED,
                         now.minusDays(publishCommentNDaysAgo)));
 
-        CommentSimpleDto commentSimpleDto = RANDOM.nextObject(CommentSimpleDto.class);
+        CommentSimpleDto commentSimpleDto = Constants.RANDOM.nextObject(CommentSimpleDto.class);
         commentSimpleDto.setAuthorId(authorId);
         commentSimpleDto.setItemId(itemId);
         commentSimpleDto.setCreated(now.plusDays(publishCommentNDaysAgo));
@@ -191,7 +191,7 @@ class ItemServiceCommentsITest {
 
     @Test
     void createComment_wrongText_Throw() {
-        CommentSimpleDto wrongText = RANDOM.nextObject(CommentSimpleDto.class);
+        CommentSimpleDto wrongText = Constants.RANDOM.nextObject(CommentSimpleDto.class);
         wrongText.setText("   ");
         BadRequestException e = assertThrows(BadRequestException.class,
                 () -> itemService.createComment(wrongText));
@@ -201,14 +201,14 @@ class ItemServiceCommentsITest {
 
     @Transactional
     private int getUserId() {
-        UserSimpleDto requestUser = RANDOM.nextObject(UserSimpleDto.class);
+        UserSimpleDto requestUser = Constants.RANDOM.nextObject(UserSimpleDto.class);
         UserDto authorDto = userService.create(requestUser);
         return authorDto.getId();
     }
 
     @Transactional
     private int getRequestByItem(int requesterId, int requestItemDaysAgo) {
-        ItemRequestSimpleDto requestSimpleDto = RANDOM.nextObject(ItemRequestSimpleDto.class);
+        ItemRequestSimpleDto requestSimpleDto = Constants.RANDOM.nextObject(ItemRequestSimpleDto.class);
         LocalDateTime requestTime = LocalDateTime.now().minusDays(requestItemDaysAgo);
         ItemRequestDto requestDto = itemRequestService
                 .create(requesterId, requestSimpleDto, requestTime);
@@ -217,7 +217,7 @@ class ItemServiceCommentsITest {
 
     @Transactional
     private int getItemId(int ownerId, int authorId, int requestItemDaysAgo) {
-        ItemSimpleDto requestItem = RANDOM.nextObject(ItemSimpleDto.class);
+        ItemSimpleDto requestItem = Constants.RANDOM.nextObject(ItemSimpleDto.class);
         requestItem.setRequestId(getRequestByItem(authorId, requestItemDaysAgo));
         // requestItem.setAvailable(false);
         // in Booking: BadRequestException: It is impossible to rent an item to which access is closed.
@@ -228,7 +228,7 @@ class ItemServiceCommentsITest {
 
     @Transactional
     private void getBookingId(int ownerId, int itemId, int authorId, int rentStartNDaysAgo, int rentFinishNDaysAgo) {
-        BookingSimpleDto requestBooking = RANDOM.nextObject(BookingSimpleDto.class);
+        BookingSimpleDto requestBooking = Constants.RANDOM.nextObject(BookingSimpleDto.class);
         requestBooking.setItemId(itemId);
         requestBooking.setStart(now.minusDays(rentStartNDaysAgo));
         requestBooking.setEnd(now.minusDays(rentFinishNDaysAgo));
@@ -242,7 +242,7 @@ class ItemServiceCommentsITest {
         int authorId = getUserId();
         int itemId = Integer.MAX_VALUE;//getItemId(ownerId, authorId, 3);
 
-        CommentSimpleDto commentSimpleDto = RANDOM.nextObject(CommentSimpleDto.class);
+        CommentSimpleDto commentSimpleDto = Constants.RANDOM.nextObject(CommentSimpleDto.class);
         commentSimpleDto.setAuthorId(authorId);
         commentSimpleDto.setItemId(itemId);
         commentSimpleDto.setCreated(now);
@@ -254,7 +254,7 @@ class ItemServiceCommentsITest {
 
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> itemService.createComment(commentSimpleDto));
-        assertEquals(e.getMessage(), format(ITEM_NOT_EXISTS, itemId));
+        assertEquals(e.getMessage(), format(Constants.ITEM_NOT_EXISTS, itemId));
     }
 
 
@@ -270,6 +270,6 @@ class ItemServiceCommentsITest {
 
         //then
         assertEquals(exception.getMessage(),
-                format(USER_NOT_EXISTS, userId));
+                format(Constants.USER_NOT_EXISTS, userId));
     }
 }

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.api.service.IT;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,14 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.*;
-import static ru.practicum.shareit.ShareItApp.RANDOM;
-import static ru.practicum.shareit.ShareItApp.USER_NOT_EXISTS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static ru.practicum.shareit.constants.Constants.RANDOM;
+import static ru.practicum.shareit.constants.Constants.USER_NOT_EXISTS;
 
 @SpringBootTest
-class ItemServiceTest { // todo true named class
-    public static final LocalDateTime NOW = LocalDateTime.now();
-
+class ItemServiceTest {
     @Autowired
     private ItemService itemService;
     @Autowired
@@ -34,11 +36,22 @@ class ItemServiceTest { // todo true named class
     private ItemRepository itemRepository;
 
 
+    /**
+     * Create new user and save in DB
+     *
+     * @return user with ID
+     */
     private User getNewUser() {
         User owner = RANDOM.nextObject(User.class);
         return userRepository.save(owner);
     }
 
+    /**
+     * Create new item and save in DB
+     *
+     * @param owner Owner by Item
+     * @return Item with ID
+     */
     private Item getNewItem(User owner) {
         Item item = RANDOM.nextObject(Item.class);
         item.setOwner(owner);
@@ -47,6 +60,7 @@ class ItemServiceTest { // todo true named class
     }
 
     @Test
+    @DisplayName("POST create<Item> - Then User not exists - Exception: " + USER_NOT_EXISTS)
     void create_whenUserIdNotExist_thenReturnException() {
         //given
         Integer userId = 100;
@@ -61,6 +75,7 @@ class ItemServiceTest { // todo true named class
     }
 
     @Test
+    @DisplayName("GET get<Item> - Then User, Item exists - Return: DTO")
     void get_whenUserAndItemExists_thenReturnDto() {
         User owner = getNewUser();
         Item item = getNewItem(owner);
@@ -79,6 +94,7 @@ class ItemServiceTest { // todo true named class
     }
 
     @Test
+    @DisplayName("GET getAll<List<Item>> then get Items by Owner - Return: List<Dto>")
     void getAll() {
         User owner = getNewUser();
 
@@ -90,7 +106,7 @@ class ItemServiceTest { // todo true named class
         }
 
         final List<ItemDto> response = itemService.getAll(owner.getId(),
-                Pageable.ofSize(onPage), NOW);
+                Pageable.ofSize(onPage), LocalDateTime.now());
 
         //then
         assertEquals(response.get(0).getId(), items.get(0).getId());

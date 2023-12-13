@@ -4,8 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.item.entity.Item;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static ru.practicum.shareit.ShareItApp.RANDOM;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static ru.practicum.shareit.constants.Constants.RANDOM;
 
 @SpringBootTest
 class ItemMapperTest {

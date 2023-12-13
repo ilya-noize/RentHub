@@ -15,7 +15,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static ru.practicum.shareit.ShareItApp.RANDOM;
+import static ru.practicum.shareit.constants.Constants.RANDOM;
 
 
 @DataJpaTest
