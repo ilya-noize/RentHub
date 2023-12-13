@@ -13,6 +13,7 @@ import ru.practicum.shareit.booking.api.repository.BookingRepository;
 import ru.practicum.shareit.booking.entity.Booking;
 import ru.practicum.shareit.booking.entity.enums.BookingFilterByTemplate;
 import ru.practicum.shareit.booking.entity.enums.BookingStatus;
+import ru.practicum.shareit.constants.Constants;
 import ru.practicum.shareit.exception.BookingException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.StateException;
@@ -29,12 +30,20 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-import static ru.practicum.shareit.ShareItApp.*;
-import static ru.practicum.shareit.booking.entity.enums.BookingFilterByTemplate.*;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static ru.practicum.shareit.booking.entity.enums.BookingFilterByTemplate.ALL;
+import static ru.practicum.shareit.booking.entity.enums.BookingFilterByTemplate.CURRENT;
+import static ru.practicum.shareit.booking.entity.enums.BookingFilterByTemplate.FUTURE;
+import static ru.practicum.shareit.booking.entity.enums.BookingFilterByTemplate.PAST;
+import static ru.practicum.shareit.booking.entity.enums.BookingStatus.APPROVED;
 import static ru.practicum.shareit.booking.entity.enums.BookingStatus.REJECTED;
 import static ru.practicum.shareit.booking.entity.enums.BookingStatus.WAITING;
-import static ru.practicum.shareit.booking.entity.enums.BookingStatus.*;
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceTest extends InjectResources {
@@ -90,7 +99,7 @@ class BookingServiceTest extends InjectResources {
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> bookingService.create(bookerId, bookingRequest));
         //then
-        assertEquals(e.getMessage(), format(ITEM_NOT_EXISTS, itemId));
+        assertEquals(e.getMessage(), format(Constants.ITEM_NOT_EXISTS, itemId));
     }
 
     @Test
@@ -112,7 +121,7 @@ class BookingServiceTest extends InjectResources {
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> bookingService.create(bookerId, bookingRequest));
         //then
-        assertEquals(e.getMessage(), format(USER_NOT_EXISTS, bookerId));
+        assertEquals(e.getMessage(), format(Constants.USER_NOT_EXISTS, bookerId));
     }
 
 
@@ -144,7 +153,7 @@ class BookingServiceTest extends InjectResources {
                 .thenReturn(true);
         doNothing().when(bookingRepository).updateStatusById(status, bookingId);
 
-        if (LOGGING_IN_TEST) {
+        if (Constants.LOGGING_IN_TEST) {
             System.out.printf("itemId: %d, ownerId: %d, bookerId: %d, bookingId: %d%n", itemId, ownerId, bookerId, bookingId);
             System.out.printf("bookingEntity:   %s%n", bookingEntity);
             System.out.printf("bookingRequest:  %s%n", bookingRequest);
@@ -174,7 +183,7 @@ class BookingServiceTest extends InjectResources {
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> bookingService.update(ownerId, bookingId, false));
         //then
-        assertEquals(e.getMessage(), format(BOOKING_NOT_EXISTS, bookingId));
+        assertEquals(e.getMessage(), format(Constants.BOOKING_NOT_EXISTS, bookingId));
 
         verify(bookingRepository, never())
                 .updateStatusById(BookingStatus.REJECTED, bookingId);
@@ -197,7 +206,7 @@ class BookingServiceTest extends InjectResources {
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> bookingService.update(ownerId, bookingId, false));
         //then
-        assertEquals(e.getMessage(), format(USER_NOT_EXISTS, ownerId));
+        assertEquals(e.getMessage(), format(Constants.USER_NOT_EXISTS, ownerId));
 
         verify(bookingRepository, never())
                 .updateStatusById(BookingStatus.REJECTED, bookingId);
@@ -230,7 +239,7 @@ class BookingServiceTest extends InjectResources {
         when(userRepository.existsById(ownerId))
                 .thenReturn(true);
         doNothing().when(bookingRepository).updateStatusById(status, bookingId);
-        if (LOGGING_IN_TEST) {
+        if (Constants.LOGGING_IN_TEST) {
             System.out.printf("itemId: %d, ownerId: %d, bookerId: %d, bookingId: %d%n", itemId, ownerId, bookerId, bookingId);
             System.out.printf("bookingEntity:   %s%n", bookingEntity);
             System.out.printf("bookingRequest:  %s%n", bookingRequest);
@@ -389,7 +398,7 @@ class BookingServiceTest extends InjectResources {
                                 now,
                                 pageable));
         //then
-        assertEquals(e.getMessage(), format(USER_NOT_EXISTS, bookerId));
+        assertEquals(e.getMessage(), format(Constants.USER_NOT_EXISTS, bookerId));
     }
 
     @Test
@@ -399,7 +408,7 @@ class BookingServiceTest extends InjectResources {
 
         when(userRepository.existsById(ownerId)).thenReturn(true);
         when(bookingRepository // CURRENT
-                .findAllByItem_Owner_IdAndStartBeforeAndEndAfter(
+                .findAllByItem_Owner_IdAndStartBeforeAndEndAfterByStartDesc(
                         ownerId, now, now, pageable))
                 .thenReturn(bookingList);
         // when
@@ -505,7 +514,7 @@ class BookingServiceTest extends InjectResources {
                                 now,
                                 pageable));
         //then
-        assertEquals(e.getMessage(), format(USER_NOT_EXISTS, ownerId));
+        assertEquals(e.getMessage(), format(Constants.USER_NOT_EXISTS, ownerId));
     }
 
     @Test

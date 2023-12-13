@@ -7,9 +7,12 @@ import ru.practicum.shareit.user.entity.User;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static ru.practicum.shareit.ShareItApp.RANDOM;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static ru.practicum.shareit.booking.entity.enums.BookingStatus.WAITING;
+import static ru.practicum.shareit.constants.Constants.RANDOM;
 
 class BookingMapperTest {
     private final LocalDateTime now = LocalDateTime.now();

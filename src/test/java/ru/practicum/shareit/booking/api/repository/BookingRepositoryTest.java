@@ -16,9 +16,13 @@ import ru.practicum.shareit.user.entity.User;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static ru.practicum.shareit.ShareItApp.RANDOM;
-import static ru.practicum.shareit.booking.entity.enums.BookingStatus.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static ru.practicum.shareit.booking.entity.enums.BookingStatus.APPROVED;
+import static ru.practicum.shareit.booking.entity.enums.BookingStatus.REJECTED;
+import static ru.practicum.shareit.booking.entity.enums.BookingStatus.WAITING;
+import static ru.practicum.shareit.constants.Constants.RANDOM;
 
 
 @DataJpaTest
@@ -27,8 +31,6 @@ class BookingRepositoryTest {
     private final LocalDateTime now = LocalDateTime.of(2000, 1, 1, 12, 0, 0, 0);
     private final Sort sortStartAsc =
             Sort.by(Sort.Direction.ASC, "start");
-    private final Sort sortStartDesc =
-            Sort.by(Sort.Direction.DESC, "start");
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -328,7 +330,7 @@ class BookingRepositoryTest {
         getNewBookingInFuture(item2, booker, WAITING);
 
         assertEquals(1, bookingRepository
-                .findAllByItem_Owner_IdAndStartBeforeAndEndAfter(
+                .findAllByItem_Owner_IdAndStartBeforeAndEndAfterByStartDesc(
                         owner.getId(), now, now, pageable)
                 .size());
     }

@@ -8,6 +8,7 @@ import ru.practicum.shareit.booking.api.dto.BookingSimpleDto;
 import ru.practicum.shareit.booking.api.repository.BookingRepository;
 import ru.practicum.shareit.booking.entity.Booking;
 import ru.practicum.shareit.booking.entity.enums.BookingStatus;
+import ru.practicum.shareit.constants.Constants;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.BookingException;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -20,9 +21,12 @@ import ru.practicum.shareit.user.entity.User;
 import java.time.LocalDateTime;
 
 import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.*;
-import static ru.practicum.shareit.ShareItApp.*;
-import static ru.practicum.shareit.booking.entity.enums.BookingStatus.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static ru.practicum.shareit.booking.entity.enums.BookingStatus.APPROVED;
+import static ru.practicum.shareit.booking.entity.enums.BookingStatus.REJECTED;
+import static ru.practicum.shareit.booking.entity.enums.BookingStatus.WAITING;
 
 @SpringBootTest
 class BookingServiceImplITest {
@@ -38,12 +42,12 @@ class BookingServiceImplITest {
     private BookingService bookingService;
 
     private User getNewUser() {
-        User owner = RANDOM.nextObject(User.class);
+        User owner = Constants.RANDOM.nextObject(User.class);
         return userRepository.save(owner);
     }
 
     private Item getNewItem(User owner, boolean available) {
-        Item item = RANDOM.nextObject(Item.class);
+        Item item = Constants.RANDOM.nextObject(Item.class);
         item.setOwner(owner);
         item.setAvailable(available);
         item.setRequest(null);
@@ -74,7 +78,7 @@ class BookingServiceImplITest {
 
         assertThrows(NotFoundException.class, () ->
                         bookingService.create(booker.getId(), bookingSimpleDto),
-                format(ITEM_NOT_EXISTS, itemId));
+                format(Constants.ITEM_NOT_EXISTS, itemId));
     }
 
     @Test
@@ -179,7 +183,7 @@ class BookingServiceImplITest {
 
         assertThrows(NotFoundException.class, () ->
                         bookingService.update(bookerId, bookingId, true),
-                format(BOOKING_NOT_EXISTS, bookingId));
+                format(Constants.BOOKING_NOT_EXISTS, bookingId));
     }
 
 
@@ -222,7 +226,7 @@ class BookingServiceImplITest {
 
         assertThrows(NotFoundException.class, () ->
                         bookingService.update(bookerId, bookingId, true),
-                format(USER_NOT_EXISTS, bookerId));
+                format(Constants.USER_NOT_EXISTS, bookerId));
     }
 
     @Test
@@ -297,7 +301,7 @@ class BookingServiceImplITest {
 
         assertThrows(NotFoundException.class, () ->
                         bookingService.get(bookerId, bookingId),
-                format(BOOKING_NOT_EXISTS, bookingId));
+                format(Constants.BOOKING_NOT_EXISTS, bookingId));
     }
 
     @Test
@@ -318,7 +322,7 @@ class BookingServiceImplITest {
 
         assertThrows(NotFoundException.class, () ->
                         bookingService.get(bookerId, bookingId),
-                format(USER_NOT_EXISTS, bookingId));
+                format(Constants.USER_NOT_EXISTS, bookingId));
     }
 
     @Test

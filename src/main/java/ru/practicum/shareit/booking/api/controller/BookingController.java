@@ -2,10 +2,19 @@ package ru.practicum.shareit.booking.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.booking.api.dto.BookingDto;
 import ru.practicum.shareit.booking.api.dto.BookingSimpleDto;
 import ru.practicum.shareit.booking.api.service.BookingService;
+import ru.practicum.shareit.constants.Constants;
+import ru.practicum.shareit.valid.Checking;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -13,17 +22,17 @@ import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ru.practicum.shareit.ShareItApp.*;
+import static ru.practicum.shareit.constants.Constants.CREATE_BOOKING;
+import static ru.practicum.shareit.constants.Constants.GET_ALL_BOOKINGS_FOR_OWNER;
+import static ru.practicum.shareit.constants.Constants.GET_ALL_BOOKINGS_FOR_USER;
+import static ru.practicum.shareit.constants.Constants.GET_BOOKING;
+import static ru.practicum.shareit.constants.Constants.HEADER_USER_ID;
+import static ru.practicum.shareit.constants.Constants.UPDATE_STATUS_BOOKING;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class BookingController {
-    public static final String CREATE_BOOKING = "/bookings";
-    public static final String UPDATE_STATUS_BOOKING = "/bookings/{id}";
-    public static final String GET_BOOKING = "/bookings/{id}";
-    public static final String GET_ALL_BOOKINGS_FOR_USER = "/bookings";
-    public static final String GET_ALL_BOOKINGS_FOR_OWNER = "/bookings/owner";
     private final BookingService service;
 
     /**
@@ -35,18 +44,18 @@ public class BookingController {
             @RequestHeader(HEADER_USER_ID) Integer userId,
             @RequestBody
             @Valid BookingSimpleDto dto) {
-        log.info("Point: [{}]\nIncoming: Dto:{} UserId:{}", CREATE_BOOKING, dto, userId);
+        log.debug("Point: [{}]\nIncoming: Dto:{} UserId:{}", CREATE_BOOKING, dto, userId);
 
-        BookingDto record = service.create(userId, dto);
+        BookingDto response = service.create(userId, dto);
 
-        log.info("[i] CREATE_BOOKING \n" +
+        log.debug("[i] CREATE_BOOKING \n" +
                         "ID:{}, START:{}, " +
                         "END:{}, STATUS:{}, BOOKER_ID:{}, " +
                         "ITEM_DTO:{}",
-                record.getId(), record.getStart(),
-                record.getEnd(), record.getStatus(), record.getBooker(), record.getItem());
+                response.getId(), response.getStart(),
+                response.getEnd(), response.getStatus(), response.getBooker(), response.getItem());
 
-        return record;
+        return response;
     }
 
     /**
@@ -63,7 +72,7 @@ public class BookingController {
             @RequestHeader(HEADER_USER_ID) Integer userId,
             @PathVariable Long id,
             @RequestParam Boolean approved) {
-        log.info("[i] UPDATE_STATUS_BOOKING\n USER_ID:{}, BOOKING_ID:{}, APPROVED:{}",
+        log.debug("[i] UPDATE_STATUS_BOOKING\n USER_ID:{}, BOOKING_ID:{}, APPROVED:{}",
                 userId, id, approved);
 
         return service.update(userId, id, approved);
@@ -81,7 +90,7 @@ public class BookingController {
     public BookingDto get(
             @RequestHeader(HEADER_USER_ID) Integer userId,
             @PathVariable Long id) {
-        log.info("[i] GET_BOOKING\n USER_ID:{}, BOOKING_ID:{}",
+        log.debug("[i] GET_BOOKING\n USER_ID:{}, BOOKING_ID:{}",
                 userId, id);
 
         return service.get(userId, id);
@@ -99,18 +108,18 @@ public class BookingController {
     public List<BookingDto> getAllByUser(
             @RequestHeader(HEADER_USER_ID) Integer bookerId,
             @RequestParam(defaultValue = "ALL") String state,
-            @RequestParam(required = false, defaultValue = FROM)
+            @RequestParam(required = false, defaultValue = Constants.FROM)
             @PositiveOrZero Integer from,
-            @RequestParam(required = false, defaultValue = SIZE)
+            @RequestParam(required = false, defaultValue = Constants.SIZE)
             @Positive Integer size) {
-        log.info("[i] GET_ALL_BOOKINGS_FOR_USER\n BOOKER_ID:{}, STATE:{}",
+        log.debug("[i] GET_ALL_BOOKINGS_FOR_USER\n BOOKER_ID:{}, STATE:{}",
                 bookerId, state);
 
         return service.getAllByUser(
                 bookerId,
                 state.toUpperCase(),
                 LocalDateTime.now(),
-                checkPageable(from, size));
+                Checking.checkPageable(from, size));
     }
 
     /**
@@ -124,17 +133,17 @@ public class BookingController {
     public List<BookingDto> getAllByOwner(
             @RequestHeader(HEADER_USER_ID) Integer ownerId,
             @RequestParam(defaultValue = "ALL") String state,
-            @RequestParam(required = false, defaultValue = FROM)
+            @RequestParam(required = false, defaultValue = Constants.FROM)
             @PositiveOrZero Integer from,
-            @RequestParam(required = false, defaultValue = SIZE)
+            @RequestParam(required = false, defaultValue = Constants.SIZE)
             @Positive Integer size) {
-        log.info("[i] GET_ALL_BOOKINGS_FOR_OWNER\n OWNER_ID:{}, STATE:{}",
+        log.debug("[i] GET_ALL_BOOKINGS_FOR_OWNER\n OWNER_ID:{}, STATE:{}",
                 ownerId, state);
 
         return service.getAllByOwner(
                 ownerId,
                 state.toUpperCase(),
                 LocalDateTime.now(),
-                checkPageable(from, size));
+                Checking.checkPageable(from, size));
     }
 }
