@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
+import ru.practicum.shareit.constants.Constants;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestMapper;
 import ru.practicum.shareit.request.dto.ItemRequestSimpleDto;
@@ -23,18 +24,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.practicum.shareit.ShareItApp.*;
-import static ru.practicum.shareit.request.controller.ItemRequestController.*;
 
 @WebMvcTest(controllers = ItemRequestController.class)
 @AutoConfigureMockMvc
 class ItemRequestControllerTest {
-    private final Pageable pageable = PageRequest.ofSize(Integer.parseInt(SIZE));
+    private final Pageable pageable = PageRequest.ofSize(Integer.parseInt(Constants.SIZE));
 
     private final ItemRequestSimpleDto requestSimpleDto = ItemRequestSimpleDto.builder()
             .description("Description").build();
@@ -52,14 +54,14 @@ class ItemRequestControllerTest {
     private ObjectMapper mapper;
 
     @Test
-    @DisplayName("CREATE_REQUEST:" + CREATE_REQUEST)
+    @DisplayName("CREATE_REQUEST:" + Constants.CREATE_REQUEST)
     void addItemRequest() throws Exception {
         LocalDateTime now = LocalDateTime.now();
         when(itemRequestService.create(requesterId, requestSimpleDto, now))
                 .thenReturn(requestDto);
 
-        RequestBuilder requestBuilder = post(CREATE_REQUEST)
-                .header(HEADER_USER_ID, requesterId)
+        RequestBuilder requestBuilder = post(Constants.CREATE_REQUEST)
+                .header(Constants.HEADER_USER_ID, requesterId)
                 .content(mapper.writeValueAsString(requestSimpleDto))
                 .characterEncoding(UTF_8)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -70,10 +72,10 @@ class ItemRequestControllerTest {
     }
 
     @Test
-    @DisplayName("GET_BY_REQUESTER:" + GET_BY_REQUESTER)
+    @DisplayName("GET_BY_REQUESTER:" + Constants.GET_BY_REQUESTER)
     void getByRequesterId() throws Exception {
-        User requester = RANDOM.nextObject(User.class);
-        ItemRequest itemRequest = RANDOM.nextObject(ItemRequest.class);
+        User requester = Constants.RANDOM.nextObject(User.class);
+        ItemRequest itemRequest = Constants.RANDOM.nextObject(ItemRequest.class);
         requester.setId(requesterId);
         itemRequest.setRequester(requester);
         List<ItemRequestDto> itemRequests = List.of(
@@ -85,8 +87,8 @@ class ItemRequestControllerTest {
 
         itemRequestService.getByRequesterId(requesterId);
 
-        RequestBuilder requestBuilder = get(GET_BY_REQUESTER)
-                .header(HEADER_USER_ID, requesterId)
+        RequestBuilder requestBuilder = get(Constants.GET_BY_REQUESTER)
+                .header(Constants.HEADER_USER_ID, requesterId)
                 .characterEncoding(UTF_8)
                 .accept(MediaType.ALL_VALUE);
 
@@ -99,15 +101,15 @@ class ItemRequestControllerTest {
     }
 
     @Test
-    @DisplayName("GET_ALL_REQUESTS:" + GET_ALL_REQUESTS)
+    @DisplayName("GET_ALL_REQUESTS:" + Constants.GET_ALL_REQUESTS)
     void getAll() throws Exception {
         requestDto.setItems(null);
         requestDto.setId(1);
         when(itemRequestService.getAll(1, pageable))
                 .thenReturn(List.of(requestDto));
 
-        RequestBuilder requestBuilder = get(GET_ALL_REQUESTS)
-                .header(HEADER_USER_ID, 1)
+        RequestBuilder requestBuilder = get(Constants.GET_ALL_REQUESTS)
+                .header(Constants.HEADER_USER_ID, 1)
                 .characterEncoding(UTF_8)
                 .accept(MediaType.ALL_VALUE);
 
@@ -123,13 +125,13 @@ class ItemRequestControllerTest {
     }
 
     @Test
-    @DisplayName("GET_REQUEST:" + GET_REQUEST)
+    @DisplayName("GET_REQUEST:" + Constants.GET_REQUEST)
     void getRequest() throws Exception {
         int requestId = 1;
         when(itemRequestService.get(anyInt(), anyInt())).thenReturn(requestDto);
 
-        RequestBuilder requestBuilder = get(GET_REQUEST, requestId)
-                .header(HEADER_USER_ID, requesterId)
+        RequestBuilder requestBuilder = get(Constants.GET_REQUEST, requestId)
+                .header(Constants.HEADER_USER_ID, requesterId)
                 .characterEncoding(UTF_8)
                 .accept(MediaType.ALL_VALUE);
 

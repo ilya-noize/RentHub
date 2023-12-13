@@ -16,7 +16,7 @@ import ru.practicum.shareit.user.entity.User;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static ru.practicum.shareit.ShareItApp.SEPARATOR_LINE;
+import static ru.practicum.shareit.constants.Constants.LOG_SEPARATOR;
 
 
 @SpringBootTest
@@ -37,7 +37,7 @@ class ItemRequestServiceITest {
 
     @BeforeEach
     void setUp() {
-        System.out.println(SEPARATOR_LINE);
+        System.out.println(LOG_SEPARATOR);
         User u1 = User.builder()
                 .name("owner")
                 .email("owner@owner.com").build();

@@ -10,19 +10,23 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import ru.practicum.shareit.user.api.UserController;
-import ru.practicum.shareit.user.api.UserServiceImpl;
+import ru.practicum.shareit.constants.Constants;
 import ru.practicum.shareit.user.api.dto.UserDto;
 import ru.practicum.shareit.user.api.dto.UserSimpleDto;
+import ru.practicum.shareit.user.api.service.UserServiceImpl;
 
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.practicum.shareit.user.api.UserController.*;
 
 @WebMvcTest(controllers = UserController.class)
 @AutoConfigureWebMvc
@@ -47,7 +51,7 @@ class UserControllerITest {
         when(userService.create(userRequestNew))
                 .thenReturn(userResponse);
 
-        mvc.perform(post(CREATE_USER)
+        mvc.perform(post(Constants.CREATE_USER)
                         .content(mapper.writeValueAsString(userRequestNew))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -68,7 +72,7 @@ class UserControllerITest {
         when(userService.update(userRequestPatch))
                 .thenReturn(userResponse);
 
-        mvc.perform(patch(UPDATE_USER, userId)
+        mvc.perform(patch(Constants.UPDATE_USER, userId)
                         .content(mapper.writeValueAsString(userRequestPatch))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -85,7 +89,7 @@ class UserControllerITest {
         int userId = userRequestPatch.getId();
         when(userService.get(1))
                 .thenReturn(userResponse);
-        mvc.perform(MockMvcRequestBuilders.get(GET_USER, userId))
+        mvc.perform(MockMvcRequestBuilders.get(Constants.GET_USER, userId))
                 .andExpect(jsonPath("$.id").value(userResponse.getId()))
                 .andExpect(jsonPath("$.email").value(userResponse.getEmail()))
                 .andExpect(jsonPath("$.name").value(userResponse.getName()))
@@ -96,7 +100,7 @@ class UserControllerITest {
     void getAll() throws Exception {
         when(userService.getAll())
                 .thenReturn(userResponseList);
-        mvc.perform(MockMvcRequestBuilders.get(GET_ALL_USERS))
+        mvc.perform(MockMvcRequestBuilders.get(Constants.GET_ALL_USERS))
                 .andExpect(jsonPath("$[0].id").value(userResponseList.get(0).getId()))
                 .andExpect(jsonPath("$[0].email").value(userResponseList.get(0).getEmail()))
                 .andExpect(jsonPath("$[0].name").value(userResponseList.get(0).getName()))
@@ -111,7 +115,7 @@ class UserControllerITest {
         int userId = userRequestPatch.getId();
         doNothing().when(userService).delete(anyInt());
 
-        mvc.perform(MockMvcRequestBuilders.delete(DELETE_USER, userId))
+        mvc.perform(MockMvcRequestBuilders.delete(Constants.DELETE_USER, userId))
                 .andExpect(status().isOk());
 
         verify(userService, times(1)).delete(userId);

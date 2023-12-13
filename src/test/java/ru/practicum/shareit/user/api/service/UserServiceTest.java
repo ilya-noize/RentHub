@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.user.api.UserServiceImpl;
 import ru.practicum.shareit.user.api.dto.UserDto;
 import ru.practicum.shareit.user.api.dto.UserMapper;
 import ru.practicum.shareit.user.api.dto.UserSimpleDto;
@@ -19,10 +18,20 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.lang.String.format;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static ru.practicum.shareit.ShareItApp.RANDOM;
-import static ru.practicum.shareit.ShareItApp.USER_NOT_EXISTS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static ru.practicum.shareit.constants.Constants.RANDOM;
+import static ru.practicum.shareit.constants.Constants.USER_NOT_EXISTS;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {

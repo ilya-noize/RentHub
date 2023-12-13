@@ -22,8 +22,8 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
-import static ru.practicum.shareit.ShareItApp.REQUEST_NOT_EXISTS;
-import static ru.practicum.shareit.ShareItApp.USER_NOT_EXISTS;
+import static ru.practicum.shareit.constants.Constants.REQUEST_NOT_EXISTS;
+import static ru.practicum.shareit.constants.Constants.USER_NOT_EXISTS;
 
 @Service
 @RequiredArgsConstructor
@@ -48,8 +48,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public ItemRequestDto get(Integer requesterId, Integer itemRequestId) {
         checkingUserExists(requesterId);
-        List<ItemRequest> itemRequests = itemRequestRepository
-                .findByRequesterIdNot(requesterId);
 
         return itemRequestRepository.findById(itemRequestId)
                 .map(itemRequest -> {
