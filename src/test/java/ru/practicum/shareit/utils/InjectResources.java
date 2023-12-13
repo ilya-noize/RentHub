@@ -14,8 +14,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
-import static ru.practicum.shareit.ShareItApp.LOGGING_IN_TEST;
-import static ru.practicum.shareit.utils.ResourcePool.*;
+import static ru.practicum.shareit.constants.Constants.LOGGING_IN_TEST;
+import static ru.practicum.shareit.utils.ResourcePool.CREATE_ITEM_ENTITIES;
+import static ru.practicum.shareit.utils.ResourcePool.CREATE_USER_ENTITIES;
+import static ru.practicum.shareit.utils.ResourcePool.readResource;
 
 /**
  * OwnerStorage by UserId:[1]
