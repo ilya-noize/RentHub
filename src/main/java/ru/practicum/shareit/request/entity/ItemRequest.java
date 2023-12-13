@@ -1,35 +1,42 @@
 package ru.practicum.shareit.request.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import ru.practicum.shareit.item.entity.Item;
+import ru.practicum.shareit.user.entity.User;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
- * TODO Sprint add-item-requests.
- * <p>
  * A class of user requests for items
  * <p>
- * {@code id} ID request <br/>
- * {@code created} Date of creation <br/>
- * {@code description} Request text <br/>
- * {@code requester} The author of the request <br/>
+ * {@link #id} ID request <br/>
+ * {@link #created} Date of creation <br/>
+ * {@link #description} Request text <br/>
+ * {@link #requester} The author of the request <br/>
  */
 @Builder
 @Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "requests", schema = "public")
-@NoArgsConstructor
 public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
     private Integer id;
-    private LocalDateTime created;
+
+    @Size(max = 2000)
     private String description;
-    private Integer requester;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User requester;
+
+    private LocalDateTime created;
+
+    @Transient
+    private List<Item> items;
 }

@@ -1,17 +1,19 @@
 package ru.practicum.shareit.item.api.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.item.entity.Item;
+import ru.practicum.shareit.request.entity.ItemRequest;
 
 import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Integer> {
     @Query("select i from Item i where i.owner.id = ?1")
-    List<Item> findAllByOwner_Id(Integer id);
+    List<Item> findAllByOwner_Id(Integer id, Pageable pageable);
 
     @Query("select i from Item i " +
             "where ( " +
@@ -19,15 +21,15 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
             ") and i.available = true " +
             "order by i.id")
     List<Item> searchItemByNameOrDescription(
-            @Param("search") String text);
+            @Param("search") String text, Pageable pageable);
 
-    @Query("select (count(i) > 0) from Item i where i.id = ?1 and i.owner.id = ?2")
-    boolean existsByIdAndOwner_Id(int id, Integer id1);
+    @Query("select not(count(i) > 0) from Item i where i.id = ?1 and i.owner.id = ?2")
+    boolean notExistsByIdAndOwner_Id(int itemId, Integer ownerId);
 
     @Transactional
     @Modifying
     @Query("delete from Item i where i.id = ?1 and i.owner.id = ?2")
-    void deleteByIdAndOwner_Id(Integer ownerId, Integer itemId);
+    void deleteByIdAndOwner_Id(Integer itemId, Integer ownerId);
 
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)
@@ -73,4 +75,11 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
     void updateAvailableById(
             @Param("available") boolean available,
             @Param("id") int id);
+
+    @Query("select i from Item i where i.request.id = ?1")
+    List<Item> getByRequest_Id(Integer id);
+
+    @Query("select i from Item i where i.request in ?1")
+    List<Item> findByRequestIn(List<ItemRequest> requests);
 }
+

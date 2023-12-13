@@ -2,10 +2,8 @@ package ru.practicum.shareit.exception.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.HttpMediaTypeNotAcceptableException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -15,9 +13,9 @@ import ru.practicum.shareit.exception.entity.ErrorException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.ZonedDateTime;
-import java.util.Objects;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Slf4j
 @RestControllerAdvice
@@ -33,76 +31,18 @@ public class ExceptionController {
         log.error("[!] Received the status {} Error: {}\n{}", status, message, stackTraceString);
     }
 
-    @ExceptionHandler
-    @ResponseStatus(INTERNAL_SERVER_ERROR)
-    public ResponseEntity<?> handleThrowable(Throwable e) {
-        String message = e.getMessage();
-
-        logError(INTERNAL_SERVER_ERROR, message, e);
-
-        return ResponseEntity
-                .status(INTERNAL_SERVER_ERROR)
-                .lastModified(NOW)
-                .header("Error message", message)
-                .build();
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(BAD_REQUEST)
-    public ResponseEntity<?> handleNotValidException(MethodArgumentNotValidException e) {
-        BindingResult result = e.getBindingResult();
-
-        String field = Objects.requireNonNull(result.getFieldError())
-                .getField();
-        String message = result.getAllErrors().get(0).getDefaultMessage();
-
-        logError(BAD_REQUEST, message, e);
-
-        return ResponseEntity
-                .status(BAD_REQUEST)
-                .lastModified(NOW)
-                .header(field, message)
-                .build();
-    }
-
-    @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
-    @ResponseStatus(NOT_ACCEPTABLE)
-    public ResponseEntity<?> handleHttpMediaTypeNotAcceptableException(HttpMediaTypeNotAcceptableException e) {
-        String message = e.getMessage();
-
-        logError(NOT_ACCEPTABLE, message, e);
-
-        return ResponseEntity
-                .status(406)
-                .body(new ErrorException(406, message));
-    }
-
     @ExceptionHandler(RentalPeriodException.class)
-    @ResponseStatus(INTERNAL_SERVER_ERROR)
+    @ResponseStatus(BAD_REQUEST)
     public ResponseEntity<?> handleRentalPeriodException(RentalPeriodException e) {
         String message = e.getMessage();
 
-        logError(INTERNAL_SERVER_ERROR, message, e);
-
-        return ResponseEntity
-                .status(BAD_REQUEST)
-                .lastModified(NOW)
-                .header("Rental period", message)
-                .build();
-    }
-
-    @ExceptionHandler(NullPointerException.class)
-    @ResponseStatus(BAD_REQUEST)
-    public ResponseEntity<?> handleNullPointerException(NullPointerException e) {
-        String message = e.getMessage();
-
         logError(BAD_REQUEST, message, e);
 
         return ResponseEntity
                 .status(BAD_REQUEST)
                 .lastModified(NOW)
-                .header("null", message)
-                .build();
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorException(400, message));
     }
 
     @ExceptionHandler(NotFoundException.class)
@@ -115,36 +55,22 @@ public class ExceptionController {
         return ResponseEntity
                 .status(NOT_FOUND)
                 .lastModified(NOW)
-                .header("Not Found", message)
-                .build();
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorException(404, message));
     }
 
-    @ExceptionHandler(AlreadyExistsException.class)
-    @ResponseStatus(CONFLICT)
-    public ResponseEntity<?> handleAlreadyExistsException(AlreadyExistsException e) {
-        String message = e.getMessage();
 
-        logError(CONFLICT, message, e);
-
-        return ResponseEntity
-                .status(CONFLICT)
-                .lastModified(NOW)
-                .header("Already exists", message)
-                .build();
-    }
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(BAD_REQUEST)
     public ResponseEntity<?> handleBadRequestException(BadRequestException e) {
-        String message = e.getMessage();
+        String error = e.getMessage();
 
-        logError(BAD_REQUEST, message, e);
+        logError(BAD_REQUEST, error, e);
 
-        return ResponseEntity
-                .status(BAD_REQUEST)
-                .lastModified(NOW)
-                .header("Bad Request", message)
-                .build();
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorException(400, error));
     }
 
     @ExceptionHandler(StateException.class)
@@ -152,9 +78,10 @@ public class ExceptionController {
     public ResponseEntity<?> handleStateException(StateException e) {
         String message = e.getMessage();
 
-        logError(INTERNAL_SERVER_ERROR, message, e);
+        logError(BAD_REQUEST, message, e);
 
         return ResponseEntity.badRequest()
+                .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorException(400, message));
     }
 
@@ -168,7 +95,7 @@ public class ExceptionController {
         return ResponseEntity
                 .status(NOT_FOUND)
                 .lastModified(NOW)
-                .header("Booking error", message)
-                .build();
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorException(404, message));
     }
 }

@@ -1,24 +1,25 @@
 package ru.practicum.shareit.user.api.dto;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import ru.practicum.shareit.valid.group.Create;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.valid.group.Update;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 
-@Builder
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDto {
     @PositiveOrZero
     private Integer id;
 
-    @Email(groups = {Create.class, Update.class})
-    @NotEmpty(groups = {Create.class})
-    @Size(max = 255)
+    @Email(groups = {Update.class})
+    @Size(max = 255, groups = {Update.class})
     private String email;
 
-    @NotBlank(groups = {Create.class})
-    @Size(max = 255)
+    @Size(max = 255, groups = {Update.class})
     private String name;
 }
