@@ -20,12 +20,6 @@ import ru.practicum.shareit.valid.group.Update;
 
 import javax.validation.constraints.Positive;
 
-import static ru.practicum.shareit.constants.Constants.CREATE_USER;
-import static ru.practicum.shareit.constants.Constants.DELETE_USER;
-import static ru.practicum.shareit.constants.Constants.GET_ALL_USERS;
-import static ru.practicum.shareit.constants.Constants.GET_USER;
-import static ru.practicum.shareit.constants.Constants.UPDATE_USER;
-
 /**
  * <h3>User Controller</h3>
  * {@link #CREATE_USER} Создать пользователя <br/>
@@ -41,12 +35,11 @@ import static ru.practicum.shareit.constants.Constants.UPDATE_USER;
 @Validated
 @Slf4j
 public class UserController {
-//    private final String CREATE_USER = "/users";
-//    private final String UPDATE_USER = "/users/{id}";
-//    private final String GET_USER = "/users/{id}";
-//    private final String GET_ALL_USERS = "/users";
-//    private final String DELETE_USER = "/users/{id}";
-
+    private final String CREATE_USER = "/users";
+    private final String UPDATE_USER = "/users/{id}";
+    private final String GET_USER = "/users/{id}";
+    private final String GET_ALL_USERS = "/users";
+    private final String DELETE_USER = "/users/{id}";
     private final UserClient userClient;
 
 
@@ -61,27 +54,29 @@ public class UserController {
     public ResponseEntity<Object> update(
             @PathVariable @Positive Integer id,
             @RequestBody @Validated(Update.class) UserDto userDto) {
+
         return userClient.update(id, userDto);
     }
 
     @GetMapping(GET_USER)
     @Validated
-    public ResponseEntity<Object> get(
-            @PathVariable @Positive Integer id) {
+    public ResponseEntity<Object> getUsersById(
+            @PathVariable Integer id) {
 
-        return userClient.get(id);
+        return userClient.getById(id);
     }
 
     @GetMapping(GET_ALL_USERS)
     public ResponseEntity<Object> getAll() {
+
         return userClient.getAll();
     }
 
     @DeleteMapping(DELETE_USER)
     @Validated
-    public void delete(
-            @PathVariable @Positive Integer id) {
-
-        userClient.delete(id);
+    public void deleteUser(
+            @PathVariable Integer userId) {
+        userClient.delete(userId);
     }
+
 }

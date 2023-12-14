@@ -11,33 +11,38 @@ import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.user.api.dto.UserDto;
 import ru.practicum.shareit.user.api.dto.UserSimpleDto;
 
+import javax.validation.Valid;
+
 @Service
 public class UserClient extends BaseClient {
+
+    private static final String API_PREFIX = "/users";
+
     @Autowired
     public UserClient(@Value("${shareit-server.url}") String serverUrl, RestTemplateBuilder builder) {
         super(builder
-                .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl + "/users"))
+                .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl + API_PREFIX))
                 .requestFactory(HttpComponentsClientHttpRequestFactory::new)
                 .build());
     }
 
-    public ResponseEntity<Object> create(UserSimpleDto userDto) {
+    public ResponseEntity<Object> getAll() {
+        return get("");
+    }
+
+    public ResponseEntity<Object> getById(Integer userId) {
+        return get("/" + userId);
+    }
+
+    public ResponseEntity<Object> create(@Valid UserSimpleDto userDto) {
         return post("", userDto);
     }
 
-    public ResponseEntity<Object> update(int userId, UserDto userDto) {
+    public ResponseEntity<Object> update(Integer userId, UserDto userDto) {
         return patch("/" + userId, userDto);
     }
 
-    public ResponseEntity<Object> get(int userId) {
-        return get("/" + userId, requesterId, parameters);
-    }
-
-    public ResponseEntity<Object> getAll() {
-        return get("", requesterId, parameters);
-    }
-
-    public void delete(int userId) {
+    public void delete(Integer userId) {
         delete("/" + userId);
     }
 }
