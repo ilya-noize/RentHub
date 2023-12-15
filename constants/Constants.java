@@ -3,7 +3,7 @@ package ru.practicum.shareit.constants;
 import org.jeasy.random.EasyRandom;
 
 /**
- * <h1>GLOBAL VARIABLES</h1>
+ * <h1>GLOBAL VARIABLES - SERVER</h1>
  * <h2>Logs in tests</h2>
  * {@link Constants#LOG_SEPARATOR} Разделитель логов <br/>
  * {@link Constants#LOGGING_IN_TEST} Включает логирование в тестах (No args: false)<br/>
