@@ -2,8 +2,8 @@ package ru.practicum.shareit.item.api.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import org.hibernate.sql.Update;
 import ru.practicum.shareit.valid.group.Create;
+import ru.practicum.shareit.valid.group.Update;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
