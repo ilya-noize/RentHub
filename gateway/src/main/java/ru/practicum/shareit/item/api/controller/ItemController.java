@@ -23,21 +23,22 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import static ru.practicum.shareit.constants.Constants.CREATE_COMMENT;
+import static ru.practicum.shareit.constants.Constants.CREATE_ITEM;
+import static ru.practicum.shareit.constants.Constants.FROM;
+import static ru.practicum.shareit.constants.Constants.GET_ALL_ITEMS;
+import static ru.practicum.shareit.constants.Constants.GET_ITEM;
+import static ru.practicum.shareit.constants.Constants.HEADER_USER_ID;
+import static ru.practicum.shareit.constants.Constants.SEARCH_ITEM;
+import static ru.practicum.shareit.constants.Constants.SIZE;
+import static ru.practicum.shareit.constants.Constants.UPDATE_ITEM;
+
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
 @Validated
 public class ItemController {
     private final ItemClient itemClient;
-    private final String FROM = "0";
-    private final String SIZE = "10";
-    private final String HEADER_USER_ID = "X-Sharer-User-Id";
-    private final String CREATE_ITEM = "/items";
-    private final String UPDATE_ITEM = "/items/{id}";
-    private final String GET_ITEM = "/items/{id}";
-    private final String SEARCH_ITEM = "/items/search";
-    private final String GET_ALL_ITEMS = "/items";
-    private final String CREATE_COMMENT = "/items/{id}/comment";
 
 
     @PostMapping(CREATE_ITEM)
@@ -84,9 +85,8 @@ public class ItemController {
             @PositiveOrZero Integer from,
             @RequestParam(required = false, defaultValue = SIZE)
             @Positive Integer size) {
-        ResponseEntity<Object> items = itemClient.getAll(userId, from, size);
 
-        return items;
+        return itemClient.getAll(userId, from, size);
     }
 
     @PostMapping(CREATE_COMMENT)

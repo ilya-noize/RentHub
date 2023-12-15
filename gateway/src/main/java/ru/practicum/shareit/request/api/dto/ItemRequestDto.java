@@ -1,4 +1,4 @@
-package ru.practicum.shareit.request.dto;
+package ru.practicum.shareit.request.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

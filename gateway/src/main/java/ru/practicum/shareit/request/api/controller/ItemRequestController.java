@@ -1,4 +1,4 @@
-package ru.practicum.shareit.request.controller;
+package ru.practicum.shareit.request.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,12 +12,20 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.shareit.request.client.ItemRequestClient;
-import ru.practicum.shareit.request.dto.ItemRequestSimpleDto;
+import ru.practicum.shareit.request.api.client.ItemRequestClient;
+import ru.practicum.shareit.request.api.dto.ItemRequestSimpleDto;
 import ru.practicum.shareit.valid.group.Create;
 
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+
+import static ru.practicum.shareit.constants.Constants.CREATE_REQUEST;
+import static ru.practicum.shareit.constants.Constants.FROM;
+import static ru.practicum.shareit.constants.Constants.GET_ALL_REQUESTS;
+import static ru.practicum.shareit.constants.Constants.GET_BY_REQUESTER;
+import static ru.practicum.shareit.constants.Constants.GET_REQUEST;
+import static ru.practicum.shareit.constants.Constants.HEADER_USER_ID;
+import static ru.practicum.shareit.constants.Constants.SIZE;
 
 @RestController
 @RequestMapping("/requests")
@@ -25,13 +33,6 @@ import javax.validation.constraints.PositiveOrZero;
 @Validated
 @Slf4j
 public class ItemRequestController {
-    private final String FROM = "0";
-    private final String SIZE = "10";
-    private final String HEADER_USER_ID = "X-Sharer-User-Id";
-    private final String CREATE_REQUEST = "/requests";
-    private final String GET_BY_REQUESTER = "/requests";
-    private final String GET_REQUEST = "/requests/{id}";
-    private final String GET_ALL_REQUESTS = "/requests/all";
     private final ItemRequestClient itemRequestClient;
 
     @PostMapping(CREATE_REQUEST)

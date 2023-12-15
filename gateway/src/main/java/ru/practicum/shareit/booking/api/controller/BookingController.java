@@ -15,25 +15,26 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.booking.api.client.BookingClient;
 import ru.practicum.shareit.booking.api.dto.BookingSimpleDto;
 import ru.practicum.shareit.booking.api.dto.BookingState;
+import ru.practicum.shareit.exception.StateException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+
+import static ru.practicum.shareit.constants.Constants.CREATE_BOOKING;
+import static ru.practicum.shareit.constants.Constants.FROM;
+import static ru.practicum.shareit.constants.Constants.GET_ALL_BOOKINGS_FOR_OWNER;
+import static ru.practicum.shareit.constants.Constants.GET_ALL_BOOKINGS_FOR_USER;
+import static ru.practicum.shareit.constants.Constants.GET_BOOKING;
+import static ru.practicum.shareit.constants.Constants.HEADER_USER_ID;
+import static ru.practicum.shareit.constants.Constants.SIZE;
+import static ru.practicum.shareit.constants.Constants.UPDATE_STATUS_BOOKING;
 
 @RestController
 @RequiredArgsConstructor
 @Validated
 @Slf4j
 public class BookingController {
-    private final String HEADER_USER_ID = "X-Sharer-User-Id";
-    private final String FROM = "0";
-    private final String SIZE = "10";
-
-    private final String CREATE_BOOKING = "/bookings";
-    private final String UPDATE_STATUS_BOOKING = "/bookings/{id}";
-    private final String GET_BOOKING = "/bookings/{id}";
-    private final String GET_ALL_BOOKINGS_FOR_USER = "/bookings";
-    private final String GET_ALL_BOOKINGS_FOR_OWNER = "/bookings/owner";
     private final BookingClient bookingClient;
 
     @PostMapping(CREATE_BOOKING)
@@ -64,11 +65,13 @@ public class BookingController {
     @GetMapping(GET_ALL_BOOKINGS_FOR_USER)
     public ResponseEntity<Object> getAllByUser(
             @RequestHeader(HEADER_USER_ID) Integer userId,
-            @RequestParam(required = false, defaultValue = "ALL") BookingState state,
+            @RequestParam(required = false, defaultValue = "ALL") String stateIn,
             @RequestParam(required = false, defaultValue = FROM)
             @PositiveOrZero Integer from,
             @RequestParam(required = false, defaultValue = SIZE)
             @Positive Integer size) {
+        BookingState state = BookingState.from(stateIn)
+                .orElseThrow(() -> new StateException(stateIn));
 
         return bookingClient.getAllByUser(userId, state, from, size);
     }
