@@ -27,7 +27,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ItemDto {
-    private Integer id;
+    private Long id;
     private String name;
     private String description;
     private Boolean available;

@@ -27,12 +27,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ItemDto {
-    private Integer id;
+    private Long id;
     private String name;
     private String description;
     private Boolean available;
     private BookingItemDto lastBooking;
     private BookingItemDto nextBooking;
     private List<ru.practicum.shareit.item.api.dto.CommentDto> comments;
-    private Integer requestId;
+    private Long requestId;
 }

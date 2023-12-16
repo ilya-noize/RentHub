@@ -16,5 +16,5 @@ public final class BookingSimpleDto {
     private Long id;
     private LocalDateTime start;
     private LocalDateTime end;
-    private Integer itemId;
+    private Long itemId;
 }

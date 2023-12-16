@@ -19,9 +19,9 @@ import lombok.Data;
 @Data
 @Builder
 public class ItemSimpleDto {
-    private Integer id;
+    private Long id;
     private String name;
     private String description;
     private Boolean available;
-    private Integer requestId;
+    private Long requestId;
 }

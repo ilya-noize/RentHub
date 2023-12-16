@@ -17,5 +17,5 @@ public interface ItemRequestMapper {
     @Mapping(target = "items", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "created", ignore = true)
-    ItemRequest toEntity(ItemRequestSimpleDto dto, Integer requesterId);
+    ItemRequest toEntity(ItemRequestSimpleDto dto, Long requesterId);
 }

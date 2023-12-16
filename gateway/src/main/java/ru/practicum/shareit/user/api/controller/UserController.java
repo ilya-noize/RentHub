@@ -29,7 +29,6 @@ import static ru.practicum.shareit.constants.Constants.UPDATE_USER;
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
-@Validated
 @Slf4j
 public class UserController {
     private final UserClient userClient;
@@ -38,14 +37,16 @@ public class UserController {
     @PostMapping(CREATE_USER)
     public ResponseEntity<Object> create(
             @RequestBody @Validated(Create.class) UserSimpleDto userDto) {
+        log.info("[i] create user {}", userDto);
 
         return userClient.create(userDto);
     }
 
     @PatchMapping(UPDATE_USER)
     public ResponseEntity<Object> update(
-            @PathVariable @Positive Integer id,
+            @PathVariable @Positive Long id,
             @RequestBody @Validated(Update.class) UserDto userDto) {
+        log.info("[i] update user {}", userDto);
 
         return userClient.update(id, userDto);
     }
@@ -53,13 +54,15 @@ public class UserController {
     @GetMapping(GET_USER)
     @Validated
     public ResponseEntity<Object> getUsersById(
-            @PathVariable Integer id) {
+            @PathVariable Long id) {
+        log.info("[i] get user {}", id);
 
         return userClient.getById(id);
     }
 
     @GetMapping(GET_ALL_USERS)
     public ResponseEntity<Object> getAll() {
+        log.info("[i] get users");
 
         return userClient.getAll();
     }
@@ -67,8 +70,9 @@ public class UserController {
     @DeleteMapping(DELETE_USER)
     @Validated
     public void deleteUser(
-            @PathVariable Integer userId) {
-        userClient.delete(userId);
+            @PathVariable Long id) {
+        log.info("[i] delete user {}", id);
+        userClient.delete(id);
     }
 
 }

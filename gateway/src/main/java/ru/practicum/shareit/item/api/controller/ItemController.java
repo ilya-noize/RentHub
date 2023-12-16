@@ -43,7 +43,7 @@ public class ItemController {
 
     @PostMapping(CREATE_ITEM)
     public ResponseEntity<Object> create(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @Validated(Create.class) @RequestBody ItemSimpleDto itemDto) {
 
         return itemClient.create(userId, itemDto);
@@ -51,24 +51,24 @@ public class ItemController {
 
     @PatchMapping(UPDATE_ITEM)
     public ResponseEntity<Object> update(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @Validated(Update.class) @RequestBody ItemDto itemDto,
-            @PathVariable long itemId) {
+            @PathVariable Long itemId) {
 
         return itemClient.update(userId, itemDto, itemId);
     }
 
     @GetMapping(GET_ITEM)
     public ResponseEntity<Object> get(
-            @RequestHeader("X-Sharer-User-Id") Integer userId,
-            @PathVariable long itemId) {
+            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @PathVariable Long itemId) {
 
         return itemClient.get(userId, itemId);
     }
 
     @GetMapping(SEARCH_ITEM)
     public ResponseEntity<Object> search(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @RequestParam String text,
             @RequestParam(required = false, defaultValue = FROM)
             @PositiveOrZero Integer from,
@@ -80,7 +80,7 @@ public class ItemController {
 
     @GetMapping(GET_ALL_ITEMS)
     public ResponseEntity<Object> getAll(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @RequestParam(required = false, defaultValue = FROM)
             @PositiveOrZero Integer from,
             @RequestParam(required = false, defaultValue = SIZE)
@@ -91,7 +91,7 @@ public class ItemController {
 
     @PostMapping(CREATE_COMMENT)
     public ResponseEntity<Object> addComment(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable Integer itemId,
             @Valid @RequestBody CommentSimpleDto commentCreateDto) {
 

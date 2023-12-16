@@ -10,13 +10,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ItemService {
-    ItemDto create(Integer userId, ItemSimpleDto itemDto);
+    ItemDto create(Long userId, ItemSimpleDto itemDto);
 
-    ItemDto update(Integer userId, Integer itemId, ItemSimpleDto dto);
+    ItemDto update(Long userId, Long itemId, ItemSimpleDto dto);
 
-    ItemDto get(Integer userId, Integer itemId);
+    ItemDto get(Long userId, Long itemId);
 
-    List<ItemDto> getAll(Integer userId, Pageable pageable, LocalDateTime now);
+    List<ItemDto> getAll(Long userId, Pageable pageable, LocalDateTime now);
 
     List<ItemSimpleDto> search(String searchText, Pageable pageable);
 

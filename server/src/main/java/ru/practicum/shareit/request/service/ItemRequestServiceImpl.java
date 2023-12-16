@@ -33,7 +33,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRepository itemRepository;
 
     @Override
-    public ItemRequestDto create(Integer requesterId, ItemRequestSimpleDto dto, LocalDateTime now) {
+    public ItemRequestDto create(Long requesterId, ItemRequestSimpleDto dto, LocalDateTime now) {
         User requester = userRepository.findById(requesterId)
                 .orElseThrow(() -> new NotFoundException(
                         format(USER_NOT_EXISTS, requesterId)));
@@ -46,7 +46,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public ItemRequestDto get(Integer requesterId, Integer itemRequestId) {
+    public ItemRequestDto get(Long requesterId, Long itemRequestId) {
         checkingUserExists(requesterId);
 
         return itemRequestRepository.findById(itemRequestId)
@@ -59,7 +59,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestDto> getByRequesterId(Integer requesterId) {
+    public List<ItemRequestDto> getByRequesterId(Long requesterId) {
         checkingUserExists(requesterId);
         List<ItemRequest> itemRequests = itemRequestRepository
                 .findByRequesterId(requesterId);
@@ -68,7 +68,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestDto> getAll(Integer requesterId, Pageable pageable) {
+    public List<ItemRequestDto> getAll(Long requesterId, Pageable pageable) {
         checkingUserExists(requesterId);
         List<ItemRequest> itemRequests = itemRequestRepository
                 .findByRequesterIdNot(requesterId);
@@ -88,7 +88,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return requests.stream().map(ItemRequestMapper.INSTANCE::toDto).collect(toList());
     }
 
-    private void checkingUserExists(Integer requesterId) {
+    private void checkingUserExists(Long requesterId) {
         if (!userRepository.existsById(requesterId)) {
             throw new NotFoundException(
                     format(USER_NOT_EXISTS, requesterId));

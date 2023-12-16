@@ -37,7 +37,7 @@ public class ItemRequestController {
 
     @PostMapping(CREATE_REQUEST)
     public ResponseEntity<Object> create(
-            @RequestHeader(HEADER_USER_ID) int requesterId,
+            @RequestHeader(HEADER_USER_ID) Long requesterId,
             @RequestBody
             @Validated(Create.class) ItemRequestSimpleDto itemRequestSimpleDto) {
 
@@ -46,7 +46,7 @@ public class ItemRequestController {
 
     @GetMapping(GET_BY_REQUESTER)
     public ResponseEntity<Object> getByRequesterId(
-            @RequestHeader(HEADER_USER_ID) int requesterId) {
+            @RequestHeader(HEADER_USER_ID) Long requesterId) {
 
         return itemRequestClient.getByRequesterId(requesterId);
     }
@@ -54,7 +54,7 @@ public class ItemRequestController {
     @GetMapping(GET_ALL_REQUESTS)
     @Validated
     public ResponseEntity<Object> getAll(
-            @RequestHeader(HEADER_USER_ID) int requesterId,
+            @RequestHeader(HEADER_USER_ID) Long requesterId,
             @RequestParam(required = false, defaultValue = FROM)
             @PositiveOrZero Integer from,
             @RequestParam(required = false, defaultValue = SIZE)
@@ -65,7 +65,7 @@ public class ItemRequestController {
 
     @GetMapping(GET_REQUEST)
     public ResponseEntity<Object> getById(
-            @RequestHeader(HEADER_USER_ID) int requesterId,
+            @RequestHeader(HEADER_USER_ID) Long requesterId,
             @PathVariable int requestId) {
 
         return itemRequestClient.getById(requesterId, requestId);

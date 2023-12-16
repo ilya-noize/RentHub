@@ -6,7 +6,7 @@ import ru.practicum.shareit.item.entity.CommentEntity;
 
 import java.util.List;
 
-public interface CommentRepository extends JpaRepository<CommentEntity, Integer> {
+public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
     /**
      * for getAll Items. grouping By Map
      *
@@ -14,7 +14,7 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Integer>
      * @return Comments
      */
     @Query("select c from CommentEntity c where c.item.id in ?1 order by c.created DESC")
-    List<CommentEntity> findByItem_IdInOrderByCreatedDesc(List<Integer> itemIds);
+    List<CommentEntity> findByItem_IdInOrderByCreatedDesc(List<Long> itemIds);
 
     /**
      * for get Item
@@ -23,5 +23,5 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Integer>
      * @return Comments
      */
     @Query("select c from CommentEntity c where c.item.id = ?1 order by c.created DESC")
-    List<CommentEntity> findAllByItem_IdOrderByCreatedDesc(Integer itemId);
+    List<CommentEntity> findAllByItem_IdOrderByCreatedDesc(Long itemId);
 }
