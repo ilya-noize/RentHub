@@ -60,7 +60,7 @@ public class ItemController {
 
     @GetMapping(GET_ITEM)
     public ResponseEntity<Object> get(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable Long itemId) {
 
         return itemClient.get(userId, itemId);
