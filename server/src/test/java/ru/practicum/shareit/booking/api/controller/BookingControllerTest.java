@@ -30,7 +30,6 @@ import java.util.List;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -52,7 +51,7 @@ import static ru.practicum.shareit.constants.Constants.UPDATE_STATUS_BOOKING;
 @AutoConfigureMockMvc
 class BookingControllerTest {
     private final LocalDateTime now = LocalDateTime.now();
-    private final int bookerId = 1;
+    private final Long bookerId = 1L;
     private final BookingSimpleDto bookingSimpleDto = RANDOM.nextObject(BookingSimpleDto.class);
     private Booking booking;
     private BookingDto bookingDto;
@@ -78,7 +77,7 @@ class BookingControllerTest {
     @DisplayName("CREATE_BOOKING: " + CREATE_BOOKING + " It is impossible to rent an item to which access is closed.")
     void create_ItemNotAvailable_Throw() throws Exception {
 
-        when(bookingService.create(anyInt(), any(BookingSimpleDto.class)))
+        when(bookingService.create(anyLong(), any(BookingSimpleDto.class)))
                 .thenThrow(BadRequestException.class);
 
         mvc.perform(post(CREATE_BOOKING)
@@ -91,7 +90,7 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$.status", is(400)));
 
         verify(bookingService, times(1))
-                .create(anyInt(), any(BookingSimpleDto.class));
+                .create(anyLong(), any(BookingSimpleDto.class));
     }
 
     @Test
@@ -99,7 +98,7 @@ class BookingControllerTest {
     @DisplayName("CREATE_BOOKING: " + CREATE_BOOKING + " Access denied. You are owner this item")
     void create_accessDenied_Throw() throws Exception {
 
-        when(bookingService.create(anyInt(), any(BookingSimpleDto.class)))
+        when(bookingService.create(anyLong(), any(BookingSimpleDto.class)))
                 .thenThrow(BookingException.class);
 
         mvc.perform(post(CREATE_BOOKING)
@@ -112,7 +111,7 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$.status", is(404)));
 
         verify(bookingService, times(1))
-                .create(anyInt(), any(BookingSimpleDto.class));
+                .create(anyLong(), any(BookingSimpleDto.class));
     }
 
 
@@ -122,7 +121,7 @@ class BookingControllerTest {
             + " coincides with its termination OR after its termination")
     void create_rentalPeriod_Throw() throws Exception {
 
-        when(bookingService.create(anyInt(), any(BookingSimpleDto.class)))
+        when(bookingService.create(anyLong(), any(BookingSimpleDto.class)))
                 .thenThrow(RentalPeriodException.class);
 
         mvc.perform(post(CREATE_BOOKING)
@@ -135,7 +134,7 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$.status", is(400)));
 
         verify(bookingService, times(1))
-                .create(anyInt(), any(BookingSimpleDto.class));
+                .create(anyLong(), any(BookingSimpleDto.class));
     }
 
     @Test
@@ -144,7 +143,7 @@ class BookingControllerTest {
     void getAllOwner_wrongFilter() throws Exception {
         String state = "UNSUPPORTED_STATUS";
 
-        when(bookingService.getAllByOwner(anyInt(),
+        when(bookingService.getAllByOwner(anyLong(),
                 any(BookingState.class),
                 any(LocalDateTime.class),
                 any(Pageable.class)))
@@ -159,7 +158,7 @@ class BookingControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(bookingService, times(1))
-                .getAllByOwner(anyInt(),
+                .getAllByOwner(anyLong(),
                         any(BookingState.class),
                         any(LocalDateTime.class),
                         any(Pageable.class));
@@ -169,7 +168,7 @@ class BookingControllerTest {
     @DisplayName("CREATE_BOOKING:" + CREATE_BOOKING)
     void create() throws Exception {
 
-        when(bookingService.create(anyInt(), any(BookingSimpleDto.class)))
+        when(bookingService.create(anyLong(), any(BookingSimpleDto.class)))
                 .thenReturn(bookingDto);
 
         mvc.perform(post(CREATE_BOOKING)
@@ -182,13 +181,13 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$.id").value(bookingSimpleDto.getId()));
 
         verify(bookingService, times(1))
-                .create(anyInt(), any(BookingSimpleDto.class));
+                .create(anyLong(), any(BookingSimpleDto.class));
     }
 
     @Test
     @DisplayName("UPDATE_STATUS_BOOKING:" + UPDATE_STATUS_BOOKING)
     void update() throws Exception {
-        when(bookingService.update(anyInt(), anyLong(), anyBoolean()))
+        when(bookingService.update(anyLong(), anyLong(), anyBoolean()))
                 .thenReturn(bookingDto);
 
         mvc.perform(patch(UPDATE_STATUS_BOOKING, booking.getId())
@@ -202,13 +201,13 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$.id").value(bookingSimpleDto.getId()));
 
         verify(bookingService, times(1))
-                .update(anyInt(), anyLong(), anyBoolean());
+                .update(anyLong(), anyLong(), anyBoolean());
     }
 
     @Test
     @DisplayName("GET_BOOKING:" + GET_BOOKING)
     void getBookingById() throws Exception {
-        when(bookingService.get(anyInt(), anyLong())).thenReturn(bookingDto);
+        when(bookingService.get(anyLong(), anyLong())).thenReturn(bookingDto);
 
         mvc.perform(get(GET_BOOKING, booking.getId())
                         .header(HEADER_USER_ID, bookerId)
@@ -219,13 +218,13 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$.id").value(bookingSimpleDto.getId()));
 
         verify(bookingService, times(1))
-                .get(anyInt(), anyLong());
+                .get(anyLong(), anyLong());
     }
 
     @Test
     @DisplayName("GET_ALL_BOOKINGS_FOR_USER:" + GET_ALL_BOOKINGS_FOR_USER)
     void getByBookerId() throws Exception {
-        when(bookingService.getAllByUser(anyInt(),
+        when(bookingService.getAllByUser(anyLong(),
                 any(BookingState.class),
                 any(LocalDateTime.class),
                 any(Pageable.class)))
@@ -240,7 +239,7 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$[0].id").value(bookingDtoList.get(0).getId()));
 
         verify(bookingService, times(1))
-                .getAllByUser(anyInt(),
+                .getAllByUser(anyLong(),
                         any(BookingState.class),
                         any(LocalDateTime.class),
                         any(Pageable.class));
@@ -251,7 +250,7 @@ class BookingControllerTest {
     void getAllOwner() throws Exception {
         String state = "FUTURE";
 
-        when(bookingService.getAllByOwner(anyInt(),
+        when(bookingService.getAllByOwner(anyLong(),
                 any(BookingState.class),
                 any(LocalDateTime.class),
                 any(Pageable.class)))
@@ -267,7 +266,7 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$[0].id").value(bookingDtoList.get(0).getId()));
 
         verify(bookingService, times(1))
-                .getAllByOwner(anyInt(),
+                .getAllByOwner(anyLong(),
                         any(BookingState.class),
                         any(LocalDateTime.class),
                         any(Pageable.class));

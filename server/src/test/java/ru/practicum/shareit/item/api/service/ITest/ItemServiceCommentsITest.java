@@ -65,9 +65,9 @@ class ItemServiceCommentsITest {
             throw new BadRequestException("Something wrong in roadmap by create comment.");
         }
 
-        int authorId = getUserId();
-        int ownerId = getUserId();
-        int itemId = getItemId(ownerId, authorId, requestSendNDaysAgo);
+        long authorId = getUserId();
+        long ownerId = getUserId();
+        long itemId = getItemId(ownerId, authorId, requestSendNDaysAgo);
         getBookingId(ownerId, itemId, authorId,
                 rentStartNDaysAgo, rentFinishNDaysAgo);
 
@@ -104,9 +104,9 @@ class ItemServiceCommentsITest {
             System.out.println("Something wrong in roadmap by create comment.");
         }
 
-        int authorId = getUserId();
-        int ownerId = getUserId();
-        int itemId = getItemId(ownerId, authorId, requestSendNDaysAgo);
+        long authorId = getUserId();
+        long ownerId = getUserId();
+        long itemId = getItemId(ownerId, authorId, requestSendNDaysAgo);
         getBookingId(ownerId, itemId, authorId,
                 rentStartNDaysAgo, rentFinishNDaysAgo);
 
@@ -141,9 +141,9 @@ class ItemServiceCommentsITest {
             System.out.println("Something wrong in roadmap by create comment.");
         }
 
-        int authorId = getUserId();
-        int ownerId = getUserId();
-        int itemId = getItemId(ownerId, authorId, requestSendNDaysAgo);
+        long authorId = getUserId();
+        long ownerId = getUserId();
+        long itemId = getItemId(ownerId, authorId, requestSendNDaysAgo);
         getBookingId(ownerId, itemId, authorId,
                 rentStartNDaysAgo, rentFinishNDaysAgo);
 // должно быть true
@@ -204,14 +204,14 @@ class ItemServiceCommentsITest {
 
 
     @Transactional
-    private int getUserId() {
+    private long getUserId() {
         UserSimpleDto requestUser = RANDOM.nextObject(UserSimpleDto.class);
         UserDto authorDto = userService.create(requestUser);
         return authorDto.getId();
     }
 
     @Transactional
-    private int getRequestByItem(int requesterId, int requestItemDaysAgo) {
+    private long getRequestByItem(long requesterId, long requestItemDaysAgo) {
         ItemRequestSimpleDto requestSimpleDto = RANDOM.nextObject(ItemRequestSimpleDto.class);
         LocalDateTime requestTime = LocalDateTime.now().minusDays(requestItemDaysAgo);
         ItemRequestDto requestDto = itemRequestService
@@ -220,7 +220,7 @@ class ItemServiceCommentsITest {
     }
 
     @Transactional
-    private int getItemId(int ownerId, int authorId, int requestItemDaysAgo) {
+    private long getItemId(long ownerId, long authorId, int requestItemDaysAgo) {
         ItemSimpleDto requestItem = RANDOM.nextObject(ItemSimpleDto.class);
         requestItem.setRequestId(getRequestByItem(authorId, requestItemDaysAgo));
         // requestItem.setAvailable(false);
@@ -231,7 +231,7 @@ class ItemServiceCommentsITest {
     }
 
     @Transactional
-    private void getBookingId(int ownerId, int itemId, int authorId, int rentStartNDaysAgo, int rentFinishNDaysAgo) {
+    private void getBookingId(long ownerId, long itemId, long authorId, int rentStartNDaysAgo, int rentFinishNDaysAgo) {
         BookingSimpleDto requestBooking = RANDOM.nextObject(BookingSimpleDto.class);
         requestBooking.setItemId(itemId);
         requestBooking.setStart(now.minusDays(rentStartNDaysAgo));
@@ -243,8 +243,8 @@ class ItemServiceCommentsITest {
     @Test
     void createComment_wrongItem_Throw() {
         LocalDateTime now = LocalDateTime.now();
-        int authorId = getUserId();
-        int itemId = Integer.MAX_VALUE;//getItemId(ownerId, authorId, 3);
+        long authorId = getUserId();
+        long itemId = Integer.MAX_VALUE;//getItemId(ownerId, authorId, 3);
 
         CommentSimpleDto commentSimpleDto = RANDOM.nextObject(CommentSimpleDto.class);
         commentSimpleDto.setAuthorId(authorId);
@@ -265,12 +265,12 @@ class ItemServiceCommentsITest {
     @Test
     void get_whenUserNotExist_thenReturnException() {
         //given
-        int userId = 9999;
+        long userId = 9999;
 
         //when
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-                () -> itemService.get(userId, 1));
+                () -> itemService.get(userId, 1L));
 
         //then
         assertEquals(exception.getMessage(),

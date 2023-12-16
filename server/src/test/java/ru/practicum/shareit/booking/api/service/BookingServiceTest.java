@@ -31,7 +31,6 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
@@ -80,7 +79,7 @@ class BookingServiceTest extends InjectResources {
 
         nextBookingRequest = BookingSimpleDto.builder()
                 .id(1L)
-                .itemId(1)
+                .itemId(1L)
                 .start(startNext)
                 .end(endNext).build();
     }
@@ -88,8 +87,8 @@ class BookingServiceTest extends InjectResources {
     @Test
     void create_whenInvalidItem_thenReturnThrow() {
         //given
-        int itemId = itemStorage.get(1).getId();
-        int bookerId = userStorage.get(2).getId();
+        Long itemId = itemStorage.get(1L).getId();
+        Long bookerId = userStorage.get(2L).getId();
 
         BookingSimpleDto bookingRequest = nextBookingRequest;
 
@@ -106,10 +105,10 @@ class BookingServiceTest extends InjectResources {
     @Test
     void create_whenInvalidUser_thenReturnThrow() {
         //given
-        Item item = itemStorage.get(1);
-        int itemId = item.getId();
-        User booker = userStorage.get(2);
-        int bookerId = booker.getId();
+        Item item = itemStorage.get(1L);
+        Long itemId = item.getId();
+        User booker = userStorage.get(2L);
+        Long bookerId = booker.getId();
 
         BookingSimpleDto bookingRequest = nextBookingRequest;
 
@@ -130,12 +129,12 @@ class BookingServiceTest extends InjectResources {
     void update_REJECTED() {
         //given
         final BookingStatus status = REJECTED;
-        Item item = itemStorage.get(1);
-        int itemId = item.getId();
+        Item item = itemStorage.get(1L);
+        Long itemId = item.getId();
         User owner = item.getOwner();
-        int ownerId = owner.getId();
-        User booker = userStorage.get(2);
-        int bookerId = booker.getId();
+        Long ownerId = owner.getId();
+        User booker = userStorage.get(2L);
+        Long bookerId = booker.getId();
 
         BookingSimpleDto bookingRequest = nextBookingRequest;
         BookingDto bookingResponse;
@@ -173,7 +172,7 @@ class BookingServiceTest extends InjectResources {
     @Test
     void update_whenInvalidBooking_thenReturnThrow() {
         //given
-        int ownerId = itemStorage.get(1).getOwner().getId();
+        Long ownerId = itemStorage.get(1L).getOwner().getId();
 
         BookingSimpleDto bookingRequest = nextBookingRequest;
         long bookingId = bookingRequest.getId();
@@ -194,7 +193,7 @@ class BookingServiceTest extends InjectResources {
     @Test
     void update_whenInvalidUser_thenReturnThrow() {
         //given
-        int ownerId = itemStorage.get(1).getOwner().getId();
+        Long ownerId = itemStorage.get(1L).getOwner().getId();
 
         BookingSimpleDto bookingRequest = nextBookingRequest;
         long bookingId = bookingRequest.getId();
@@ -217,12 +216,12 @@ class BookingServiceTest extends InjectResources {
     void update_APPROVED() {
         //given
         final BookingStatus status = APPROVED;
-        Item item = itemStorage.get(1);
-        int itemId = item.getId();
+        Item item = itemStorage.get(1L);
+        Long itemId = item.getId();
         User owner = item.getOwner();
-        int ownerId = owner.getId();
-        User booker = userStorage.get(2);
-        int bookerId = booker.getId();
+        Long ownerId = owner.getId();
+        User booker = userStorage.get(2L);
+        Long bookerId = booker.getId();
 
         BookingSimpleDto bookingRequest = nextBookingRequest;
         BookingDto bookingResponse;
@@ -258,13 +257,13 @@ class BookingServiceTest extends InjectResources {
 
     @Test
     void get_whenOwner_thenReturnDtoRecord() {
-        Item item = itemStorage.get(1);
+        Item item = itemStorage.get(1L);
         User owner = item.getOwner();
-        int ownerId = owner.getId();
+        Long ownerId = owner.getId();
 
         when(bookingRepository.findById(anyLong()))
                 .thenReturn(Optional.of(bookingEntity));
-        when(userRepository.existsById(anyInt()))
+        when(userRepository.existsById(anyLong()))
                 .thenReturn(true);
 
         // when
@@ -276,7 +275,7 @@ class BookingServiceTest extends InjectResources {
 
     @Test
     void getAllByUser_CURRENT() {
-        int bookerId = userStorage.get(2).getId();
+        Long bookerId = userStorage.get(2L).getId();
 
         List<Booking> bookingList = List.of(bookingEntity);
 
@@ -294,7 +293,7 @@ class BookingServiceTest extends InjectResources {
 
     @Test
     void getAllByUser_PAST() {
-        int bookerId = userStorage.get(2).getId();
+        Long bookerId = userStorage.get(2L).getId();
 
         List<Booking> bookingList = List.of(bookingEntity);
 
@@ -312,7 +311,7 @@ class BookingServiceTest extends InjectResources {
 
     @Test
     void getAllByUser_ALL() {
-        int bookerId = userStorage.get(2).getId();
+        Long bookerId = userStorage.get(2L).getId();
 
         List<Booking> bookingList = List.of(bookingEntity);
 
@@ -329,7 +328,7 @@ class BookingServiceTest extends InjectResources {
 
     @Test
     void getAllByUser_FUTURE() {
-        int bookerId = userStorage.get(2).getId();
+        Long bookerId = userStorage.get(2L).getId();
 
         List<Booking> bookingList = List.of(bookingEntity);
 
@@ -347,7 +346,7 @@ class BookingServiceTest extends InjectResources {
 
     @Test
     void getAllByUser_WAITING() {
-        int bookerId = userStorage.get(2).getId();
+        Long bookerId = userStorage.get(2L).getId();
 
         List<Booking> bookingList = List.of(bookingEntity);
 
@@ -366,7 +365,7 @@ class BookingServiceTest extends InjectResources {
 
     @Test
     void getAllByUser_REJECTED() {
-        int bookerId = userStorage.get(2).getId();
+        Long bookerId = userStorage.get(2L).getId();
 
         List<Booking> bookingList = List.of(bookingEntity);
 
@@ -387,7 +386,7 @@ class BookingServiceTest extends InjectResources {
 
     @Test
     void getAllByUser_whenInvalidUser_thenReturnThrow() {
-        int bookerId = userStorage.get(2).getId();
+        Long bookerId = userStorage.get(2L).getId();
 
         when(userRepository.existsById(bookerId)).thenReturn(false);
         //when
@@ -403,7 +402,7 @@ class BookingServiceTest extends InjectResources {
 
     @Test
     void getAllByOwner_CURRENT() {
-        int ownerId = itemStorage.get(1).getOwner().getId();
+        Long ownerId = itemStorage.get(1L).getOwner().getId();
         List<Booking> bookingList = List.of(bookingEntity);
 
         when(userRepository.existsById(ownerId)).thenReturn(true);
@@ -420,7 +419,7 @@ class BookingServiceTest extends InjectResources {
 
     @Test
     void getAllByOwner_PAST() {
-        int ownerId = itemStorage.get(1).getOwner().getId();
+        Long ownerId = itemStorage.get(1L).getOwner().getId();
         List<Booking> bookingList = List.of(bookingEntity);
 
         when(userRepository.existsById(ownerId)).thenReturn(true);
@@ -437,7 +436,7 @@ class BookingServiceTest extends InjectResources {
 
     @Test
     void getAllByOwner_ALL() {
-        int ownerId = itemStorage.get(1).getOwner().getId();
+        Long ownerId = itemStorage.get(1L).getOwner().getId();
         List<Booking> bookingList = List.of(bookingEntity);
 
         when(userRepository.existsById(ownerId)).thenReturn(true);
@@ -453,7 +452,7 @@ class BookingServiceTest extends InjectResources {
 
     @Test
     void getAllByOwner_FUTURE() {
-        int ownerId = itemStorage.get(1).getOwner().getId();
+        Long ownerId = itemStorage.get(1L).getOwner().getId();
         List<Booking> bookingList = List.of(bookingEntity);
 
         when(userRepository.existsById(ownerId)).thenReturn(true);
@@ -469,7 +468,7 @@ class BookingServiceTest extends InjectResources {
 
     @Test
     void getAllByOwner_WAITING() {
-        int ownerId = itemStorage.get(1).getOwner().getId();
+        Long ownerId = itemStorage.get(1L).getOwner().getId();
         List<Booking> bookingList = List.of(bookingEntity);
 
         when(userRepository.existsById(ownerId)).thenReturn(true);
@@ -486,7 +485,7 @@ class BookingServiceTest extends InjectResources {
 
     @Test
     void getAllByOwner_REJECTED() {
-        int ownerId = itemStorage.get(1).getOwner().getId();
+        Long ownerId = itemStorage.get(1L).getOwner().getId();
         List<Booking> bookingList = List.of(bookingEntity);
 
         when(userRepository.existsById(ownerId)).thenReturn(true);
@@ -503,7 +502,7 @@ class BookingServiceTest extends InjectResources {
 
     @Test
     void getAllByOwner_whenInvalidUser_thenReturnThrow() {
-        int ownerId = itemStorage.get(1).getOwner().getId();
+        Long ownerId = itemStorage.get(1L).getOwner().getId();
 
         when(userRepository.existsById(ownerId)).thenReturn(false);
         //when
@@ -521,7 +520,7 @@ class BookingServiceTest extends InjectResources {
     @Disabled
     void getAllByOwner_whenInvalidState_thenReturnThrow() {
         BookingState state = PAST;//"UNSUPPORTED";
-        int ownerId = itemStorage.get(1).getOwner().getId();
+        Long ownerId = itemStorage.get(1L).getOwner().getId();
 
         when(userRepository.existsById(ownerId)).thenReturn(true);
         //when

@@ -24,9 +24,9 @@ import static ru.practicum.shareit.constants.Constants.LOG_SEPARATOR;
 @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
 class ItemRequestServiceITest {
     User owner;
-    int ownerId;
+    long ownerId;
     User requester;
-    int requesterId;
+    long requesterId;
     String wanted = "PlayStation 5 на две недели есть у кого-нибудь?";
     @Autowired
     private ItemRequestService itemRequestService;

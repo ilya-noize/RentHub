@@ -16,7 +16,7 @@ import ru.practicum.shareit.utils.InjectResources;
 
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -28,8 +28,6 @@ import static ru.practicum.shareit.constants.Constants.USER_NOT_EXISTS;
 class ItemServiceUpdateValidateTest extends InjectResources {
     private final Item itemRequest = items.get(1);
     private final Item itemResponse = itemRequest;
-    private ItemSimpleDto itemDtoRequest;
-
     @InjectMocks
     protected ItemServiceImpl itemService;
     @Mock
@@ -38,11 +36,12 @@ class ItemServiceUpdateValidateTest extends InjectResources {
     protected UserRepository userRepository;
     @Mock
     protected ItemMapper itemMapper;
+    private ItemSimpleDto itemDtoRequest;
 
     @Test
     void update_whenUserNotExists_thenReturnException() {
-        final int userId = 100;
-        final int itemId = 1;
+        final long userId = 100;
+        final long itemId = 1;
 
         String name = itemRequest.getName();
         String description = itemRequest.getDescription();
@@ -63,11 +62,11 @@ class ItemServiceUpdateValidateTest extends InjectResources {
                 format(USER_NOT_EXISTS, userId));
 
         verify(userRepository, times(1))
-                .existsById(anyInt());
+                .existsById(anyLong());
         verify(itemMapper, never())
                 .toDto(itemResponse);
         verify(itemRepository, never())
-                .findById(anyInt());
+                .findById(anyLong());
 
         verify(itemRepository, never())
                 .updateNameById(name, itemId);

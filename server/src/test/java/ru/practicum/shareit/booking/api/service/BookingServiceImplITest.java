@@ -68,7 +68,7 @@ class BookingServiceImplITest {
     @Test
     void create_ItemIsNotExists_Throw() {
         User booker = getNewUser();
-        int itemId = Integer.MAX_VALUE;
+        Long itemId = Long.MAX_VALUE;
 
         LocalDateTime start = now.minusDays(7);
         LocalDateTime end = now.minusDays(4);
@@ -104,7 +104,7 @@ class BookingServiceImplITest {
         User owner = getNewUser();
         Item item = getNewItem(owner, true);
 
-        Integer bookerId = owner.getId();
+        Long bookerId = owner.getId();
 
         LocalDateTime start = now.minusDays(7);
         LocalDateTime end = now.minusDays(4);
@@ -162,12 +162,12 @@ class BookingServiceImplITest {
         LocalDateTime start = now.minusDays(7);
         LocalDateTime end = now.minusDays(4);
 
-        Integer itemId = item.getId();
+        Long itemId = item.getId();
 
         BookingSimpleDto bookingSimpleDto =
                 new BookingSimpleDto(null, start, end, itemId);
 
-        Integer bookerId = booker.getId();
+        Long bookerId = booker.getId();
 
         BookingDto response = bookingService.create(bookerId, bookingSimpleDto);
 
@@ -178,7 +178,7 @@ class BookingServiceImplITest {
     void update_BookingNotExists_Throw() {
         User booker = getNewUser();
 
-        Integer bookerId = booker.getId();
+        Long bookerId = booker.getId();
         Long bookingId = Long.MAX_VALUE;
 
         assertThrows(NotFoundException.class, () ->
@@ -200,7 +200,7 @@ class BookingServiceImplITest {
                 booker,
                 REJECTED);
 
-        Integer bookerId = booker.getId();
+        Long bookerId = booker.getId();
         Long bookingId = booking.getId();
 
         assertThrows(BadRequestException.class, () ->
@@ -221,7 +221,7 @@ class BookingServiceImplITest {
                 booker,
                 WAITING);
 
-        Integer bookerId = Integer.MAX_VALUE;
+        Long bookerId = Long.MAX_VALUE;
         Long bookingId = booking.getId();
 
         assertThrows(NotFoundException.class, () ->
@@ -241,7 +241,7 @@ class BookingServiceImplITest {
                 owner,
                 WAITING);
 
-        Integer bookerId = owner.getId();
+        Long bookerId = owner.getId();
         Long bookingId = booking.getId();
 
         assertThrows(BookingException.class, () ->
@@ -263,7 +263,7 @@ class BookingServiceImplITest {
                 booker,
                 WAITING);
 
-        Integer ownerId = owner.getId();
+        Long ownerId = owner.getId();
         Long bookingId = booking.getId();
 
         BookingDto result = bookingService.update(ownerId, bookingId, true);
@@ -283,7 +283,7 @@ class BookingServiceImplITest {
                 booker,
                 WAITING);
 
-        Integer ownerId = owner.getId();
+        Long ownerId = owner.getId();
         Long bookingId = booking.getId();
 
         BookingDto result = bookingService.update(ownerId, bookingId, false);
@@ -296,7 +296,7 @@ class BookingServiceImplITest {
         getNewItem(owner, true);
         User booker = getNewUser();
 
-        Integer bookerId = booker.getId();
+        Long bookerId = booker.getId();
         Long bookingId = Long.MAX_VALUE;
 
         assertThrows(NotFoundException.class, () ->
@@ -317,7 +317,7 @@ class BookingServiceImplITest {
                 booker,
                 WAITING);
 
-        Integer bookerId = Integer.MAX_VALUE;
+        Long bookerId = Long.MAX_VALUE;
         Long bookingId = booking.getId();
 
         assertThrows(NotFoundException.class, () ->
@@ -339,7 +339,7 @@ class BookingServiceImplITest {
                 booker,
                 WAITING);
 
-        Integer bookerId = requester.getId();
+        Long bookerId = requester.getId();
         Long bookingId = booking.getId();
 
         assertThrows(BookingException.class, () ->
@@ -361,7 +361,7 @@ class BookingServiceImplITest {
                 booker,
                 WAITING);
 
-        Integer bookerId = booker.getId();
+        Long bookerId = booker.getId();
         Long bookingId = booking.getId();
 
         BookingDto result = bookingService.get(bookerId, bookingId);
@@ -382,7 +382,7 @@ class BookingServiceImplITest {
                 booker,
                 WAITING);
 
-        Integer ownerId = owner.getId();
+        Long ownerId = owner.getId();
         Long bookingId = booking.getId();
 
         BookingDto result = bookingService.get(ownerId, bookingId);

@@ -28,7 +28,7 @@ import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -58,7 +58,7 @@ class ItemRequestServiceTest {
         ItemRequest entity = ItemRequestMapper.INSTANCE.toEntity(request, requester.getId());
         ItemRequestDto expected = ItemRequestMapper.INSTANCE.toDto(entity);
 
-        when(userRepository.findById(anyInt()))
+        when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(requester));
         when(itemRequestRepository.save(any(ItemRequest.class)))
                 .thenReturn(entity);
@@ -73,11 +73,11 @@ class ItemRequestServiceTest {
 
     @Test
     void create_Throw() {
-        int requesterId = Constants.RANDOM.nextInt();
+        long requesterId = Constants.RANDOM.nextInt();
         System.out.println("requesterId = " + requesterId);
         ItemRequestSimpleDto request = Constants.RANDOM.nextObject(ItemRequestSimpleDto.class);
 
-        when(userRepository.findById(anyInt()))
+        when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.empty());
 
         NotFoundException e = assertThrows(NotFoundException.class,
@@ -96,9 +96,9 @@ class ItemRequestServiceTest {
         itemRequest.setItems(new ArrayList<>());
         ItemRequestDto expected = ItemRequestMapper.INSTANCE.toDto(itemRequest);
 
-        when(userRepository.existsById(anyInt()))
+        when(userRepository.existsById(anyLong()))
                 .thenReturn(true);
-        when(itemRequestRepository.findById(anyInt()))
+        when(itemRequestRepository.findById(anyLong()))
                 .thenReturn(Optional.of(itemRequest));
         when(itemRepository.getByRequest_Id(itemRequest.getId()))
                 .thenReturn(emptyList());
@@ -112,8 +112,8 @@ class ItemRequestServiceTest {
         User user = Constants.RANDOM.nextObject(User.class);
         ItemRequest itemRequest = Constants.RANDOM.nextObject(ItemRequest.class);
         itemRequest.setItems(new ArrayList<>());
-        int itemRequestId = itemRequest.getId();
-        when(userRepository.existsById(anyInt()))
+        long itemRequestId = itemRequest.getId();
+        when(userRepository.existsById(anyLong()))
                 .thenReturn(true);
         when(itemRequestRepository.findById(itemRequestId))
                 .thenReturn(Optional.empty())
@@ -133,12 +133,12 @@ class ItemRequestServiceTest {
         List<ItemRequestDto> expected = List.of(
                 ItemRequestMapper.INSTANCE.toDto(itemRequest));
 
-        int requesterId = itemRequest.getRequester().getId();
+        long requesterId = itemRequest.getRequester().getId();
 
-        when(userRepository.existsById(anyInt()))
+        when(userRepository.existsById(anyLong()))
                 .thenReturn(true);
         when(itemRequestRepository.findByRequesterIdNot(
-                anyInt())) // todo , any(Pageable.class)))
+                anyLong())) // todo , any(Pageable.class)))
                 .thenReturn(List.of(itemRequest));
         when(itemRepository.findByRequestIn(anyList()))
                 .thenReturn(List.of());
@@ -152,9 +152,9 @@ class ItemRequestServiceTest {
     @Test
     void getAll_Throw() {
         ItemRequest itemRequest = Constants.RANDOM.nextObject(ItemRequest.class);
-        int requesterId = itemRequest.getRequester().getId();
+        long requesterId = itemRequest.getRequester().getId();
 
-        when(userRepository.existsById(anyInt()))
+        when(userRepository.existsById(anyLong()))
                 .thenReturn(false);
 
         assertThrows(NotFoundException.class,
@@ -166,13 +166,13 @@ class ItemRequestServiceTest {
     void getByRequesterId() {
         ItemRequest itemRequest = Constants.RANDOM.nextObject(ItemRequest.class);
         itemRequest.setItems(new ArrayList<>());
-        int requesterId = itemRequest.getRequester().getId();
+        long requesterId = itemRequest.getRequester().getId();
         List<ItemRequestDto> expected = List.of(
                 ItemRequestMapper.INSTANCE.toDto(itemRequest));
 
-        when(userRepository.existsById(anyInt()))
+        when(userRepository.existsById(anyLong()))
                 .thenReturn(true);
-        when(itemRequestRepository.findByRequesterId(anyInt()))
+        when(itemRequestRepository.findByRequesterId(anyLong()))
                 .thenReturn(List.of(itemRequest));
 
         List<ItemRequestDto> response = itemRequestService.getByRequesterId(requesterId);

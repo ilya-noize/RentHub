@@ -44,7 +44,7 @@ class ItemServiceCreateTest extends InjectResources {
     void create_whenUserNotExists_thenReturnException() {
         Item item = random.nextObject(Item.class);
         final User owner = item.getOwner();
-        final int userId = owner.getId();
+        final long userId = owner.getId();
         final ItemSimpleDto request = ItemMapper.INSTANCE.toSimpleDto(item);
 
         when(userRepository.existsById(userId))
@@ -65,8 +65,8 @@ class ItemServiceCreateTest extends InjectResources {
         final User owner = item.getOwner();
         item.setRequest(null);
         final ItemSimpleDto simpleDto = ItemMapper.INSTANCE.toSimpleDto(item);
-        final int userId = owner.getId();
-        final int requestId = 1;
+        final long userId = owner.getId();
+        final long requestId = 1;
         simpleDto.setRequestId(requestId);
 
         when(userRepository.existsById(userId))
