@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.api.client.ItemClient;
@@ -34,7 +33,6 @@ import static ru.practicum.shareit.constants.Constants.SIZE;
 import static ru.practicum.shareit.constants.Constants.UPDATE_ITEM;
 
 @RestController
-@RequestMapping("/items")
 @RequiredArgsConstructor
 @Validated
 public class ItemController {
@@ -60,7 +58,7 @@ public class ItemController {
 
     @GetMapping(GET_ITEM)
     public ResponseEntity<Object> get(
-            @RequestHeader("X-Sharer-User-Id") Integer userId,
+            @RequestHeader(HEADER_USER_ID) Integer userId,
             @PathVariable long itemId) {
 
         return itemClient.get(userId, itemId);
