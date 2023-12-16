@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.api.service;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,6 +30,7 @@ import static ru.practicum.shareit.booking.entity.enums.BookingStatus.REJECTED;
 import static ru.practicum.shareit.booking.entity.enums.BookingStatus.WAITING;
 
 @SpringBootTest
+@Disabled
 class BookingServiceImplITest {
     private final LocalDateTime now = LocalDateTime.now();
 

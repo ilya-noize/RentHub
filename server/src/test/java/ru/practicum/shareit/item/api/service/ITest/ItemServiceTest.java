@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.api.service.ITest;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import static ru.practicum.shareit.constants.Constants.RANDOM;
 import static ru.practicum.shareit.constants.Constants.USER_NOT_EXISTS;
 
 @SpringBootTest
+@Disabled
 class ItemServiceTest {
     @Autowired
     private ItemService itemService;

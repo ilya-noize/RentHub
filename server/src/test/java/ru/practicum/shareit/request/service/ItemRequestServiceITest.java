@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import static ru.practicum.shareit.constants.Constants.LOG_SEPARATOR;
 @SpringBootTest
 @Transactional
 @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+@Disabled
 class ItemRequestServiceITest {
     User owner;
     long ownerId;

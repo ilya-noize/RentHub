@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.api.dto;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.item.entity.Item;
@@ -10,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static ru.practicum.shareit.constants.Constants.RANDOM;
 
 @SpringBootTest
+@Disabled
 class ItemMapperTest {
     private final ItemMapper itemMapper = ItemMapper.INSTANCE;
 

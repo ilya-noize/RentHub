@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.api.repository;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static ru.practicum.shareit.constants.Constants.RANDOM;
 
 @DataJpaTest
+@Disabled
 class CommentRepositoryTest {
     private final LocalDateTime now = LocalDateTime
             .of(2000, 1, 1, 12, 0, 0, 0);

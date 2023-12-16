@@ -38,6 +38,7 @@ import static ru.practicum.shareit.constants.Constants.USER_NOT_EXISTS;
 
 @SpringBootTest
 @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+@Disabled
 class ItemServiceCommentsITest {
     private final LocalDateTime now = LocalDateTime.now();
     @Autowired

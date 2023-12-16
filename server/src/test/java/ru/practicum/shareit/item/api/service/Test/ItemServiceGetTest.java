@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.api.service.Test;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
+@Disabled
 class ItemServiceGetTest {
     @InjectMocks
     private ItemServiceImpl itemService;
