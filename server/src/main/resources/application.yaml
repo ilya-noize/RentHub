@@ -16,6 +16,10 @@ spring:
     init:
       mode: always
 
+  config:
+    activate:
+      on-profile: prod
+
   datasource:
     driverClassName: org.postgresql.Driver
     url: ${SPRING_DATASOURCE_URL}
