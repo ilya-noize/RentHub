@@ -39,27 +39,27 @@ public interface Constants {
 
     String HEADER_USER_ID = "X-Sharer-User-Id";
 
-    String CREATE_BOOKING = "";
-    String UPDATE_STATUS_BOOKING = "/{id}";
-    String GET_BOOKING = "/{id}";
-    String GET_ALL_BOOKINGS_FOR_USER = "";
-    String GET_ALL_BOOKINGS_FOR_OWNER = "/owner";
+    String CREATE_BOOKING = "/bookings";
+    String UPDATE_STATUS_BOOKING = "/bookings/{id}";
+    String GET_BOOKING = "/bookings/{id}";
+    String GET_ALL_BOOKINGS_FOR_USER = "/bookings";
+    String GET_ALL_BOOKINGS_FOR_OWNER = "/bookings/owner";
 
-    String CREATE_ITEM = "";
-    String UPDATE_ITEM = "/{id}";
-    String GET_ITEM = "/{id}";
-    String SEARCH_ITEM = "/search";
-    String GET_ALL_ITEMS = "";
-    String CREATE_COMMENT = "/{id}/comment";
+    String CREATE_ITEM = "/items";
+    String UPDATE_ITEM = "/items/{id}";
+    String GET_ITEM = "/items/{id}";
+    String SEARCH_ITEM = "/items/search";
+    String GET_ALL_ITEMS = "/items";
+    String CREATE_COMMENT = "/items/{id}/comment";
 
-    String CREATE_REQUEST = "";
-    String GET_BY_REQUESTER = "";
-    String GET_REQUEST = "/{id}";
-    String GET_ALL_REQUESTS = "/all";
+    String CREATE_REQUEST = "/requests";
+    String GET_BY_REQUESTER = "/requests";
+    String GET_REQUEST = "/requests/{id}";
+    String GET_ALL_REQUESTS = "/requests/all";
 
-    String CREATE_USER = "";
-    String UPDATE_USER = "/{id}";
-    String GET_USER = "/{id}";
-    String DELETE_USER = "/{id}";
-    String GET_ALL_USERS = "";
+    String CREATE_USER = "/users";
+    String UPDATE_USER = "/users/{id}";
+    String GET_USER = "/users/{id}";
+    String DELETE_USER = "/users/{id}";
+    String GET_ALL_USERS = "/users";
 }
