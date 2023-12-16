@@ -42,8 +42,8 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
 
     @Override
-    public BookingDto create(Integer bookerId, BookingSimpleDto dto) {
-        Integer itemId = dto.getItemId();
+    public BookingDto create(Long bookerId, BookingSimpleDto dto) {
+        Long itemId = dto.getItemId();
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(
                         format(ITEM_NOT_EXISTS, itemId)));
@@ -100,7 +100,7 @@ public class BookingServiceImpl implements BookingService {
      * @return Бронирование с новым статусом
      */
     @Override
-    public BookingDto update(Integer ownerId, Long bookingId, Boolean approved) {
+    public BookingDto update(Long ownerId, Long bookingId, Boolean approved) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(
                         () -> new NotFoundException(
@@ -117,7 +117,7 @@ public class BookingServiceImpl implements BookingService {
                     format(USER_NOT_EXISTS, ownerId));
         }
 
-        Integer bookerId = booking.getBooker().getId();
+        Long bookerId = booking.getBooker().getId();
         boolean ownerIsBooker = ownerId.equals(bookerId);
         if (ownerIsBooker) {
             throw new BookingException("Access denied.\n"
@@ -137,7 +137,7 @@ public class BookingServiceImpl implements BookingService {
      * @return Booking
      */
     @Override
-    public BookingDto get(Integer userId, Long bookingId) {
+    public BookingDto get(Long userId, Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException(
                         format(BOOKING_NOT_EXISTS, bookingId)));
@@ -148,8 +148,8 @@ public class BookingServiceImpl implements BookingService {
                     format(USER_NOT_EXISTS, userId));
         }
 
-        Integer bookerId = booking.getBooker().getId();
-        Integer ownerId = booking.getItem().getOwner().getId();
+        Long bookerId = booking.getBooker().getId();
+        Long ownerId = booking.getItem().getOwner().getId();
 
         boolean isBooker = userId.equals(bookerId);
         boolean isOwner = userId.equals(ownerId);
@@ -181,7 +181,7 @@ public class BookingServiceImpl implements BookingService {
      * @return Список бронирования
      */
     @Override
-    public List<BookingDto> getAllByUser(Integer bookerId, BookingState state, LocalDateTime now, Pageable pageable) {
+    public List<BookingDto> getAllByUser(Long bookerId, BookingState state, LocalDateTime now, Pageable pageable) {
         List<Booking> bookings = new ArrayList<>();
 
         checkingUserId(bookerId);
@@ -217,7 +217,7 @@ public class BookingServiceImpl implements BookingService {
         return getListBookingDtoRecord(bookings);
     }
 
-    private void checkingUserId(Integer userId) {
+    private void checkingUserId(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException(format(USER_NOT_EXISTS, userId));
         }
@@ -242,7 +242,7 @@ public class BookingServiceImpl implements BookingService {
      * @return Список бронирования
      */
     @Override
-    public List<BookingDto> getAllByOwner(Integer ownerId, BookingState state, LocalDateTime now, Pageable pageable) {
+    public List<BookingDto> getAllByOwner(Long ownerId, BookingState state, LocalDateTime now, Pageable pageable) {
         List<Booking> bookings = new ArrayList<>();
 
         checkingUserId(ownerId);

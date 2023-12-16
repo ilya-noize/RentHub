@@ -36,7 +36,7 @@ public class ItemRequestController {
 
     @PostMapping(CREATE_REQUEST)
     public ItemRequestDto create(
-            @RequestHeader(HEADER_USER_ID) int requesterId,
+            @RequestHeader(HEADER_USER_ID) Long requesterId,
             @RequestBody
             ItemRequestSimpleDto itemRequestSimpleDto) {
 
@@ -45,7 +45,7 @@ public class ItemRequestController {
 
     @GetMapping(GET_BY_REQUESTER)
     public List<ItemRequestDto> getByRequesterId(
-            @RequestHeader(HEADER_USER_ID) Integer requesterId) {
+            @RequestHeader(HEADER_USER_ID) Long requesterId) {
 
         return itemRequestService.getByRequesterId(requesterId);
     }
@@ -53,7 +53,7 @@ public class ItemRequestController {
     @GetMapping(GET_ALL_REQUESTS)
     @Validated
     public List<ItemRequestDto> getAll(
-            @RequestHeader(HEADER_USER_ID) Integer requesterId,
+            @RequestHeader(HEADER_USER_ID) Long requesterId,
             @RequestParam(required = false, defaultValue = FROM)
             Integer from,
             @RequestParam(required = false, defaultValue = SIZE)
@@ -64,8 +64,8 @@ public class ItemRequestController {
 
     @GetMapping(GET_REQUEST)
     public ItemRequestDto get(
-            @RequestHeader(HEADER_USER_ID) Integer requesterId,
-            @PathVariable Integer id) {
+            @RequestHeader(HEADER_USER_ID) Long requesterId,
+            @PathVariable Long id) {
 
         return itemRequestService.get(requesterId, id);
     }

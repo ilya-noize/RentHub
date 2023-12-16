@@ -31,8 +31,8 @@ class ItemServiceGetTest {
     @Test
     @DisplayName("ITEM GET _ THROW IF USER NOT EXIST")
     void get_whenUserNotExists_thenReturnException() {
-        int userId = 1;
-        int itemId = 1;
+        long userId = 1;
+        long itemId = 1;
         when(userRepository.existsById(userId))
                 .thenReturn(false);
 
@@ -45,10 +45,10 @@ class ItemServiceGetTest {
     @DisplayName("ITEM GET _ THROW IF ITEM NOT EXIST")
     void get_whenItemNotExists_thenReturnException() {
         User owner = Constants.RANDOM.nextObject(User.class);
-        int ownerId = owner.getId();
+        long ownerId = owner.getId();
         Item item = Constants.RANDOM.nextObject(Item.class);
         item.setOwner(owner);
-        int itemId = item.getId();
+        long itemId = item.getId();
 
         when(userRepository.existsById(ownerId))
                 .thenReturn(true);

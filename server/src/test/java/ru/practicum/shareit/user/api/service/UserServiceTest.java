@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -65,18 +65,18 @@ class UserServiceTest {
 
     @Test
     void get_ok() {
-        when(userRepository.findById(anyInt()))
+        when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(user));
 
-        userService.get(1);
+        userService.get(1L);
 
         verify(userRepository, times(1))
-                .findById(anyInt());
+                .findById(anyLong());
     }
 
     @Test
     void get_404() {
-        int userId = 1;
+        long userId = 1;
         when(userRepository.findById(userId))
                 .thenThrow(new NotFoundException(format(USER_NOT_EXISTS, userId)));
 
@@ -102,7 +102,7 @@ class UserServiceTest {
 
     @Test
     void delete() {
-        int id = user.getId();
+        long id = user.getId();
 
         when(userRepository.existsById(id)).thenReturn(true);
 
@@ -116,7 +116,7 @@ class UserServiceTest {
 
     @Test
     void delete_notExists_Throw() {
-        int id = user.getId();
+        long id = user.getId();
 
         when(userRepository.existsById(id))
                 .thenReturn(false);
@@ -134,10 +134,10 @@ class UserServiceTest {
 
     @Test
     void update_notFound_throw() {
-        int userId = user.getId();
+        long userId = user.getId();
         UserDto updateDto = UserMapper.INSTANTS.toDto(user);
 
-        when(userRepository.findById(anyInt()))
+        when(userRepository.findById(anyLong()))
                 .thenThrow(new NotFoundException(format(USER_NOT_EXISTS, userId)));
 
         NotFoundException e = assertThrows(NotFoundException.class,
@@ -147,7 +147,7 @@ class UserServiceTest {
 
     @Test
     void update() {
-        int userId = user.getId();
+        long userId = user.getId();
 
         User updateUser = RANDOM.nextObject(User.class);
         updateUser.setId(userId);
@@ -155,7 +155,7 @@ class UserServiceTest {
         updateUser.setEmail("vi@king.com");
         UserDto updateDto = UserMapper.INSTANTS.toDto(updateUser);
 
-        when(userRepository.findById(anyInt()))
+        when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(user));
 
         when(userRepository.save(any(User.class)))
@@ -169,7 +169,7 @@ class UserServiceTest {
 
     @Test
     void update_onlyName_emailNull() {
-        int userId = user.getId();
+        long userId = user.getId();
 
         User updateUser = RANDOM.nextObject(User.class);
         updateUser.setId(userId);
@@ -178,7 +178,7 @@ class UserServiceTest {
         UserDto updateDto = UserMapper.INSTANTS.toDto(updateUser);
         updateDto.setEmail(null);
 
-        when(userRepository.findById(anyInt()))
+        when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(user));
 
         when(userRepository.save(any(User.class)))
@@ -191,7 +191,7 @@ class UserServiceTest {
 
     @Test
     void update_onlyName_emailBlank() {
-        int userId = user.getId();
+        long userId = user.getId();
 
         User updateUser = RANDOM.nextObject(User.class);
         updateUser.setId(userId);
@@ -200,7 +200,7 @@ class UserServiceTest {
         UserDto updateDto = UserMapper.INSTANTS.toDto(updateUser);
         updateDto.setEmail("");
 
-        when(userRepository.findById(anyInt()))
+        when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(user));
 
         when(userRepository.save(any(User.class)))
@@ -213,7 +213,7 @@ class UserServiceTest {
 
     @Test
     void update_onlyEmail_nameNull() {
-        int userId = user.getId();
+        long userId = user.getId();
 
         User updateUser = RANDOM.nextObject(User.class);
         updateUser.setId(userId);
@@ -222,7 +222,7 @@ class UserServiceTest {
         UserDto updateDto = UserMapper.INSTANTS.toDto(updateUser);
         updateDto.setName(null);
 
-        when(userRepository.findById(anyInt()))
+        when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(user));
 
         when(userRepository.save(any(User.class)))
@@ -236,7 +236,7 @@ class UserServiceTest {
 
     @Test
     void update_onlyEmail_nameBlank() {
-        int userId = user.getId();
+        long userId = user.getId();
 
         User updateUser = RANDOM.nextObject(User.class);
         updateUser.setId(userId);
@@ -245,7 +245,7 @@ class UserServiceTest {
         UserDto updateDto = UserMapper.INSTANTS.toDto(updateUser);
         updateDto.setName("");
 
-        when(userRepository.findById(anyInt()))
+        when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(user));
 
         when(userRepository.save(any(User.class)))

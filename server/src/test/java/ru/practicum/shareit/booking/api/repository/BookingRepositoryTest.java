@@ -88,7 +88,7 @@ class BookingRepositoryTest {
         getNewBookingInFuture(item2, booker, APPROVED);
     }
 
-    private List<Integer> getItemIds() {
+    private List<Long> getItemIds() {
         User owner = getNewUser();
         Item item1 = getNewItem(owner);
         Item item2 = getNewItem(owner);
@@ -101,7 +101,7 @@ class BookingRepositoryTest {
     @Test
     @DisplayName("GET ALL LAST")
     void findByItem_IdInAndStartAfterAndStatus() {
-        List<Integer> ids = getItemIds();
+        List<Long> ids = getItemIds();
 
         assertEquals(1,
                 bookingRepository
@@ -113,7 +113,7 @@ class BookingRepositoryTest {
     @Test
     @DisplayName("GET ALL NEXT")
     void findByItem_IdInAndStartLessThanEqualAndStatus() {
-        List<Integer> ids = getItemIds();
+        List<Long> ids = getItemIds();
 
         assertEquals(2,
                 bookingRepository
@@ -125,7 +125,7 @@ class BookingRepositoryTest {
     @Test
     @DisplayName("GET LAST")
     void findFirstByItem_IdAndStartAfterAndStatus() {
-        List<Integer> ids = getItemIds();
+        List<Long> ids = getItemIds();
 
         assertFalse(bookingRepository
                 .findFirstByItem_IdAndStartAfterAndStatus(
@@ -136,7 +136,7 @@ class BookingRepositoryTest {
     @Test
     @DisplayName("GET NEXT")
     void findFirstByItem_IdAndStartLessThanEqualAndStatus() {
-        List<Integer> ids = getItemIds();
+        List<Long> ids = getItemIds();
 
         assertFalse(bookingRepository
                 .findFirstByItem_IdAndStartAfterAndStatus(

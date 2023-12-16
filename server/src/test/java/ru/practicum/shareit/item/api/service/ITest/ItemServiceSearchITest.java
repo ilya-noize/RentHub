@@ -28,7 +28,7 @@ class ItemServiceSearchITest extends InjectResources {
     void setUp() {
         for (User owner : ownerStorage.keySet()) {
 
-            int userId = userService.create(new UserSimpleDto(owner.getEmail(), owner.getName())).getId();
+            long userId = userService.create(new UserSimpleDto(owner.getEmail(), owner.getName())).getId();
 
             for (Item item : ownerStorage.get(owner)) {
 

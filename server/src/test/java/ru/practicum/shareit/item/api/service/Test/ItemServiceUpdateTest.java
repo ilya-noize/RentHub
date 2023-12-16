@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
-import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
@@ -49,11 +49,11 @@ class ItemServiceUpdateTest extends InjectResources {
     @DisplayName("Update impossible - Owner not found")
     void update_whenUserNotExists_thenReturnException() {
         User owner = random.nextObject(User.class);
-        owner.setId(10);
+        owner.setId(10L);
         Item item = random.nextObject(Item.class);
         item.setOwner(owner);
-        final int wrongUserId = random.nextInt(5);
-        final int itemId = item.getId();
+        final long wrongUserId = random.nextInt(5);
+        final long itemId = item.getId();
 
         ItemSimpleDto itemDtoRequest = ItemMapper.INSTANCE.toSimpleDto(item);
         String name = itemDtoRequest.getName();
@@ -68,9 +68,9 @@ class ItemServiceUpdateTest extends InjectResources {
                 format(USER_NOT_EXISTS, wrongUserId));
 
         verify(userRepository, times(1))
-                .existsById(anyInt());
+                .existsById(anyLong());
         verify(itemRepository, never())
-                .findById(anyInt());
+                .findById(anyLong());
 
         verify(itemRepository, never())
                 .updateNameById(name, itemId);
@@ -93,12 +93,12 @@ class ItemServiceUpdateTest extends InjectResources {
     void update_whenItemNotExists_thenReturnException() {
 
         User owner = random.nextObject(User.class);
-        owner.setId(10);
+        owner.setId(10L);
         Item item = random.nextObject(Item.class);
-        final int itemId = item.getId();
+        final long itemId = item.getId();
 
         item.setOwner(owner);
-        final int userId = random.nextInt(5);
+        final long userId = random.nextInt(5);
 
         ItemSimpleDto itemDtoRequest = ItemMapper.INSTANCE.toSimpleDto(item);
         String name = itemDtoRequest.getName();
@@ -118,9 +118,9 @@ class ItemServiceUpdateTest extends InjectResources {
                 format(ITEM_NOT_EXISTS, userId));
 
         verify(userRepository, times(1))
-                .existsById(anyInt());
+                .existsById(anyLong());
         verify(itemRepository, times(1))
-                .findById(anyInt());
+                .findById(anyLong());
 
         verify(itemRepository, never())
                 .updateNameById(name, itemId);
@@ -144,9 +144,9 @@ class ItemServiceUpdateTest extends InjectResources {
     void update() {
         // given
         User owner = random.nextObject(User.class);
-        final int userId = owner.getId();
+        final long userId = owner.getId();
         Item entity = random.nextObject(Item.class);
-        final int itemId = entity.getId();
+        final long itemId = entity.getId();
         entity.setAvailable(false);
         entity.setOwner(owner);
 
@@ -198,17 +198,17 @@ class ItemServiceUpdateTest extends InjectResources {
                 .findById(itemId);
 
         verify(itemRepository, never())
-                .updateNameById(anyString(), anyInt());
+                .updateNameById(anyString(), anyLong());
         verify(itemRepository, never())
-                .updateNameAndDescriptionById(anyString(), anyString(), anyInt());
+                .updateNameAndDescriptionById(anyString(), anyString(), anyLong());
         verify(itemRepository, never())
-                .updateNameAndAvailableById(anyString(), anyBoolean(), anyInt());
+                .updateNameAndAvailableById(anyString(), anyBoolean(), anyLong());
         verify(itemRepository, never())
-                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyInt());
+                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyLong());
         verify(itemRepository, never())
-                .updateDescriptionById(anyString(), anyInt());
+                .updateDescriptionById(anyString(), anyLong());
         verify(itemRepository, never())
-                .updateAvailableById(anyBoolean(), anyInt());
+                .updateAvailableById(anyBoolean(), anyLong());
         verify(itemRepository, times(1))
                 .save(any(Item.class));
     }
@@ -218,8 +218,8 @@ class ItemServiceUpdateTest extends InjectResources {
     void update_whenEditNameDescription_thenReturnDto() {
         // given
         Item entity = items.get(0);
-        final int userId = 1;
-        final int itemId = entity.getId();
+        final long userId = 1;
+        final long itemId = entity.getId();
 
         final String setName = "setName";
         final String setDescription = "setDescription";
@@ -248,7 +248,7 @@ class ItemServiceUpdateTest extends InjectResources {
                 .updateNameAndDescriptionById(
                         anyString(),
                         anyString(),
-                        anyInt());
+                        anyLong());
         // when
         ItemDto response = itemService.update(userId, itemId, requestDto);
         // then
@@ -262,24 +262,24 @@ class ItemServiceUpdateTest extends InjectResources {
         assertNotNull(response.getAvailable());
 
         verify(userRepository, times(1))
-                .existsById(anyInt());
+                .existsById(anyLong());
         verify(itemRepository, times(1))
-                .findById(anyInt());
+                .findById(anyLong());
         verify(itemRepository, times(1))
                 .notExistsByIdAndOwner_Id(itemId, userId);
 
         verify(itemRepository, never())
-                .updateNameById(anyString(), anyInt());
+                .updateNameById(anyString(), anyLong());
         verify(itemRepository, times(1))
-                .updateNameAndDescriptionById(anyString(), anyString(), anyInt());
+                .updateNameAndDescriptionById(anyString(), anyString(), anyLong());
         verify(itemRepository, never())
-                .updateNameAndAvailableById(anyString(), anyBoolean(), anyInt());
+                .updateNameAndAvailableById(anyString(), anyBoolean(), anyLong());
         verify(itemRepository, never())
-                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyInt());
+                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyLong());
         verify(itemRepository, never())
-                .updateDescriptionById(anyString(), anyInt());
+                .updateDescriptionById(anyString(), anyLong());
         verify(itemRepository, never())
-                .updateAvailableById(anyBoolean(), anyInt());
+                .updateAvailableById(anyBoolean(), anyLong());
         verify(itemRepository, never()).save(any(Item.class));
     }
 
@@ -287,9 +287,9 @@ class ItemServiceUpdateTest extends InjectResources {
     @DisplayName("Update Name + Available , not Description")
     void update_whenEditNameAvailable_thenReturnItemDto() {
         // given
-        Item entity = itemStorage.get(1);
-        final int userId = 1;
-        final int itemId = entity.getId();
+        Item entity = itemStorage.get(1L);
+        final long userId = 1;
+        final long itemId = entity.getId();
 
         final String setName = "setName";
         final String setDescription = "";
@@ -319,7 +319,7 @@ class ItemServiceUpdateTest extends InjectResources {
                 .updateNameAndAvailableById(
                         anyString(),
                         anyBoolean(),
-                        anyInt());
+                        anyLong());
         // when
         ItemDto response = itemService.update(userId, itemId, requestDto);
         // then
@@ -333,24 +333,24 @@ class ItemServiceUpdateTest extends InjectResources {
         assertNotNull(response.getAvailable());
 
         verify(userRepository, times(1))
-                .existsById(anyInt());
+                .existsById(anyLong());
         verify(itemRepository, times(1))
-                .findById(anyInt());
+                .findById(anyLong());
         verify(itemRepository, times(1))
                 .notExistsByIdAndOwner_Id(itemId, userId);
 
         verify(itemRepository, never())
-                .updateNameById(anyString(), anyInt());
+                .updateNameById(anyString(), anyLong());
         verify(itemRepository, never())
-                .updateNameAndDescriptionById(anyString(), anyString(), anyInt());
+                .updateNameAndDescriptionById(anyString(), anyString(), anyLong());
         verify(itemRepository, times(1))
-                .updateNameAndAvailableById(anyString(), anyBoolean(), anyInt());
+                .updateNameAndAvailableById(anyString(), anyBoolean(), anyLong());
         verify(itemRepository, never())
-                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyInt());
+                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyLong());
         verify(itemRepository, never())
-                .updateDescriptionById(anyString(), anyInt());
+                .updateDescriptionById(anyString(), anyLong());
         verify(itemRepository, never())
-                .updateAvailableById(anyBoolean(), anyInt());
+                .updateAvailableById(anyBoolean(), anyLong());
         verify(itemRepository, never()).save(any(Item.class));
     }
 
@@ -358,9 +358,9 @@ class ItemServiceUpdateTest extends InjectResources {
     @DisplayName("Update Name , not Description + Available")
     void update_whenEditName_thenReturnItemDto() {
         // given
-        Item entity = itemStorage.get(1);
-        final int userId = 1;
-        final int itemId = entity.getId();
+        Item entity = itemStorage.get(1L);
+        final long userId = 1;
+        final long itemId = entity.getId();
         final String setName = "setName";
         final String setDescription = "";
 
@@ -384,7 +384,7 @@ class ItemServiceUpdateTest extends InjectResources {
                 .when(itemRepository)
                 .updateNameById(
                         anyString(),
-                        anyInt());
+                        anyLong());
         // when
         ItemDto response = itemService.update(userId, itemId, requestDto);
         // then
@@ -399,24 +399,24 @@ class ItemServiceUpdateTest extends InjectResources {
         assertNotNull(response.getAvailable());
 
         verify(userRepository, times(1))
-                .existsById(anyInt());
+                .existsById(anyLong());
         verify(itemRepository, times(1))
-                .findById(anyInt());
+                .findById(anyLong());
         verify(itemRepository, times(1))
                 .notExistsByIdAndOwner_Id(itemId, userId);
 
         verify(itemRepository, times(1))
-                .updateNameById(anyString(), anyInt());
+                .updateNameById(anyString(), anyLong());
         verify(itemRepository, never())
-                .updateNameAndDescriptionById(anyString(), anyString(), anyInt());
+                .updateNameAndDescriptionById(anyString(), anyString(), anyLong());
         verify(itemRepository, never())
-                .updateNameAndAvailableById(anyString(), anyBoolean(), anyInt());
+                .updateNameAndAvailableById(anyString(), anyBoolean(), anyLong());
         verify(itemRepository, never())
-                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyInt());
+                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyLong());
         verify(itemRepository, never())
-                .updateDescriptionById(anyString(), anyInt());
+                .updateDescriptionById(anyString(), anyLong());
         verify(itemRepository, never())
-                .updateAvailableById(anyBoolean(), anyInt());
+                .updateAvailableById(anyBoolean(), anyLong());
         verify(itemRepository, never()).save(any(Item.class));
     }
 
@@ -424,9 +424,9 @@ class ItemServiceUpdateTest extends InjectResources {
     @DisplayName("Update Description + Available, not Name")
     void update_whenEditDescriptionAvailable_thenReturnDto() {
         // given
-        Item entity = itemStorage.get(1);
-        final int userId = 1;
-        final int itemId = entity.getId();
+        Item entity = itemStorage.get(1L);
+        final long userId = 1;
+        final long itemId = entity.getId();
 
         final String setName = "";
         final String setDescription = "setDescription";
@@ -456,7 +456,7 @@ class ItemServiceUpdateTest extends InjectResources {
                 .updateDescriptionAndAvailableById(
                         anyString(),
                         anyBoolean(),
-                        anyInt());
+                        anyLong());
         // when
         ItemDto response = itemService.update(userId, itemId, requestDto);
         // then
@@ -470,24 +470,24 @@ class ItemServiceUpdateTest extends InjectResources {
         assertNotNull(response.getAvailable());
 
         verify(userRepository, times(1))
-                .existsById(anyInt());
+                .existsById(anyLong());
         verify(itemRepository, times(1))
-                .findById(anyInt());
+                .findById(anyLong());
         verify(itemRepository, times(1))
                 .notExistsByIdAndOwner_Id(itemId, userId);
 
         verify(itemRepository, never())
-                .updateNameById(anyString(), anyInt());
+                .updateNameById(anyString(), anyLong());
         verify(itemRepository, never())
-                .updateNameAndDescriptionById(anyString(), anyString(), anyInt());
+                .updateNameAndDescriptionById(anyString(), anyString(), anyLong());
         verify(itemRepository, never())
-                .updateNameAndAvailableById(anyString(), anyBoolean(), anyInt());
+                .updateNameAndAvailableById(anyString(), anyBoolean(), anyLong());
         verify(itemRepository, times(1))
-                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyInt());
+                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyLong());
         verify(itemRepository, never())
-                .updateDescriptionById(anyString(), anyInt());
+                .updateDescriptionById(anyString(), anyLong());
         verify(itemRepository, never())
-                .updateAvailableById(anyBoolean(), anyInt());
+                .updateAvailableById(anyBoolean(), anyLong());
         verify(itemRepository, never()).save(any(Item.class));
     }
 
@@ -495,9 +495,9 @@ class ItemServiceUpdateTest extends InjectResources {
     @DisplayName("Update Description, not Name + Available")
     void update_whenEditDescription_thenReturnDto() {
         // given
-        Item entity = itemStorage.get(1);
-        final int userId = 1;
-        final int itemId = entity.getId();
+        Item entity = itemStorage.get(1L);
+        final long userId = 1;
+        final long itemId = entity.getId();
 
         final String setName = "";
         final String setDescription = "setDescription";
@@ -523,7 +523,7 @@ class ItemServiceUpdateTest extends InjectResources {
                 .when(itemRepository)
                 .updateDescriptionById(
                         anyString(),
-                        anyInt());
+                        anyLong());
         // when
         ItemDto response = itemService.update(userId, itemId, requestDto);
         // then
@@ -538,24 +538,24 @@ class ItemServiceUpdateTest extends InjectResources {
         assertNotNull(response.getAvailable());
 
         verify(userRepository, times(1))
-                .existsById(anyInt());
+                .existsById(anyLong());
         verify(itemRepository, times(1))
-                .findById(anyInt());
+                .findById(anyLong());
         verify(itemRepository, times(1))
                 .notExistsByIdAndOwner_Id(itemId, userId);
 
         verify(itemRepository, never())
-                .updateNameById(anyString(), anyInt());
+                .updateNameById(anyString(), anyLong());
         verify(itemRepository, never())
-                .updateNameAndDescriptionById(anyString(), anyString(), anyInt());
+                .updateNameAndDescriptionById(anyString(), anyString(), anyLong());
         verify(itemRepository, never())
-                .updateNameAndAvailableById(anyString(), anyBoolean(), anyInt());
+                .updateNameAndAvailableById(anyString(), anyBoolean(), anyLong());
         verify(itemRepository, never())
-                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyInt());
+                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyLong());
         verify(itemRepository, times(1))
-                .updateDescriptionById(anyString(), anyInt());
+                .updateDescriptionById(anyString(), anyLong());
         verify(itemRepository, never())
-                .updateAvailableById(anyBoolean(), anyInt());
+                .updateAvailableById(anyBoolean(), anyLong());
         verify(itemRepository, never()).save(any(Item.class));
     }
 
@@ -563,9 +563,9 @@ class ItemServiceUpdateTest extends InjectResources {
     @DisplayName("Update Available, not Name + Description")
     void update_whenEditAvailable_thenReturnDto() {
         // given
-        Item entity = itemStorage.get(1);
-        final int userId = 1;
-        final int itemId = entity.getId();
+        Item entity = itemStorage.get(1L);
+        final long userId = 1;
+        final long itemId = entity.getId();
 
         final String setName = "";
         final String setDescription = "";
@@ -592,7 +592,7 @@ class ItemServiceUpdateTest extends InjectResources {
                 .when(itemRepository)
                 .updateAvailableById(
                         anyBoolean(),
-                        anyInt());
+                        anyLong());
         // when
         ItemDto response = itemService.update(userId, itemId, requestDto);
         // then
@@ -607,24 +607,24 @@ class ItemServiceUpdateTest extends InjectResources {
         assertNotNull(response.getAvailable());
 
         verify(userRepository, times(1))
-                .existsById(anyInt());
+                .existsById(anyLong());
         verify(itemRepository, times(1))
-                .findById(anyInt());
+                .findById(anyLong());
         verify(itemRepository, times(1))
                 .notExistsByIdAndOwner_Id(itemId, userId);
 
         verify(itemRepository, never())
-                .updateNameById(anyString(), anyInt());
+                .updateNameById(anyString(), anyLong());
         verify(itemRepository, never())
-                .updateNameAndDescriptionById(anyString(), anyString(), anyInt());
+                .updateNameAndDescriptionById(anyString(), anyString(), anyLong());
         verify(itemRepository, never())
-                .updateNameAndAvailableById(anyString(), anyBoolean(), anyInt());
+                .updateNameAndAvailableById(anyString(), anyBoolean(), anyLong());
         verify(itemRepository, never())
-                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyInt());
+                .updateDescriptionAndAvailableById(anyString(), anyBoolean(), anyLong());
         verify(itemRepository, never())
-                .updateDescriptionById(anyString(), anyInt());
+                .updateDescriptionById(anyString(), anyLong());
         verify(itemRepository, times(1))
-                .updateAvailableById(anyBoolean(), anyInt());
+                .updateAvailableById(anyBoolean(), anyLong());
         verify(itemRepository, never()).save(any(Item.class));
     }
 }

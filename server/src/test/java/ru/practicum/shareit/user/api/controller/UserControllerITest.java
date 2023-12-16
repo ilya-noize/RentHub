@@ -17,7 +17,7 @@ import ru.practicum.shareit.user.api.service.UserServiceImpl;
 import java.util.List;
 
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -37,11 +37,11 @@ import static ru.practicum.shareit.constants.Constants.UPDATE_USER;
 @AutoConfigureMockMvc
 class UserControllerITest {
     private final UserSimpleDto userRequestNew = new UserSimpleDto("user@user.com", "user");
-    private final UserDto userRequestPatch = new UserDto(1, "userUpdate@user.com", "userUpdate");
-    private final UserDto userResponse = new UserDto(1, "user@user.com", "user");
+    private final UserDto userRequestPatch = new UserDto(1L, "userUpdate@user.com", "userUpdate");
+    private final UserDto userResponse = new UserDto(1L, "user@user.com", "user");
     private final List<UserDto> userResponseList = List.of(
-            new UserDto(2, "root@user.com", "root"),
-            new UserDto(3, "user@user.com", "user"));
+            new UserDto(2L, "root@user.com", "root"),
+            new UserDto(3L, "user@user.com", "user"));
     @Autowired
     private ObjectMapper mapper;
     @Autowired
@@ -71,7 +71,7 @@ class UserControllerITest {
     void update() throws Exception {
         userResponse.setEmail("userUpdate@user.com");
         userResponse.setName("userUpdate");
-        int userId = userRequestPatch.getId();
+        long userId = userRequestPatch.getId();
 
         when(userService.update(userRequestPatch))
                 .thenReturn(userResponse);
@@ -90,8 +90,8 @@ class UserControllerITest {
 
     @Test
     void get() throws Exception {
-        int userId = userRequestPatch.getId();
-        when(userService.get(1))
+        long userId = userRequestPatch.getId();
+        when(userService.get(1L))
                 .thenReturn(userResponse);
         mvc.perform(MockMvcRequestBuilders.get(GET_USER, userId))
                 .andExpect(jsonPath("$.id").value(userResponse.getId()))
@@ -116,8 +116,8 @@ class UserControllerITest {
 
     @Test
     void delete() throws Exception {
-        int userId = userRequestPatch.getId();
-        doNothing().when(userService).delete(anyInt());
+        long userId = userRequestPatch.getId();
+        doNothing().when(userService).delete(anyLong());
 
         mvc.perform(MockMvcRequestBuilders.delete(DELETE_USER, userId))
                 .andExpect(status().isOk());

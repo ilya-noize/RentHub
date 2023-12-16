@@ -53,7 +53,7 @@ class ItemMapperTest {
     void toEntity() {
         ItemSimpleDto dto = RANDOM.nextObject(ItemSimpleDto.class);
 
-        Item result = itemMapper.toEntity(dto, 1);
+        Item result = itemMapper.toEntity(dto, 1L);
 
         assertEquals(dto.getName(), result.getName());
         assertEquals(dto.getDescription(), result.getDescription());
@@ -62,7 +62,7 @@ class ItemMapperTest {
 
     @Test
     void toEntity_null() {
-        Item result = itemMapper.toEntity(null, 1);
+        Item result = itemMapper.toEntity(null, 1L);
 
         assertNull(result.getId());
         assertNull(result.getName());

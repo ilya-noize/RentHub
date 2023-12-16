@@ -26,7 +26,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * @return Bookings
      */
     List<Booking> findByItem_IdInAndStartAfterAndStatus(
-            List<Integer> ids,
+            List<Long> ids,
             LocalDateTime start,
             BookingStatus status,
             Sort sort);
@@ -41,7 +41,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * @return Bookings
      */
     List<Booking> findByItem_IdInAndStartLessThanEqualAndStatus(
-            List<Integer> ids,
+            List<Long> ids,
             LocalDateTime start,
             BookingStatus status,
             Sort sort);
@@ -56,7 +56,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * @return Bookings
      */
     Optional<Booking> findFirstByItem_IdAndStartAfterAndStatus(
-            Integer itemId,
+            Long itemId,
             LocalDateTime now,
             BookingStatus approved,
             Sort sortStartAsc);
@@ -71,7 +71,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * @return Bookings
      */
     Optional<Booking> findFirstByItem_IdAndStartLessThanEqualAndStatus(
-            Integer itemId,
+            Long itemId,
             LocalDateTime now,
             BookingStatus approved,
             Sort sortStartDesc);
@@ -84,7 +84,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * @return Bookings
      */
     @Query("select b from Booking b where b.item.owner.id = ?1 order by b.start DESC")
-    List<Booking> findAllByItem_Owner_IdOrderByStartDesc(Integer id,
+    List<Booking> findAllByItem_Owner_IdOrderByStartDesc(Long id,
                                                          Pageable pageable);
 
     /**
@@ -95,7 +95,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * @return Bookings
      */
     @Query("select b from Booking b where b.booker.id = ?1 order by b.start DESC")
-    List<Booking> findAllByBooker_IdOrderByStartDesc(Integer id,
+    List<Booking> findAllByBooker_IdOrderByStartDesc(Long id,
                                                      Pageable pageable);
 
     /**
@@ -108,7 +108,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      */
     @Query("select b from Booking b where b.item.owner.id = ?1 and b.status = ?2 order by b.start DESC")
     List<Booking> findAllByItem_Owner_IdAndStatusOrderByStartDesc(
-            Integer id,
+            Long id,
             BookingStatus status,
             Pageable pageable);
 
@@ -122,7 +122,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      */
     @Query("select b from Booking b where b.booker.id = ?1 and b.status = ?2 order by b.start DESC")
     List<Booking> findAllByBooker_IdAndStatusOrderByStartDesc(
-            Integer id,
+            Long id,
             BookingStatus status,
             Pageable pageable);
 
@@ -136,7 +136,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      */
     @Query("select b from Booking b where b.item.owner.id = ?1 and b.end < ?2 order by b.start DESC")
     List<Booking> findAllByItem_Owner_IdAndEndBeforeOrderByStartDesc(
-            Integer ownerId,
+            Long ownerId,
             LocalDateTime end,
             Pageable pageable);
 
@@ -150,7 +150,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      */
     @Query("select b from Booking b where b.booker.id = ?1 and b.end < ?2 order by b.start DESC")
     List<Booking> findAllByBooker_IdAndEndBeforeOrderByStartDesc(
-            Integer bookerId,
+            Long bookerId,
             LocalDateTime now,
             Pageable pageable);
 
@@ -164,7 +164,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      */
     @Query("select b from Booking b where b.booker.id = ?1 and b.start > ?2 order by b.start DESC")
     List<Booking> findAllByBooker_IdAndStartAfterOrderByStartDesc(
-            Integer id,
+            Long id,
             LocalDateTime start,
             Pageable pageable);
 
@@ -178,7 +178,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      */
     @Query("select b from Booking b where b.item.owner.id = ?1 and b.start > ?2 order by b.start DESC")
     List<Booking> findAllByItem_Owner_IdAndStartAfterOrderByStartDesc(
-            Integer id,
+            Long id,
             LocalDateTime start,
             Pageable pageable);
 
@@ -193,7 +193,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      */
     @Query("select b from Booking b where b.booker.id = ?1 and b.start < ?2 and b.end > ?3 order by b.start DESC")
     List<Booking> findAllByBooker_IdAndStartBeforeAndEndAfterOrderByStartDesc(
-            Integer bookerId,
+            Long bookerId,
             LocalDateTime start,
             LocalDateTime end,
             Pageable pageable);
@@ -209,7 +209,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      */
     @Query("select b from Booking b where b.item.owner.id = ?1 and b.start < ?2 and b.end > ?3")
     List<Booking> findAllByItem_Owner_IdAndStartBeforeAndEndAfterByStartDesc(
-            Integer ownerId,
+            Long ownerId,
             LocalDateTime start,
             LocalDateTime end,
             Pageable pageable);
@@ -239,8 +239,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("select (count(b) > 0) from Booking b " +
             "where b.item.id = :itemId and b.booker.id = :bookerId and b.status = :status and b.end <= :end")
     boolean existsCompletedBookingByTheUserOfTheItem(
-            @Param("itemId") int itemId,
-            @Param("bookerId") Integer bookerId,
+            @Param("itemId") Long itemId,
+            @Param("bookerId") Long bookerId,
             @Param("status") BookingStatus status,
             @Param("end") LocalDateTime end);
 }

@@ -39,10 +39,10 @@ public class UserServiceImpl implements UserService {
      *
      * @param id User ID
      * @return User
-     * @see #isExist(Integer)
+     * @see #isExist(Long)
      */
     @Override
-    public UserDto get(Integer id) {
+    public UserDto get(Long id) {
         log.debug("[i] get User by ID:{}", id);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(
@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserDto update(UserDto userDto) {
-        int userId = userDto.getId();
+        Long userId = userDto.getId();
         log.debug("[i] update User:{} by ID:{}", userDto, userId);
         User userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(
@@ -97,13 +97,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(Long id) {
         log.debug("[i] delete User by ID:{}", id);
         isExist(id);
         userRepository.deleteById(id);
     }
 
-    private void isExist(Integer id) {
+    private void isExist(Long id) {
         log.debug("[i] is exist User by ID:{}", id);
         if (!userRepository.existsById(id)) {
             throw new NotFoundException(

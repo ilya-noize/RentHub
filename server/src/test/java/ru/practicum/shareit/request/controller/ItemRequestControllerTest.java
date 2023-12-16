@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,11 +47,11 @@ class ItemRequestControllerTest {
     private final ItemRequestSimpleDto requestSimpleDto = ItemRequestSimpleDto.builder()
             .description("Description").build();
     private final ItemRequestDto requestDto = ItemRequestDto.builder()
-            .id(1)
+            .id(1L)
             .description("Description")
             .created(null)
             .items(List.of()).build();
-    private final int requesterId = 1;
+    private final long requesterId = 1;
     @MockBean
     private ItemRequestService itemRequestService;
     @Autowired
@@ -88,7 +88,7 @@ class ItemRequestControllerTest {
                 ItemRequestMapper.INSTANCE.toDto(itemRequest));
         itemRequests.get(0).setItems(null);
 
-        when(itemRequestService.getByRequesterId(anyInt()))
+        when(itemRequestService.getByRequesterId(anyLong()))
                 .thenReturn(itemRequests);
 
         itemRequestService.getByRequesterId(requesterId);
@@ -103,15 +103,15 @@ class ItemRequestControllerTest {
                 .andExpect(jsonPath("$[0].id").value(itemRequests.get(0).getId()))
                 .andExpect(jsonPath("$[0].description").value(itemRequests.get(0).getDescription()));
 
-        verify(itemRequestService, times(2)).getByRequesterId(anyInt());
+        verify(itemRequestService, times(2)).getByRequesterId(anyLong());
     }
 
     @Test
     @DisplayName("GET_ALL_REQUESTS:" + GET_ALL_REQUESTS)
     void getAll() throws Exception {
         requestDto.setItems(null);
-        requestDto.setId(1);
-        when(itemRequestService.getAll(1, pageable))
+        requestDto.setId(1L);
+        when(itemRequestService.getAll(1L, pageable))
                 .thenReturn(List.of(requestDto));
 
         RequestBuilder requestBuilder = get(GET_ALL_REQUESTS)
@@ -127,14 +127,14 @@ class ItemRequestControllerTest {
                         .value(requestDto.getDescription()));
 
 
-        verify(itemRequestService).getAll(1, pageable);
+        verify(itemRequestService).getAll(1L, pageable);
     }
 
     @Test
     @DisplayName("GET_REQUEST:" + GET_REQUEST)
     void getRequest() throws Exception {
-        int requestId = 1;
-        when(itemRequestService.get(anyInt(), anyInt())).thenReturn(requestDto);
+        long requestId = 1;
+        when(itemRequestService.get(anyLong(), anyLong())).thenReturn(requestDto);
 
         RequestBuilder requestBuilder = get(GET_REQUEST, requestId)
                 .header(HEADER_USER_ID, requesterId)
@@ -148,6 +148,6 @@ class ItemRequestControllerTest {
                 .andExpect(jsonPath("$.description")
                         .value(requestDto.getDescription()));
 
-        verify(itemRequestService).get(anyInt(), anyInt());
+        verify(itemRequestService).get(anyLong(), anyLong());
     }
 }

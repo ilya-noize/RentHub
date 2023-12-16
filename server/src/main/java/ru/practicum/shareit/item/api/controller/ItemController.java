@@ -36,7 +36,7 @@ public class ItemController {
 
     @PostMapping(CREATE_ITEM)
     public ItemDto create(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @RequestBody ItemSimpleDto itemDto) {
 
         return service.create(userId, itemDto);
@@ -44,8 +44,8 @@ public class ItemController {
 
     @PatchMapping(UPDATE_ITEM)
     public ItemDto update(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
-            @PathVariable(name = "id") Integer itemId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
+            @PathVariable(name = "id") Long itemId,
             @RequestBody ItemSimpleDto itemDto) {
 
         return service.update(userId, itemId, itemDto);
@@ -53,8 +53,8 @@ public class ItemController {
 
     @GetMapping(GET_ITEM)
     public ItemDto get(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
-            @PathVariable(name = "id") Integer itemId) {
+            @RequestHeader(HEADER_USER_ID) Long userId,
+            @PathVariable(name = "id") Long itemId) {
 
         return service.get(userId, itemId);
     }
@@ -72,7 +72,7 @@ public class ItemController {
 
     @GetMapping(GET_ALL_ITEMS)
     public List<ItemDto> getAll(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @RequestParam(required = false, defaultValue = FROM)
             Integer from,
 
@@ -84,8 +84,8 @@ public class ItemController {
 
     @PostMapping(CREATE_COMMENT)
     public CommentDto createComment(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
-            @PathVariable(name = "id") Integer itemId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
+            @PathVariable(name = "id") Long itemId,
             @RequestBody CommentSimpleDto commentSimpleDto) {
         commentSimpleDto.setItemId(itemId);
         commentSimpleDto.setAuthorId(userId);

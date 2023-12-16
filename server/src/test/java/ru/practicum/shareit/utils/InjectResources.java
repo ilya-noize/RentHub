@@ -37,8 +37,8 @@ public class InjectResources {
     protected final LocalDateTime now = LocalDateTime
             // created at 2000 Jan, 1, PM12:00:00.0000
             .of(2000, 1, 1, 12, 0, 0, 0);
-    public Map<Integer, User> userStorage;
-    public Map<Integer, Item> itemStorage;
+    public Map<Long, User> userStorage;
+    public Map<Long, Item> itemStorage;
     public Map<User, List<Item>> ownerStorage;
     protected List<Item> items = ResourcePool.readResource(ResourcePool.CREATE_ITEM_ENTITIES, new TypeReference<>() {
     });
@@ -60,7 +60,7 @@ public class InjectResources {
         }
 
         items.forEach(item -> {
-            int itemId = item.getId();
+            Long itemId = item.getId();
             if (itemId % 3 == 1) {
                 item.setOwner(users.get(0));
             } else if (itemId % 3 == 2) {

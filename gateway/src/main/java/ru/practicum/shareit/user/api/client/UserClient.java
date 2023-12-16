@@ -26,23 +26,23 @@ public class UserClient extends BaseClient {
                 .build());
     }
 
-    public ResponseEntity<Object> getAll() {
-        return get("");
-    }
-
-    public ResponseEntity<Object> getById(Integer userId) {
-        return get("/" + userId);
-    }
-
     public ResponseEntity<Object> create(@Valid UserSimpleDto userDto) {
         return post("", userDto);
     }
 
-    public ResponseEntity<Object> update(Integer userId, UserDto userDto) {
+    public ResponseEntity<Object> update(long userId, UserDto userDto) {
         return patch("/" + userId, userDto);
     }
 
-    public void delete(Integer userId) {
+    public ResponseEntity<Object> getById(long userId) {
+        return get("/" + userId);
+    }
+
+    public ResponseEntity<Object> getAll() {
+        return get("");
+    }
+
+    public void delete(long userId) {
         delete("/" + userId);
     }
 }

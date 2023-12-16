@@ -10,13 +10,13 @@ import java.util.List;
 
 public interface BookingService {
 
-    BookingDto create(Integer bookerId, BookingSimpleDto dto);
+    BookingDto create(Long bookerId, BookingSimpleDto dto);
 
-    BookingDto update(Integer ownerId, Long bookingId, Boolean approved);
+    BookingDto update(Long ownerId, Long bookingId, Boolean approved);
 
-    BookingDto get(Integer userId, Long bookingId);
+    BookingDto get(Long userId, Long bookingId);
 
-    List<BookingDto> getAllByUser(Integer bookerId, BookingState state, LocalDateTime now, Pageable pageable);
+    List<BookingDto> getAllByUser(Long bookerId, BookingState state, LocalDateTime now, Pageable pageable);
 
-    List<BookingDto> getAllByOwner(Integer ownerId, BookingState state, LocalDateTime now, Pageable pageable);
+    List<BookingDto> getAllByOwner(Long ownerId, BookingState state, LocalDateTime now, Pageable pageable);
 }

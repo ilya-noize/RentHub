@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemRequestDto {
-    private Integer id;
+    private Long id;
     private String description;
     private LocalDateTime created;
     private List<ItemDto> items;

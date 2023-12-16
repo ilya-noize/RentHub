@@ -42,7 +42,7 @@ public class BookingController {
      */
     @PostMapping(CREATE_BOOKING)
     public BookingDto create(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @RequestBody BookingSimpleDto dto) {
         log.debug("Point: [{}]\nIncoming: Dto:{} UserId:{}", CREATE_BOOKING, dto, userId);
 
@@ -60,7 +60,7 @@ public class BookingController {
      */
     @PatchMapping(UPDATE_STATUS_BOOKING)
     public BookingDto update(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable Long id,
             @RequestParam Boolean approved) {
         log.debug("[i] UPDATE_STATUS_BOOKING\n USER_ID:{}, BOOKING_ID:{}, APPROVED:{}",
@@ -79,7 +79,7 @@ public class BookingController {
      */
     @GetMapping(GET_BOOKING)
     public BookingDto get(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable Long id) {
         log.debug("[i] GET_BOOKING\n USER_ID:{}, BOOKING_ID:{}",
                 userId, id);
@@ -96,7 +96,7 @@ public class BookingController {
      */
     @GetMapping(GET_ALL_BOOKINGS_FOR_USER)
     public List<BookingDto> getAllByUser(
-            @RequestHeader(HEADER_USER_ID) Integer bookerId,
+            @RequestHeader(HEADER_USER_ID) Long bookerId,
             @RequestParam(defaultValue = "ALL") BookingState state,
             @RequestParam(required = false, defaultValue = FROM) Integer from,
             @RequestParam(required = false, defaultValue = SIZE) Integer size) {
@@ -119,7 +119,7 @@ public class BookingController {
      */
     @GetMapping(GET_ALL_BOOKINGS_FOR_OWNER)
     public List<BookingDto> getAllByOwner(
-            @RequestHeader(HEADER_USER_ID) Integer ownerId,
+            @RequestHeader(HEADER_USER_ID) Long ownerId,
             @RequestParam(defaultValue = "ALL") BookingState state,
             @RequestParam(required = false, defaultValue = FROM) Integer from,
             @RequestParam(required = false, defaultValue = SIZE) Integer size) {

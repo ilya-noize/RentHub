@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @ToString
 public class CommentSimpleDto {
     private String text;
-    private Integer itemId;
-    private Integer authorId;
+    private Long itemId;
+    private Long authorId;
     private LocalDateTime created;
 }

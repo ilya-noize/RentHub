@@ -75,7 +75,7 @@ class ItemServiceTest {
     @DisplayName("POST create<Item> - Then User not exists - Exception: " + USER_NOT_EXISTS)
     void create_whenUserIdNotExist_thenReturnException() {
         //given
-        Integer userId = 100;
+        long userId = 100;
         ItemSimpleDto dto = RANDOM.nextObject(ItemSimpleDto.class);
         //when
         NotFoundException e = assertThrows(

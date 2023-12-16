@@ -28,7 +28,7 @@ public final class BookingDto {
     @NoArgsConstructor
     public static
     class ItemDto {
-        private Integer id;
+        private Long id;
         private String name;
     }
 
@@ -37,6 +37,6 @@ public final class BookingDto {
     @NoArgsConstructor
     public static
     class BookerDto {
-        private Integer id;
+        private Long id;
     }
 }

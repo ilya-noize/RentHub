@@ -42,18 +42,18 @@ import static ru.practicum.shareit.constants.Constants.UPDATE_ITEM;
 @AutoConfigureMockMvc
 class ItemControllerTest {
     private final ItemSimpleDto itemRequest = ItemSimpleDto.builder()
-            .id(1)
+            .id(1L)
             .name("Item")
             .description("Description")
             .available(true)
             .requestId(null).build();
     private final ItemSimpleDto itemRequestPatch = ItemSimpleDto.builder()
-            .id(1)
+            .id(1L)
             .name("ItemUpdate")
             .description("DescriptionUpdate")
             .available(false).build();
     private final ItemDto itemResponse = ItemDto.builder()
-            .id(1)
+            .id(1L)
             .name("Item")
             .description("Description")
             .available(true)
@@ -61,15 +61,15 @@ class ItemControllerTest {
             .nextBooking(null)
             .comments(List.of()).build();
 
-    // created at 2000 year Jan, 1, PM12:00:00.000
+    // created at 2000 year Jan, 1L, PM12:00:00.000
     private final LocalDateTime now = LocalDateTime.of(2000, 1, 1, 12, 0, 0, 0);
     private final CommentSimpleDto commentRequest = CommentSimpleDto.builder()
-            .itemId(1)
-            .authorId(1)
+            .itemId(1L)
+            .authorId(1L)
             .text("Comment")
             .created(now).build();
     private final CommentDto commentResponse =
-            new CommentDto(1, "Comment", "user", now);
+            new CommentDto(1L, "Comment", "user", now);
 
     @Autowired
     private ObjectMapper mapper;
@@ -81,7 +81,7 @@ class ItemControllerTest {
     @Test
     @DisplayName("POST " + CREATE_ITEM + " when right Dto - return 200")
     void create_whenCreateItem_returnDto() throws Exception {
-        when(itemService.create(1, itemRequest))
+        when(itemService.create(1L, itemRequest))
                 .thenReturn(itemResponse);
 
         RequestBuilder requestBuilder = post(CREATE_ITEM)
@@ -102,13 +102,13 @@ class ItemControllerTest {
                 .andExpect(status().isOk());
 
         verify(itemService, times(1))
-                .create(1, itemRequest);
+                .create(1L, itemRequest);
     }
 
     @Test
     @DisplayName("POST " + CREATE_ITEM + " when wrong Dto - return 400")
     void create_whenNullDto_return400() throws Exception {
-        when(itemService.create(1, null))
+        when(itemService.create(1L, null))
                 .thenThrow(NullPointerException.class);
 
         RequestBuilder requestBuilder = post(CREATE_ITEM)
@@ -124,8 +124,8 @@ class ItemControllerTest {
     @Test
     @DisplayName("POST " + CREATE_ITEM + " when not exists User/Item/ItemRequest - return 400")
     void create_whenNotFoundUser_Item_Request_return404() throws Exception {
-        itemRequest.setRequestId(1);
-        when(itemService.create(1, itemRequest))
+        itemRequest.setRequestId(1L);
+        when(itemService.create(1L, itemRequest))
                 .thenThrow(NotFoundException.class);
 
         RequestBuilder requestBuilder = post(CREATE_ITEM)
@@ -141,7 +141,7 @@ class ItemControllerTest {
     @Test
     @DisplayName("POST " + CREATE_ITEM + " when no " + HEADER_USER_ID + " - return 400")
     void create_whenNoUserIdInHandler_return400() throws Exception {
-        when(itemService.create(1, itemRequest))
+        when(itemService.create(1L, itemRequest))
                 .thenThrow(NotFoundException.class);
 
         RequestBuilder requestBuilder = post(CREATE_ITEM)
@@ -156,7 +156,7 @@ class ItemControllerTest {
     @Test
     @DisplayName("POST " + CREATE_ITEM + " when OK return DTO")
     void create_whenWrongUserId_return404() throws Exception {
-        int wrongUserId = 9999;
+        Long wrongUserId = 9999L;
         when(itemService.create(wrongUserId, itemRequest))
                 .thenThrow(NotFoundException.class);
 
@@ -177,7 +177,7 @@ class ItemControllerTest {
         itemResponse.setDescription("DescriptionUpdate");
         itemResponse.setAvailable(false);
 
-        when(itemService.update(1, 1, itemRequestPatch))
+        when(itemService.update(1L, 1L, itemRequestPatch))
                 .thenReturn(itemResponse);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -199,13 +199,13 @@ class ItemControllerTest {
                 .andExpect(status().isOk());
 
         verify(itemService, times(1))
-                .update(1, 1, itemRequestPatch);
+                .update(1L, 1L, itemRequestPatch);
     }
 
     @Test
     @DisplayName("GET " + GET_ITEM + " when OK return DTO")
     void get_whenUserIdAndItemIdExists_thenReturnDto() throws Exception {
-        when(itemService.get(1, 1))
+        when(itemService.get(1L, 1L))
                 .thenReturn(itemResponse);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders

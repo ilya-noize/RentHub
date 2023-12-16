@@ -27,5 +27,5 @@ public final class BookingSimpleDto {
     private LocalDateTime end;
 
     @NotNull
-    private Integer itemId;
+    private Long itemId;
 }

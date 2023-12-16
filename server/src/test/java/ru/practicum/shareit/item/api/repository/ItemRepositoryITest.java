@@ -39,12 +39,12 @@ public class ItemRepositoryITest {
         List<Item> items = RANDOM.objects(Item.class, 9).collect(toList());
 
         for (int i = 1; i <= items.size(); i++) {
-            items.get(i - 1).setId(i);
-            items.get(i - 1).setRequest(null);
+            items.get((i - 1)).setId((long) i);
+            items.get((i - 1)).setRequest(null);
         }
 
         items.forEach(item -> {
-            int itemId = item.getId();
+            long itemId = item.getId();
             if (itemId % 3 == 1) {
                 item.setOwner(users.get(0));
             } else if (itemId % 3 == 2) {
@@ -103,7 +103,7 @@ public class ItemRepositoryITest {
         //given
         List<User> users = getListUsers();
         getListItems(users);
-        int ownerId = users.get(0).getId();
+        long ownerId = users.get(0).getId();
 
         //then
         List<Item> itemsByOwner = itemRepository.findAllByOwner_Id(ownerId, pageable);
@@ -117,8 +117,8 @@ public class ItemRepositoryITest {
         // given
         List<User> users = getListUsers();
         List<Item> items = getListItems(users);
-        int ownerId = users.get(0).getId();
-        int itemId = items.get(0).getId();
+        long ownerId = users.get(0).getId();
+        long itemId = items.get(0).getId();
 
         List<Item> itemsBefore = itemRepository.findAllByOwner_Id(ownerId, pageable);
         assertEquals(3, itemsBefore.size());
@@ -136,7 +136,7 @@ public class ItemRepositoryITest {
         //given
         List<User> users = getListUsers();
         List<Item> items = getListItems(users);
-        int itemId = items.get(0).getId();
+        long itemId = items.get(0).getId();
 
         String name = "Шуруповёрт сетевой";
         String description = "Кейс в комплекте.";
@@ -155,7 +155,7 @@ public class ItemRepositoryITest {
         //given
         User owner = getNewUser();
         Item item = getNewItem(owner);
-        int itemId = item.getId();
+        long itemId = item.getId();
 
         String name = "Шуруповёрт сетевой";
         boolean available = false;
@@ -174,7 +174,7 @@ public class ItemRepositoryITest {
         //given
         List<User> users = getListUsers();
         List<Item> items = getListItems(users);
-        int itemId = items.get(0).getId();
+        long itemId = items.get(0).getId();
 
         String description = "Кейс в комплекте.";
         boolean available = false;
@@ -193,7 +193,7 @@ public class ItemRepositoryITest {
         //given
         List<User> users = getListUsers();
         List<Item> items = getListItems(users);
-        int itemId = items.get(0).getId();
+        long itemId = items.get(0).getId();
 
         String name = "Шуруповёрт сетевой";
 
@@ -210,7 +210,7 @@ public class ItemRepositoryITest {
         //given
         List<User> users = getListUsers();
         List<Item> items = getListItems(users);
-        int itemId = items.get(0).getId();
+        long itemId = items.get(0).getId();
 
         String description = "Кейс в комплекте.";
 
@@ -227,7 +227,7 @@ public class ItemRepositoryITest {
         //given
         List<User> users = getListUsers();
         List<Item> items = getListItems(users);
-        int itemId = items.get(0).getId();
+        long itemId = items.get(0).getId();
 
         boolean available = false;
 

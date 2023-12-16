@@ -26,7 +26,7 @@ class BookingMapperTest {
 
         assertNull(BookingMapper.INSTANCE.toEntity(null, null));
 
-        Booking bookingNull = BookingMapper.INSTANCE.toEntity(null, 1);
+        Booking bookingNull = BookingMapper.INSTANCE.toEntity(null, 1L);
         Booking expectedNull = Booking.builder()
                 .id(null)
                 .start(null)
@@ -50,11 +50,11 @@ class BookingMapperTest {
     @Test
     void toDto() {
         User booker = RANDOM.nextObject(User.class);
-        booker.setId(1);
+        booker.setId(1L);
         User owner = RANDOM.nextObject(User.class);
-        owner.setId(2);
+        owner.setId(2L);
         Item item = RANDOM.nextObject(Item.class);
-        item.setId(1);
+        item.setId(1L);
         item.setOwner(owner);
         item.setAvailable(true);
         item.setRequest(null);
@@ -80,11 +80,11 @@ class BookingMapperTest {
     @Test
     void toItemDto() {
         User booker = RANDOM.nextObject(User.class);
-        booker.setId(1);
+        booker.setId(1L);
         User owner = RANDOM.nextObject(User.class);
-        owner.setId(2);
+        owner.setId(2L);
         Item item = RANDOM.nextObject(Item.class);
-        item.setId(1);
+        item.setId(1L);
         item.setOwner(owner);
         item.setAvailable(true);
         item.setRequest(null);
