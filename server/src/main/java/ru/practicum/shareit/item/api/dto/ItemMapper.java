@@ -24,5 +24,5 @@ public interface ItemMapper {
 
     @Mapping(target = "request", ignore = true)
     @Mapping(target = "owner.id", source = "userId")
-    Item toEntity(ItemSimpleDto itemDto, Integer userId);
+    Item toEntity(ItemSimpleDto itemDto, Long userId);
 }

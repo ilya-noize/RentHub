@@ -13,7 +13,7 @@ public interface BookingMapper {
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "item.id", source = "dto.itemId")
     @Mapping(target = "booker.id", source = "bookerId")
-    Booking toEntity(BookingSimpleDto dto, Integer bookerId);
+    Booking toEntity(BookingSimpleDto dto, Long bookerId);
 
     BookingDto toDto(Booking entity);
 

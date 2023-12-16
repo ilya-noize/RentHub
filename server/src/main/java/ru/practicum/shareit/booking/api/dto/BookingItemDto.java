@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @JsonPropertyOrder({"id", "bookerId"})
 public class BookingItemDto {
     private Long id;
-    private Integer itemId;
-    private Integer bookerId;
+    private Long itemId;
+    private Long bookerId;
     private LocalDateTime start;
     private LocalDateTime end;
 }

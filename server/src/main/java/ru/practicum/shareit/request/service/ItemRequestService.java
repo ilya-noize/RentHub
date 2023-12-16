@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ItemRequestService {
-    ItemRequestDto create(Integer userId, ItemRequestSimpleDto itemRequestSimpleDto, LocalDateTime now);
+    ItemRequestDto create(Long userId, ItemRequestSimpleDto itemRequestSimpleDto, LocalDateTime now);
 
-    ItemRequestDto get(Integer userId, Integer itemRequestId);
+    ItemRequestDto get(Long userId, Long itemRequestId);
 
-    List<ItemRequestDto> getAll(Integer userId, Pageable pageable);
+    List<ItemRequestDto> getAll(Long userId, Pageable pageable);
 
-    List<ItemRequestDto> getByRequesterId(Integer requester);
+    List<ItemRequestDto> getByRequesterId(Long requester);
 }

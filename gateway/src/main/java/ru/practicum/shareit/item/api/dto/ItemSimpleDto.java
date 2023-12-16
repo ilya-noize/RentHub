@@ -27,7 +27,7 @@ import javax.validation.constraints.Size;
 @Builder
 public class ItemSimpleDto {
     @PositiveOrZero
-    private Integer id;
+    private Long id;
 
     @NotBlank(groups = {Create.class})
     @Size(max = 255, groups = {Create.class, Update.class})
@@ -40,5 +40,5 @@ public class ItemSimpleDto {
     @NotNull(groups = {Create.class})
     private Boolean available;
 
-    private Integer requestId;
+    private Long requestId;
 }

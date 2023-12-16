@@ -22,7 +22,7 @@ public class CommentSimpleDto {
     @NotBlank(groups = {Create.class})
     @Size(max = 2048, groups = {Create.class})
     private String text;
-    private Integer itemId;
-    private Integer authorId;
+    private Long itemId;
+    private Long authorId;
     private LocalDateTime created;
 }

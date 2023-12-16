@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class UserDto {
     @PositiveOrZero
-    private Integer id;
+    private Long id;
 
     @Email(groups = {Update.class})
     @Size(max = 255, groups = {Update.class})

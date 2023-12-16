@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.booking.api.client.BookingClient;
@@ -31,6 +32,7 @@ import static ru.practicum.shareit.constants.Constants.SIZE;
 import static ru.practicum.shareit.constants.Constants.UPDATE_STATUS_BOOKING;
 
 @RestController
+@RequestMapping("/bookings")
 @RequiredArgsConstructor
 @Validated
 @Slf4j
@@ -39,7 +41,7 @@ public class BookingController {
 
     @PostMapping(CREATE_BOOKING)
     public ResponseEntity<Object> create(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @Valid @RequestBody BookingSimpleDto bookingSimpleDto) {
 
         return bookingClient.create(userId, bookingSimpleDto);
@@ -47,7 +49,7 @@ public class BookingController {
 
     @PatchMapping(UPDATE_STATUS_BOOKING)
     public ResponseEntity<Object> update(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable Long bookingId,
             @RequestParam boolean approved) {
 
@@ -56,7 +58,7 @@ public class BookingController {
 
     @GetMapping(GET_BOOKING)
     public ResponseEntity<Object> get(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable Long id) {
 
         return bookingClient.getById(userId, id);
@@ -64,7 +66,7 @@ public class BookingController {
 
     @GetMapping(GET_ALL_BOOKINGS_FOR_USER)
     public ResponseEntity<Object> getAllByUser(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @RequestParam(required = false, defaultValue = "ALL") String stateIn,
             @RequestParam(required = false, defaultValue = FROM)
             @PositiveOrZero Integer from,
@@ -78,7 +80,7 @@ public class BookingController {
 
     @GetMapping(GET_ALL_BOOKINGS_FOR_OWNER)
     public ResponseEntity<Object> getAllByOwner(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @RequestParam(required = false, defaultValue = "ALL") BookingState state,
             @RequestParam(required = false, defaultValue = FROM)
             @PositiveOrZero Integer from,

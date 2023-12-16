@@ -67,12 +67,12 @@ public class ItemServiceImpl implements ItemService {
      * @return Созданный объект, после всех проверок условий
      */
     @Override
-    public ItemDto create(Integer userId, ItemSimpleDto itemDto) {
+    public ItemDto create(Long userId, ItemSimpleDto itemDto) {
         log.debug("[i] CREATE ITEM:{} by User.id:{}", itemDto, userId);
         checkingExistUserById(userId);
 
         Item item = ItemMapper.INSTANCE.toEntity(itemDto, userId);
-        Integer requestId = itemDto.getRequestId();
+        Long requestId = itemDto.getRequestId();
         if (requestId != null) {
             ItemRequest itemRequest = itemRequestRepository.findById(requestId)
                     .orElseThrow(() ->
@@ -104,7 +104,7 @@ public class ItemServiceImpl implements ItemService {
      * @return itemDTO
      */
     @Override
-    public ItemDto update(Integer ownerId, Integer itemId, ItemSimpleDto itemDto) {
+    public ItemDto update(Long ownerId, Long itemId, ItemSimpleDto itemDto) {
         log.debug("[i] UPDATE ITEM");
         String name = itemDto.getName();
         String description = itemDto.getDescription();
@@ -146,7 +146,7 @@ public class ItemServiceImpl implements ItemService {
      * @return Item with/without Booking
      */
     @Override
-    public ItemDto get(Integer userId, Integer itemId) {
+    public ItemDto get(Long userId, Long itemId) {
 
         checkingExistUserById(userId);
         LocalDateTime now = LocalDateTime.now();
@@ -196,18 +196,18 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ItemDto> getAll(Integer userId, Pageable pageable, LocalDateTime now) {
+    public List<ItemDto> getAll(Long userId, Pageable pageable, LocalDateTime now) {
         checkingExistUserById(userId);
         List<ItemDto> itemsDto = itemRepository.findAllByOwner_Id(userId, pageable)
                 .stream()
                 .map(ItemMapper.INSTANCE::toDto)
                 .collect(Collectors.toList());
 
-        List<Integer> itemIds = itemsDto.stream()
+        List<Long> itemIds = itemsDto.stream()
                 .map(ItemDto::getId)
                 .collect(toList());
 
-        Map<Integer, BookingItemDto> lastBookingStorage = bookingRepository
+        Map<Long, BookingItemDto> lastBookingStorage = bookingRepository
                 .findByItem_IdInAndStartLessThanEqualAndStatus(
                         itemIds, now, APPROVED, sortStartDesc)
                 .stream()
@@ -216,7 +216,7 @@ public class ItemServiceImpl implements ItemService {
                         Function.identity(),
                         (first, second) -> first));
 
-        Map<Integer, BookingItemDto> nextBookingStorage = bookingRepository
+        Map<Long, BookingItemDto> nextBookingStorage = bookingRepository
                 .findByItem_IdInAndStartAfterAndStatus(
                         itemIds, now, APPROVED, sortStartAsc)
                 .stream()
@@ -225,14 +225,14 @@ public class ItemServiceImpl implements ItemService {
                         Function.identity(),
                         (first, second) -> first));
 
-        Map<Integer, List<CommentEntity>> commentStorage = commentRepository
+        Map<Long, List<CommentEntity>> commentStorage = commentRepository
                 .findByItem_IdInOrderByCreatedDesc(itemIds)
                 .stream()
                 .filter(Objects::nonNull)
                 .collect(groupingBy((comment) -> comment.getItem().getId(), toList()));
 
         itemsDto.forEach(itemDto -> {
-            Integer itemId = itemDto.getId();
+            Long itemId = itemDto.getId();
             itemDto.setLastBooking(lastBookingStorage.get(itemId));
             itemDto.setNextBooking(nextBookingStorage.get(itemId));
             itemDto.setComments(getCommentDto(commentStorage.get(itemId)));
@@ -297,8 +297,8 @@ public class ItemServiceImpl implements ItemService {
         if (text.isBlank()) {
             throw new BadRequestException("Text comment can't be blank");
         }
-        Integer authorId = commentSimpleDto.getAuthorId();
-        Integer itemId = commentSimpleDto.getItemId();
+        Long authorId = commentSimpleDto.getAuthorId();
+        Long itemId = commentSimpleDto.getItemId();
         commentSimpleDto.setText(text);
         log.debug("[i] CREATE COMMENT USER_ID:{}, ITEM_ID:{}, DTO:{}", authorId, itemId, commentSimpleDto);
 
@@ -329,7 +329,7 @@ public class ItemServiceImpl implements ItemService {
      *
      * @param userId User ID
      */
-    private void checkingExistUserById(Integer userId) {
+    private void checkingExistUserById(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException(
                     format(Constants.USER_NOT_EXISTS, userId));
@@ -341,14 +341,14 @@ public class ItemServiceImpl implements ItemService {
      *
      * @param itemId Item ID
      */
-    private void checkingExistItemById(Integer itemId) {
+    private void checkingExistItemById(Long itemId) {
         if (!itemRepository.existsById(itemId)) {
             throw new NotFoundException(
                     format(ITEM_NOT_EXISTS, itemId));
         }
     }
 
-    private Item partiallyUpdated(Integer itemId, String name, String description, Boolean available, Item item) {
+    private Item partiallyUpdated(Long itemId, String name, String description, Boolean available, Item item) {
         boolean notNullName = !(name == null || name.isBlank());
         boolean notNullDescription = !(description == null || description.isEmpty());
 
