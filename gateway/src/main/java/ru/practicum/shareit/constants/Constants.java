@@ -57,9 +57,9 @@ public interface Constants {
     String GET_REQUEST = "/{id}";
     String GET_ALL_REQUESTS = "/all";
 
-    String CREATE_USER = "/users";
-    String UPDATE_USER = "/users/{id}";
-    String GET_USER = "/users/{id}";
-    String DELETE_USER = "/users/{id}";
-    String GET_ALL_USERS = "/users";
+    String CREATE_USER = "";
+    String UPDATE_USER = "/{id}";
+    String GET_USER = "/{id}";
+    String DELETE_USER = "/{id}";
+    String GET_ALL_USERS = "";
 }
