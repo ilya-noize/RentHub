@@ -43,10 +43,10 @@ public class BookingController {
     @PatchMapping("/bookings/{id}")
     public ResponseEntity<Object> update(
             @RequestHeader(HEADER_USER_ID) Long userId,
-            @PathVariable Long bookingId,
+            @PathVariable Long id,
             @RequestParam boolean approved) {
 
-        return bookingClient.update(userId, bookingId, approved);
+        return bookingClient.update(userId, id, approved);
     }
 
     @GetMapping("/bookings/{id}")

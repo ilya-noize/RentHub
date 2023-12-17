@@ -245,7 +245,7 @@ class ItemServiceCommentsITest {
     void createComment_wrongItem_Throw() {
         LocalDateTime now = LocalDateTime.now();
         long authorId = getUserId();
-        long itemId = Integer.MAX_VALUE;//getItemId(ownerId, authorId, 3);
+        long itemId = Long.MAX_VALUE;//getItemId(ownerId, authorId, 3);
 
         CommentSimpleDto commentSimpleDto = RANDOM.nextObject(CommentSimpleDto.class);
         commentSimpleDto.setAuthorId(authorId);

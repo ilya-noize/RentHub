@@ -35,7 +35,7 @@ public class ItemController {
 
     @PostMapping("/items")
     public ResponseEntity<Object> create(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @Validated(Create.class) @RequestBody ItemSimpleDto itemDto) {
 
         return itemClient.create(userId, itemDto);
@@ -43,7 +43,7 @@ public class ItemController {
 
     @PatchMapping("/items/{id}")
     public ResponseEntity<Object> update(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @Validated(Update.class) @RequestBody ItemDto itemDto,
             @PathVariable long id) {
 
@@ -52,7 +52,7 @@ public class ItemController {
 
     @GetMapping("/items/{id}")
     public ResponseEntity<Object> get(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable long id) {
 
         return itemClient.get(userId, id);
@@ -60,7 +60,7 @@ public class ItemController {
 
     @GetMapping("/items/search")
     public ResponseEntity<Object> search(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @RequestParam String text,
             @RequestParam(required = false, defaultValue = FROM)
             @PositiveOrZero Integer from,
@@ -72,7 +72,7 @@ public class ItemController {
 
     @GetMapping("/items")
     public ResponseEntity<Object> getAll(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
             @RequestParam(required = false, defaultValue = FROM)
             @PositiveOrZero Integer from,
             @RequestParam(required = false, defaultValue = SIZE)
@@ -83,10 +83,10 @@ public class ItemController {
 
     @PostMapping("/items/{id}/comment")
     public ResponseEntity<Object> addComment(
-            @RequestHeader(HEADER_USER_ID) Integer userId,
-            @PathVariable Integer itemId,
+            @RequestHeader(HEADER_USER_ID) Long userId,
+            @PathVariable Long id,
             @Valid @RequestBody CommentSimpleDto commentCreateDto) {
 
-        return itemClient.createComment(userId, itemId, commentCreateDto);
+        return itemClient.createComment(userId, id, commentCreateDto);
     }
 }

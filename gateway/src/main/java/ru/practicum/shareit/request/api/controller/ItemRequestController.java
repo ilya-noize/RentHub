@@ -50,9 +50,9 @@ public class ItemRequestController {
     public ResponseEntity<Object> getAll(
             @RequestHeader(HEADER_USER_ID) Long requesterId,
             @RequestParam(required = false, defaultValue = FROM)
-            @PositiveOrZero Integer from,
+            @PositiveOrZero int from,
             @RequestParam(required = false, defaultValue = SIZE)
-            @Positive Integer size) {
+            @Positive int size) {
 
         return itemRequestClient.getAll(requesterId, from, size);
     }
@@ -60,8 +60,8 @@ public class ItemRequestController {
     @GetMapping("/requests/{id}")
     public ResponseEntity<Object> getById(
             @RequestHeader(HEADER_USER_ID) Long requesterId,
-            @PathVariable int requestId) {
+            @PathVariable long id) {
 
-        return itemRequestClient.getById(requesterId, requestId);
+        return itemRequestClient.getById(requesterId, id);
     }
 }
