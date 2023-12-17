@@ -22,15 +22,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
-import static ru.practicum.shareit.constants.Constants.CREATE_COMMENT;
-import static ru.practicum.shareit.constants.Constants.CREATE_ITEM;
 import static ru.practicum.shareit.constants.Constants.FROM;
-import static ru.practicum.shareit.constants.Constants.GET_ALL_ITEMS;
-import static ru.practicum.shareit.constants.Constants.GET_ITEM;
 import static ru.practicum.shareit.constants.Constants.HEADER_USER_ID;
-import static ru.practicum.shareit.constants.Constants.SEARCH_ITEM;
 import static ru.practicum.shareit.constants.Constants.SIZE;
-import static ru.practicum.shareit.constants.Constants.UPDATE_ITEM;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,7 +33,7 @@ public class ItemController {
     private final ItemClient itemClient;
 
 
-    @PostMapping(CREATE_ITEM)
+    @PostMapping("/items")
     public ResponseEntity<Object> create(
             @RequestHeader(HEADER_USER_ID) Integer userId,
             @Validated(Create.class) @RequestBody ItemSimpleDto itemDto) {
@@ -47,24 +41,24 @@ public class ItemController {
         return itemClient.create(userId, itemDto);
     }
 
-    @PatchMapping(UPDATE_ITEM)
+    @PatchMapping("/items/{id}")
     public ResponseEntity<Object> update(
             @RequestHeader(HEADER_USER_ID) Integer userId,
             @Validated(Update.class) @RequestBody ItemDto itemDto,
-            @PathVariable long itemId) {
+            @PathVariable long id) {
 
-        return itemClient.update(userId, itemDto, itemId);
+        return itemClient.update(userId, itemDto, id);
     }
 
-    @GetMapping(GET_ITEM)
+    @GetMapping("/items/{id}")
     public ResponseEntity<Object> get(
             @RequestHeader(HEADER_USER_ID) Integer userId,
-            @PathVariable long itemId) {
+            @PathVariable long id) {
 
-        return itemClient.get(userId, itemId);
+        return itemClient.get(userId, id);
     }
 
-    @GetMapping(SEARCH_ITEM)
+    @GetMapping("/items/search")
     public ResponseEntity<Object> search(
             @RequestHeader(HEADER_USER_ID) Integer userId,
             @RequestParam String text,
@@ -76,7 +70,7 @@ public class ItemController {
         return itemClient.search(userId, text, from, size);
     }
 
-    @GetMapping(GET_ALL_ITEMS)
+    @GetMapping("/items")
     public ResponseEntity<Object> getAll(
             @RequestHeader(HEADER_USER_ID) Integer userId,
             @RequestParam(required = false, defaultValue = FROM)
@@ -87,7 +81,7 @@ public class ItemController {
         return itemClient.getAll(userId, from, size);
     }
 
-    @PostMapping(CREATE_COMMENT)
+    @PostMapping("/items/{id}/comment")
     public ResponseEntity<Object> addComment(
             @RequestHeader(HEADER_USER_ID) Integer userId,
             @PathVariable Integer itemId,

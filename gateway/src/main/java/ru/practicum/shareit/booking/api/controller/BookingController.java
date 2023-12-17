@@ -21,14 +21,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
-import static ru.practicum.shareit.constants.Constants.CREATE_BOOKING;
 import static ru.practicum.shareit.constants.Constants.FROM;
-import static ru.practicum.shareit.constants.Constants.GET_ALL_BOOKINGS_FOR_OWNER;
-import static ru.practicum.shareit.constants.Constants.GET_ALL_BOOKINGS_FOR_USER;
-import static ru.practicum.shareit.constants.Constants.GET_BOOKING;
 import static ru.practicum.shareit.constants.Constants.HEADER_USER_ID;
 import static ru.practicum.shareit.constants.Constants.SIZE;
-import static ru.practicum.shareit.constants.Constants.UPDATE_STATUS_BOOKING;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,7 +32,7 @@ import static ru.practicum.shareit.constants.Constants.UPDATE_STATUS_BOOKING;
 public class BookingController {
     private final BookingClient bookingClient;
 
-    @PostMapping(CREATE_BOOKING)
+    @PostMapping("/bookings")
     public ResponseEntity<Object> create(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @Valid @RequestBody BookingSimpleDto bookingSimpleDto) {
@@ -45,7 +40,7 @@ public class BookingController {
         return bookingClient.create(userId, bookingSimpleDto);
     }
 
-    @PatchMapping(UPDATE_STATUS_BOOKING)
+    @PatchMapping("/bookings/{id}")
     public ResponseEntity<Object> update(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable Long bookingId,
@@ -54,7 +49,7 @@ public class BookingController {
         return bookingClient.update(userId, bookingId, approved);
     }
 
-    @GetMapping(GET_BOOKING)
+    @GetMapping("/bookings/{id}")
     public ResponseEntity<Object> get(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable Long id) {
@@ -62,7 +57,7 @@ public class BookingController {
         return bookingClient.getById(userId, id);
     }
 
-    @GetMapping(GET_ALL_BOOKINGS_FOR_USER)
+    @GetMapping("/bookings")
     public ResponseEntity<Object> getAllByUser(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @RequestParam(required = false, defaultValue = "ALL") String stateIn,
@@ -76,7 +71,7 @@ public class BookingController {
         return bookingClient.getAllByUser(userId, state, from, size);
     }
 
-    @GetMapping(GET_ALL_BOOKINGS_FOR_OWNER)
+    @GetMapping("/bookings/owner")
     public ResponseEntity<Object> getAllByOwner(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @RequestParam(required = false, defaultValue = "ALL") BookingState state,
