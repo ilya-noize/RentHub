@@ -19,6 +19,8 @@ import ru.practicum.shareit.valid.group.Update;
 
 import javax.validation.constraints.Positive;
 
+import static ru.practicum.shareit.constants.Constants.CREATE_USER;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -26,7 +28,7 @@ public class UserController {
     private final UserClient userClient;
 
 
-    @PostMapping("/users")
+    @PostMapping(CREATE_USER)
     public ResponseEntity<Object> create(
             @RequestBody @Validated(Create.class) UserSimpleDto userDto) {
         log.info("[i] create user {}", userDto);

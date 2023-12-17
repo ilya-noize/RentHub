@@ -10,6 +10,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.booking.api.dto.BookingSimpleDto;
 import ru.practicum.shareit.booking.api.dto.BookingState;
 import ru.practicum.shareit.client.BaseClient;
+import ru.practicum.shareit.valid.ValidPageable;
 
 import java.util.Map;
 
@@ -41,6 +42,7 @@ public class BookingClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getAllByUser(long userId, BookingState state, Integer from, Integer size) {
+        ValidPageable.check(from, size);
         Map<String, Object> parameters = Map.of(
                 "state", state.name(),
                 "from", from,
@@ -50,6 +52,7 @@ public class BookingClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getAllByOwner(long userId, BookingState state, Integer from, Integer size) {
+        ValidPageable.check(from, size);
         Map<String, Object> parameters = Map.of(
                 "state", state.name(),
                 "from", from,

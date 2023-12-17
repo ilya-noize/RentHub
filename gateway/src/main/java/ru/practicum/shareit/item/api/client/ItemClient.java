@@ -11,6 +11,7 @@ import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.item.api.dto.CommentSimpleDto;
 import ru.practicum.shareit.item.api.dto.ItemDto;
 import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
+import ru.practicum.shareit.valid.ValidPageable;
 
 import javax.validation.Valid;
 import java.util.Map;
@@ -41,16 +42,26 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getAll(long userId, Integer from, Integer size) {
-        Map<String, Object> parameters = Map.of("from", from, "size", size);
+        ValidPageable.check(from, size);
+        Map<String, Object> parameters = Map.of(
+                "from", from,
+                "size", size);
+
         return get("?from={from}&size={size}", userId, parameters);
     }
 
     public ResponseEntity<Object> search(long userId, String text, Integer from, Integer size) {
-        Map<String, Object> parameters = Map.of("text", text, "from", from, "size", size);
+        ValidPageable.check(from, size);
+        Map<String, Object> parameters = Map.of(
+                "text", text,
+                "from", from,
+                "size", size);
+
         return get("/search?text={text}&from={from}&size={size}", userId, parameters);
     }
 
     public ResponseEntity<Object> createComment(long userId, Long itemId, @Valid CommentSimpleDto commentCreateDto) {
+
         return post("/" + itemId + "/comment", userId, commentCreateDto);
     }
 }

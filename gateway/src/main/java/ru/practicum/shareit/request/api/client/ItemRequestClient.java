@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.request.api.dto.ItemRequestSimpleDto;
+import ru.practicum.shareit.valid.ValidPageable;
 
 import java.util.Map;
 
@@ -34,7 +35,11 @@ public class ItemRequestClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getAll(long requesterId, int from, int size) {
-        Map<String, Object> parameters = Map.of("from", from, "size", size);
+        ValidPageable.check(from, size);
+        Map<String, Object> parameters = Map.of(
+                "from", from,
+                "size", size);
+
         return get("/all", requesterId, parameters);
     }
 
