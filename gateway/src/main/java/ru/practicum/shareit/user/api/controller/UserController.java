@@ -21,25 +21,25 @@ import javax.validation.constraints.Positive;
 
 /**
  * <h3>User Controller</h3>
- * {@link #CREATE_USER} Создать пользователя <br/>
- * {@link #UPDATE_USER} Изменить пользователя <br/>
- * {@link #GET_USER}   Посмотреть пользователя <br/>
- * {@link #DELETE_USER} Удалить пользователя <br/>
- * {@link #GET_ALL_USERS} Посмотреть всех пользователей <br/>
+ * {@link #createUser} Создать пользователя <br/>
+ * {@link #updateUser} Изменить пользователя <br/>
+ * {@link #getUser}   Посмотреть пользователя <br/>
+ * {@link #deleteUser} Удалить пользователя <br/>
+ * {@link #getAllUsers} Посмотреть всех пользователей <br/>
  */
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
-    private final String CREATE_USER = "/users";
-    private final String UPDATE_USER = "/users/{id}";
-    private final String GET_USER = "/users/{id}";
-    private final String DELETE_USER = "/users/{id}";
-    private final String GET_ALL_USERS = "/users";
+    private final String createUser = "/users";
+    private final String updateUser = "/users/{id}";
+    private final String getUser = "/users/{id}";
+    private final String deleteUser = "/users/{id}";
+    private final String getAllUsers = "/users";
     private final UserClient userClient;
 
 
-    @PostMapping(CREATE_USER)
+    @PostMapping(createUser)
     public ResponseEntity<Object> create(
             @RequestBody @Validated(Create.class) UserSimpleDto userDto) {
         log.info("[i] create user {}", userDto);
@@ -47,7 +47,7 @@ public class UserController {
         return userClient.create(userDto);
     }
 
-    @PatchMapping(UPDATE_USER)
+    @PatchMapping(updateUser)
     public ResponseEntity<Object> update(
             @PathVariable @Positive Long id,
             @RequestBody @Validated(Update.class) UserDto userDto) {
@@ -56,7 +56,7 @@ public class UserController {
         return userClient.update(id, userDto);
     }
 
-    @GetMapping(GET_USER)
+    @GetMapping(getUser)
     @Validated
     public ResponseEntity<Object> getUsersById(
             @PathVariable Long id) {
@@ -65,14 +65,14 @@ public class UserController {
         return userClient.getById(id);
     }
 
-    @GetMapping(GET_ALL_USERS)
+    @GetMapping(getAllUsers)
     public ResponseEntity<Object> getAll() {
         log.info("[i] get users");
 
         return userClient.getAll();
     }
 
-    @DeleteMapping(DELETE_USER)
+    @DeleteMapping(deleteUser)
     @Validated
     public void deleteUser(
             @PathVariable Long id) {

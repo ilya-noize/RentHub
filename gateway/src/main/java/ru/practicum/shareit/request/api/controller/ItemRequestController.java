@@ -23,23 +23,23 @@ import static ru.practicum.shareit.constants.Constants.HEADER_USER_ID;
 import static ru.practicum.shareit.constants.Constants.SIZE;
 /**
  * <h3>ItemRequest Controller</h3>
- * {@link #CREATE_REQUEST} Создать запрос на предмет <br/>
- * {@link #GET_BY_REQUESTER} Посмотреть запрос на предмет от имени запрашиваемого <br/>
- * {@link #GET_REQUEST} Посмотреть запрос пользователя <br/>
- * {@link #GET_ALL_REQUESTS} Посмотреть все запросы <br/>
+ * {@link #createRequest} Создать запрос на предмет <br/>
+ * {@link #getByRequester} Посмотреть запрос на предмет от имени запрашиваемого <br/>
+ * {@link #getRequest} Посмотреть запрос пользователя <br/>
+ * {@link #getAllRequests} Посмотреть все запросы <br/>
  */
 @RestController
 @RequiredArgsConstructor
 @Validated
 @Slf4j
 public class ItemRequestController {
-    private final String CREATE_REQUEST = "/requests";
-    private final String GET_BY_REQUESTER = "/requests";
-    private final String GET_REQUEST = "/requests/{id}";
-    private final String GET_ALL_REQUESTS = "/requests/all";
+    private final String createRequest = "/requests";
+    private final String getByRequester = "/requests";
+    private final String getRequest = "/requests/{id}";
+    private final String getAllRequests = "/requests/all";
     private final ItemRequestClient itemRequestClient;
 
-    @PostMapping(CREATE_REQUEST)
+    @PostMapping(createRequest)
     public ResponseEntity<Object> create(
             @RequestHeader(HEADER_USER_ID) Long requesterId,
             @RequestBody
@@ -48,14 +48,14 @@ public class ItemRequestController {
         return itemRequestClient.create(requesterId, itemRequestSimpleDto);
     }
 
-    @GetMapping(GET_BY_REQUESTER)
+    @GetMapping(getByRequester)
     public ResponseEntity<Object> getByRequesterId(
             @RequestHeader(HEADER_USER_ID) Long requesterId) {
 
         return itemRequestClient.getByRequesterId(requesterId);
     }
 
-    @GetMapping(GET_ALL_REQUESTS)
+    @GetMapping(getAllRequests)
     @Validated
     public ResponseEntity<Object> getAll(
             @RequestHeader(HEADER_USER_ID) Long requesterId,
@@ -67,7 +67,7 @@ public class ItemRequestController {
         return itemRequestClient.getAll(requesterId, from, size);
     }
 
-    @GetMapping(GET_REQUEST)
+    @GetMapping(getRequest)
     public ResponseEntity<Object> getById(
             @RequestHeader(HEADER_USER_ID) Long requesterId,
             @PathVariable long id) {

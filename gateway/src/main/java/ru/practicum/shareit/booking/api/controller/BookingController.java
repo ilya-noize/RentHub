@@ -25,54 +25,54 @@ import static ru.practicum.shareit.constants.Constants.SIZE;
 
 /**
  * <h3>Booking Controller</h3>
- * {@link #CREATE_BOOKING} Создание бронирования <br/>
- * {@link #UPDATE_STATUS_BOOKING} Изменить статус бронирования <br/>
- * {@link #GET_BOOKING}    Посмотреть бронирование <br/>
- * {@link #GET_ALL_BOOKINGS_FOR_USER}  Посмотреть бронирования от имени пользователя <br/>
- * {@link #GET_ALL_BOOKINGS_FOR_OWNER} Посмотреть бронирования от имени владельца предмета <br/>
+ * {@link #createBooking} Создание бронирования <br/>
+ * {@link #updateStatusBooking} Изменить статус бронирования <br/>
+ * {@link #getBooking}    Посмотреть бронирование <br/>
+ * {@link #getAllBookingsForUser}  Посмотреть бронирования от имени пользователя <br/>
+ * {@link #getAllBookingsForOwner} Посмотреть бронирования от имени владельца предмета <br/>
  */
 @RestController
 @RequiredArgsConstructor
 @Validated
 @Slf4j
 public class BookingController {
-    private final String CREATE_BOOKING = "/bookings";
-    private final String UPDATE_STATUS_BOOKING = "/bookings/{id}";
-    private final String GET_BOOKING = "/bookings/{id}";
-    private final String GET_ALL_BOOKINGS_FOR_USER = "/bookings";
-    private final String GET_ALL_BOOKINGS_FOR_OWNER = "/bookings/owner";
+    private final String createBooking = "/bookings";
+    private final String updateStatusBooking = "/bookings/{id}";
+    private final String getBooking = "/bookings/{id}";
+    private final String getAllBookingsForUser = "/bookings";
+    private final String getAllBookingsForOwner = "/bookings/owner";
     private final BookingClient bookingClient;
 
-    @PostMapping(CREATE_BOOKING)
+    @PostMapping(createBooking)
     public ResponseEntity<Object> create(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @Valid @RequestBody BookingSimpleDto bookingSimpleDto) {
-        log.debug("POST {} - userId:{} - DTO:{}", CREATE_BOOKING, userId, bookingSimpleDto);
+        log.debug("POST {} - userId:{} - DTO:{}", createBooking, userId, bookingSimpleDto);
 
         return bookingClient.create(userId, bookingSimpleDto);
     }
 
-    @PatchMapping(UPDATE_STATUS_BOOKING)
+    @PatchMapping(updateStatusBooking)
     public ResponseEntity<Object> update(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable Long id,
             @RequestParam boolean approved) {
         log.debug("PATCH {} - userId:{} - bookingId:{} - approved:{}",
-                UPDATE_STATUS_BOOKING, userId, id, approved);
+                updateStatusBooking, userId, id, approved);
 
         return bookingClient.update(userId, id, approved);
     }
 
-    @GetMapping(GET_BOOKING)
+    @GetMapping(getBooking)
     public ResponseEntity<Object> get(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable Long id) {
-        log.debug("GET {} - userId:{} - bookingId:{}", GET_BOOKING, userId, id);
+        log.debug("GET {} - userId:{} - bookingId:{}", getBooking, userId, id);
 
         return bookingClient.getById(userId, id);
     }
 
-    @GetMapping(GET_ALL_BOOKINGS_FOR_USER)
+    @GetMapping(getAllBookingsForUser)
     public ResponseEntity<Object> getAllByUser(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @RequestParam(required = false, defaultValue = "ALL") String state,
@@ -81,12 +81,12 @@ public class BookingController {
             @RequestParam(required = false, defaultValue = SIZE)
             @Positive Integer size) {
         log.debug("GET {} - userId:{} - state:{} - from:{} - size:{}",
-                GET_ALL_BOOKINGS_FOR_USER, userId, state, from, size);
+                getAllBookingsForUser, userId, state, from, size);
 
         return bookingClient.getAllByUser(userId, state, from, size);
     }
 
-    @GetMapping(GET_ALL_BOOKINGS_FOR_OWNER)
+    @GetMapping(getAllBookingsForOwner)
     public ResponseEntity<Object> getAllByOwner(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @RequestParam(required = false, defaultValue = "ALL") String state,
@@ -95,7 +95,7 @@ public class BookingController {
             @RequestParam(required = false, defaultValue = SIZE)
             @Positive Integer size) {
         log.debug("GET {} - userId:{} - state:{} - from:{} - size:{}",
-                GET_ALL_BOOKINGS_FOR_OWNER, userId, state, from, size);
+                getAllBookingsForOwner, userId, state, from, size);
 
         return bookingClient.getAllByOwner(userId, state, from, size);
     }
