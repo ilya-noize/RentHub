@@ -13,7 +13,6 @@ import ru.practicum.shareit.booking.entity.enums.BookingState;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.BookingException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.RentalPeriodException;
 import ru.practicum.shareit.item.api.repository.ItemRepository;
 import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.user.api.repository.UserRepository;
@@ -62,22 +61,6 @@ public class BookingServiceImpl implements BookingService {
         if (bookerIsOwnerTheItem) {
             throw new BookingException("Access denied."
                     + " You are owner this item");
-        }
-
-        LocalDateTime start = dto.getStart();
-        LocalDateTime end = dto.getEnd();
-
-
-        if (start.equals(end)) {
-            String error = "The effective date of the lease agreement"
-                    + " coincides with its termination";
-            throw new RentalPeriodException(error);
-        }
-
-        if (start.isAfter(end)) {
-            String error = "The effective date of the lease agreement"
-                    + " after its termination";
-            throw new RentalPeriodException(error);
         }
 
         Booking booking = BookingMapper.INSTANCE.toEntity(dto, bookerId);

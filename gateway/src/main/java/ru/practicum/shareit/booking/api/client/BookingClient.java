@@ -10,8 +10,10 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.booking.api.dto.BookingSimpleDto;
 import ru.practicum.shareit.booking.api.dto.BookingState;
 import ru.practicum.shareit.client.BaseClient;
+import ru.practicum.shareit.exception.RentalPeriodException;
 import ru.practicum.shareit.valid.ValidPageable;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Service
@@ -27,6 +29,19 @@ public class BookingClient extends BaseClient {
     }
 
     public ResponseEntity<Object> create(long userId, BookingSimpleDto bookingSimpleDto) {
+        LocalDateTime start = bookingSimpleDto.getStart();
+        LocalDateTime end = bookingSimpleDto.getEnd();
+        if (start.equals(end)) {
+            String error = "The effective date of the lease agreement"
+                    + " coincides with its termination";
+            throw new RentalPeriodException(error);
+        }
+        if (start.isAfter(end)) {
+            String error = "The effective date of the lease agreement"
+                    + " after its termination";
+            throw new RentalPeriodException(error);
+        }
+
         return post("", userId, bookingSimpleDto);
     }
 
@@ -41,23 +56,28 @@ public class BookingClient extends BaseClient {
         return get("/" + bookingId, userId);
     }
 
-    public ResponseEntity<Object> getAllByUser(long userId, BookingState state, Integer from, Integer size) {
+    public ResponseEntity<Object> getAllByUser(long userId, String stateIn, Integer from, Integer size) {
         ValidPageable.check(from, size);
+        BookingState state = BookingState.from(stateIn);
         Map<String, Object> parameters = Map.of(
                 "state", state.name(),
                 "from", from,
                 "size", size
         );
+
         return get("?state={state}&from={from}&size={size}", userId, parameters);
     }
 
-    public ResponseEntity<Object> getAllByOwner(long userId, BookingState state, Integer from, Integer size) {
+    public ResponseEntity<Object> getAllByOwner(long userId, String stateIn, Integer from, Integer size) {
         ValidPageable.check(from, size);
+        BookingState state = BookingState.from(stateIn);
         Map<String, Object> parameters = Map.of(
                 "state", state.name(),
                 "from", from,
                 "size", size
         );
+
         return get("/owner?state={state}&from={from}&size={size}", userId, parameters);
     }
+
 }

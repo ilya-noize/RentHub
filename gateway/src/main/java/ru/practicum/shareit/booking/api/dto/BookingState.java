@@ -1,6 +1,6 @@
 package ru.practicum.shareit.booking.api.dto;
 
-import java.util.Optional;
+import ru.practicum.shareit.exception.StateException;
 
 /**
  * Для фильтрации списка бронирования у пользователя:
@@ -21,12 +21,12 @@ public enum BookingState {
     REJECTED,
     WAITING;
 
-    public static Optional<BookingState> from(String stringState) {
+    public static BookingState from(String stringState) {
         for (BookingState state : values()) {
             if (state.name().equalsIgnoreCase(stringState)) {
-                return Optional.of(state);
+                return state;
             }
         }
-        return Optional.empty();
+        throw new StateException(stringState);
     }
 }

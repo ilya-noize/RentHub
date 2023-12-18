@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.exception.BadRequestException;
+import ru.practicum.shareit.exception.RentalPeriodException;
 import ru.practicum.shareit.exception.StateException;
 import ru.practicum.shareit.exception.entity.ErrorException;
 
@@ -28,16 +29,28 @@ public class ExceptionController {
         log.error("[!] Received the status {} Error: {}\n{}", HttpStatus.BAD_REQUEST, message, stackTraceString);
     }
 
-    @ExceptionHandler(BadRequestException.class)
+    @ExceptionHandler(RentalPeriodException.class)
     @ResponseStatus(BAD_REQUEST)
-    public ResponseEntity<?> handleBadRequestException(BadRequestException e) {
-        String error = e.getMessage();
+    public ResponseEntity<?> handleRentalPeriodException(RentalPeriodException e) {
+        String message = e.getMessage();
 
-        logError(error, e);
+        logError(message, e);
 
         return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new ErrorException(400, error));
+                .body(new ErrorException(400, message));
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(BAD_REQUEST)
+    public ResponseEntity<?> handleBadRequestException(BadRequestException e) {
+        String message = e.getMessage();
+
+        logError(message, e);
+
+        return ResponseEntity.badRequest()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorException(400, message));
     }
 
     @ExceptionHandler(StateException.class)
