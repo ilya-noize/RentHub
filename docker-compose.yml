@@ -1,9 +1,20 @@
 version: '3.3'
+
 services:
   gateway:
     build: gateway
     image: gateway
     container_name: gateway
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 128M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    networks:
+      - shareit-network
     ports:
       - "8080:8080"
     depends_on:
@@ -16,14 +27,24 @@ services:
     build: server
     image: server
     container_name: server
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 256M
+    networks:
+      - shareit-network
     ports:
       - "9090:9090"
     depends_on:
       - db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${SHARE_USER}
+      - SPRING_DATASOURCE_PASSWORD=${SHARE_PASSWORD}
   #      - TZ=Europe/Moscow
 
   db:
@@ -31,8 +52,14 @@ services:
     container_name: PostgreSQL
     ports:
       - "6541:5432"
+    networks:
+      - shareit-network
     environment:
-      - POSTGRES_DB=shareit
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
 #      - TZ=Europe/Moscow
+
+networks:
+  shareit-network:
+    driver: bridge
