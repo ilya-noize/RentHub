@@ -16,8 +16,6 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 public final class BookingSimpleDto {
-    private Long id;
-
     @NotNull
     @FutureOrPresent
     private LocalDateTime start;
