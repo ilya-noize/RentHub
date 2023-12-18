@@ -13,8 +13,6 @@ services:
         reservations:
           cpus: '0.05'
           memory: 64M
-    networks:
-      - shareit-network
     ports:
       - "8080:8080"
     depends_on:
@@ -52,14 +50,8 @@ services:
     container_name: PostgreSQL
     ports:
       - "6541:5432"
-    networks:
-      - shareit-network
     environment:
       - POSTGRES_DB=shareit
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
 #      - TZ=Europe/Moscow
-
-networks:
-  shareit-network:
-    driver: bridge
