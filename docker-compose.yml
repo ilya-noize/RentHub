@@ -33,8 +33,6 @@ services:
         reservations:
           cpus: '0.05'
           memory: 256M
-    networks:
-      - shareit-network
     ports:
       - "9090:9090"
     depends_on:
