@@ -42,7 +42,7 @@ services:
     depends_on:
       - db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${DB_NAME}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
       - SPRING_DATASOURCE_USERNAME=${SHARE_USER}
       - SPRING_DATASOURCE_PASSWORD=${SHARE_PASSWORD}
   #      - TZ=Europe/Moscow
@@ -55,7 +55,7 @@ services:
     networks:
       - shareit-network
     environment:
-      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_DB=shareit
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
 #      - TZ=Europe/Moscow
