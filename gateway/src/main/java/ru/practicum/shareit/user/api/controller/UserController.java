@@ -20,6 +20,10 @@ import ru.practicum.shareit.valid.group.Update;
 import javax.validation.constraints.Positive;
 
 import static ru.practicum.shareit.constants.Constants.CREATE_USER;
+import static ru.practicum.shareit.constants.Constants.DELETE_USER;
+import static ru.practicum.shareit.constants.Constants.GET_ALL_USERS;
+import static ru.practicum.shareit.constants.Constants.GET_USER;
+import static ru.practicum.shareit.constants.Constants.UPDATE_USER;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,7 +40,7 @@ public class UserController {
         return userClient.create(userDto);
     }
 
-    @PatchMapping("/users/{id}")
+    @PatchMapping(UPDATE_USER)
     public ResponseEntity<Object> update(
             @PathVariable @Positive Long id,
             @RequestBody @Validated(Update.class) UserDto userDto) {
@@ -45,7 +49,7 @@ public class UserController {
         return userClient.update(id, userDto);
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping(GET_USER)
     @Validated
     public ResponseEntity<Object> getUsersById(
             @PathVariable Long id) {
@@ -54,14 +58,14 @@ public class UserController {
         return userClient.getById(id);
     }
 
-    @GetMapping("/users")
+    @GetMapping(GET_ALL_USERS)
     public ResponseEntity<Object> getAll() {
         log.info("[i] get users");
 
         return userClient.getAll();
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping(DELETE_USER)
     @Validated
     public void deleteUser(
             @PathVariable Long id) {

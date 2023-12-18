@@ -16,14 +16,14 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 public final class BookingSimpleDto {
-    @NotNull
-    @FutureOrPresent
+    @NotNull(message = "Start is null")
+    @FutureOrPresent(message = "Start can't be not Future Or Present")
     private LocalDateTime start;
 
-    @NotNull
-    @Future
+    @NotNull(message = "Finish is null")
+    @Future(message = "Finish can't be not in Future")
     private LocalDateTime end;
 
-    @NotNull
+    @NotNull(message = "ItemId is null")
     private Long itemId;
 }

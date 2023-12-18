@@ -39,6 +39,7 @@ public class BookingController {
     public ResponseEntity<Object> create(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @Valid @RequestBody BookingSimpleDto bookingSimpleDto) {
+        log.debug("POST {} - userId:{} - DTO:{}", CREATE_BOOKING, userId, bookingSimpleDto);
 
         return bookingClient.create(userId, bookingSimpleDto);
     }
@@ -48,6 +49,8 @@ public class BookingController {
             @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable Long id,
             @RequestParam boolean approved) {
+        log.debug("PATCH {} - userId:{} - bookingId:{} - approved:{}",
+                UPDATE_STATUS_BOOKING, userId, id, approved);
 
         return bookingClient.update(userId, id, approved);
     }
@@ -56,6 +59,7 @@ public class BookingController {
     public ResponseEntity<Object> get(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable Long id) {
+        log.debug("GET {} - userId:{} - bookingId:{}", GET_BOOKING, userId, id);
 
         return bookingClient.getById(userId, id);
     }
@@ -68,6 +72,8 @@ public class BookingController {
             @PositiveOrZero Integer from,
             @RequestParam(required = false, defaultValue = SIZE)
             @Positive Integer size) {
+        log.debug("GET {} - userId:{} - state:{} - from:{} - size:{}",
+                GET_ALL_BOOKINGS_FOR_USER, userId, state, from, size);
 
         return bookingClient.getAllByUser(userId, state, from, size);
     }
@@ -80,6 +86,8 @@ public class BookingController {
             @PositiveOrZero Integer from,
             @RequestParam(required = false, defaultValue = SIZE)
             @Positive Integer size) {
+        log.debug("GET {} - userId:{} - state:{} - from:{} - size:{}",
+                GET_ALL_BOOKINGS_FOR_OWNER, userId, state, from, size);
 
         return bookingClient.getAllByOwner(userId, state, from, size);
     }

@@ -18,7 +18,11 @@ import ru.practicum.shareit.valid.group.Create;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import static ru.practicum.shareit.constants.Constants.CREATE_REQUEST;
 import static ru.practicum.shareit.constants.Constants.FROM;
+import static ru.practicum.shareit.constants.Constants.GET_ALL_REQUESTS;
+import static ru.practicum.shareit.constants.Constants.GET_BY_REQUESTER;
+import static ru.practicum.shareit.constants.Constants.GET_REQUEST;
 import static ru.practicum.shareit.constants.Constants.HEADER_USER_ID;
 import static ru.practicum.shareit.constants.Constants.SIZE;
 
@@ -29,7 +33,7 @@ import static ru.practicum.shareit.constants.Constants.SIZE;
 public class ItemRequestController {
     private final ItemRequestClient itemRequestClient;
 
-    @PostMapping("/requests")
+    @PostMapping(CREATE_REQUEST)
     public ResponseEntity<Object> create(
             @RequestHeader(HEADER_USER_ID) Long requesterId,
             @RequestBody
@@ -38,14 +42,14 @@ public class ItemRequestController {
         return itemRequestClient.create(requesterId, itemRequestSimpleDto);
     }
 
-    @GetMapping("/requests")
+    @GetMapping(GET_BY_REQUESTER)
     public ResponseEntity<Object> getByRequesterId(
             @RequestHeader(HEADER_USER_ID) Long requesterId) {
 
         return itemRequestClient.getByRequesterId(requesterId);
     }
 
-    @GetMapping("/requests/all")
+    @GetMapping(GET_ALL_REQUESTS)
     @Validated
     public ResponseEntity<Object> getAll(
             @RequestHeader(HEADER_USER_ID) Long requesterId,
@@ -57,7 +61,7 @@ public class ItemRequestController {
         return itemRequestClient.getAll(requesterId, from, size);
     }
 
-    @GetMapping("/requests/{id}")
+    @GetMapping(GET_REQUEST)
     public ResponseEntity<Object> getById(
             @RequestHeader(HEADER_USER_ID) Long requesterId,
             @PathVariable long id) {

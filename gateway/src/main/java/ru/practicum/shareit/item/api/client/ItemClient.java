@@ -14,6 +14,7 @@ import ru.practicum.shareit.item.api.dto.ItemSimpleDto;
 import ru.practicum.shareit.valid.ValidPageable;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Service
@@ -60,8 +61,10 @@ public class ItemClient extends BaseClient {
         return get("/search?text={text}&from={from}&size={size}", userId, parameters);
     }
 
-    public ResponseEntity<Object> createComment(long userId, Long itemId, @Valid CommentSimpleDto commentCreateDto) {
-
-        return post("/" + itemId + "/comment", userId, commentCreateDto);
+    public ResponseEntity<Object> createComment(long userId, Long itemId, @Valid CommentSimpleDto commentSimpleDto) {
+        commentSimpleDto.setItemId(itemId);
+        commentSimpleDto.setAuthorId(userId);
+        commentSimpleDto.setCreated(LocalDateTime.now());
+        return post("/" + itemId + "/comment", userId, commentSimpleDto);
     }
 }

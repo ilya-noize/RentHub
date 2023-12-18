@@ -22,9 +22,15 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import static ru.practicum.shareit.constants.Constants.CREATE_COMMENT;
+import static ru.practicum.shareit.constants.Constants.CREATE_ITEM;
 import static ru.practicum.shareit.constants.Constants.FROM;
+import static ru.practicum.shareit.constants.Constants.GET_ALL_ITEMS;
+import static ru.practicum.shareit.constants.Constants.GET_ITEM;
 import static ru.practicum.shareit.constants.Constants.HEADER_USER_ID;
+import static ru.practicum.shareit.constants.Constants.SEARCH_ITEM;
 import static ru.practicum.shareit.constants.Constants.SIZE;
+import static ru.practicum.shareit.constants.Constants.UPDATE_ITEM;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,7 +39,7 @@ public class ItemController {
     private final ItemClient itemClient;
 
 
-    @PostMapping("/items")
+    @PostMapping(CREATE_ITEM)
     public ResponseEntity<Object> create(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @Validated(Create.class) @RequestBody ItemSimpleDto itemDto) {
@@ -41,7 +47,7 @@ public class ItemController {
         return itemClient.create(userId, itemDto);
     }
 
-    @PatchMapping("/items/{id}")
+    @PatchMapping(UPDATE_ITEM)
     public ResponseEntity<Object> update(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @Validated(Update.class) @RequestBody ItemDto itemDto,
@@ -50,7 +56,7 @@ public class ItemController {
         return itemClient.update(userId, itemDto, id);
     }
 
-    @GetMapping("/items/{id}")
+    @GetMapping(GET_ITEM)
     public ResponseEntity<Object> get(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable long id) {
@@ -58,7 +64,7 @@ public class ItemController {
         return itemClient.get(userId, id);
     }
 
-    @GetMapping("/items/search")
+    @GetMapping(SEARCH_ITEM)
     public ResponseEntity<Object> search(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @RequestParam String text,
@@ -70,7 +76,7 @@ public class ItemController {
         return itemClient.search(userId, text, from, size);
     }
 
-    @GetMapping("/items")
+    @GetMapping(GET_ALL_ITEMS)
     public ResponseEntity<Object> getAll(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @RequestParam(required = false, defaultValue = FROM)
@@ -81,12 +87,12 @@ public class ItemController {
         return itemClient.getAll(userId, from, size);
     }
 
-    @PostMapping("/items/{id}/comment")
+    @PostMapping(CREATE_COMMENT)
     public ResponseEntity<Object> addComment(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable Long id,
-            @Valid @RequestBody CommentSimpleDto commentCreateDto) {
+            @Valid @RequestBody CommentSimpleDto commentSimpleDto) {
 
-        return itemClient.createComment(userId, id, commentCreateDto);
+        return itemClient.createComment(userId, id, commentSimpleDto);
     }
 }
