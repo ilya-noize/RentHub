@@ -188,7 +188,7 @@ public class ItemServiceImpl implements ItemService {
      * for both the owner of the items and users.
      * {@code (/items)}
      *
-     * @param userId   User ID
+     * @param ownerId  User ID
      * @param pageable Постранично
      * @param now      Точное время
      * @return List of user's items
@@ -196,9 +196,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ItemDto> getAll(Long userId, Pageable pageable, LocalDateTime now) {
-        checkingExistUserById(userId);
-        List<ItemDto> itemsDto = itemRepository.findAllByOwner_Id(userId, pageable)
+    public List<ItemDto> getAll(Long ownerId, Pageable pageable, LocalDateTime now) {
+        checkingExistUserById(ownerId);
+        List<ItemDto> itemsDto = itemRepository.findAllByOwner_Id(ownerId, pageable)
                 .stream()
                 .map(ItemMapper.INSTANCE::toDto)
                 .collect(Collectors.toList());

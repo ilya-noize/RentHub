@@ -12,7 +12,7 @@ import ru.practicum.shareit.request.entity.ItemRequest;
 import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
-    @Query("select i from Item i where i.owner.id = ?1")
+    @Query("select i from Item i where i.owner.id = ?1 order by i.id")
     List<Item> findAllByOwner_Id(Long id, Pageable pageable);
 
     @Query("select i from Item i " +
