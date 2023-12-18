@@ -19,20 +19,28 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
-import static ru.practicum.shareit.constants.Constants.CREATE_BOOKING;
 import static ru.practicum.shareit.constants.Constants.FROM;
-import static ru.practicum.shareit.constants.Constants.GET_ALL_BOOKINGS_FOR_OWNER;
-import static ru.practicum.shareit.constants.Constants.GET_ALL_BOOKINGS_FOR_USER;
-import static ru.practicum.shareit.constants.Constants.GET_BOOKING;
 import static ru.practicum.shareit.constants.Constants.HEADER_USER_ID;
 import static ru.practicum.shareit.constants.Constants.SIZE;
-import static ru.practicum.shareit.constants.Constants.UPDATE_STATUS_BOOKING;
 
+/**
+ * <h3>Booking Controller</h3>
+ * {@link #CREATE_BOOKING} Создание бронирования <br/>
+ * {@link #UPDATE_STATUS_BOOKING} Изменить статус бронирования <br/>
+ * {@link #GET_BOOKING}    Посмотреть бронирование <br/>
+ * {@link #GET_ALL_BOOKINGS_FOR_USER}  Посмотреть бронирования от имени пользователя <br/>
+ * {@link #GET_ALL_BOOKINGS_FOR_OWNER} Посмотреть бронирования от имени владельца предмета <br/>
+ */
 @RestController
 @RequiredArgsConstructor
 @Validated
 @Slf4j
 public class BookingController {
+    private final String CREATE_BOOKING = "/bookings";
+    private final String UPDATE_STATUS_BOOKING = "/bookings/{id}";
+    private final String GET_BOOKING = "/bookings/{id}";
+    private final String GET_ALL_BOOKINGS_FOR_USER = "/bookings";
+    private final String GET_ALL_BOOKINGS_FOR_OWNER = "/bookings/owner";
     private final BookingClient bookingClient;
 
     @PostMapping(CREATE_BOOKING)

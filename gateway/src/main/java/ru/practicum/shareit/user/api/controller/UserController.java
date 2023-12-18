@@ -19,16 +19,23 @@ import ru.practicum.shareit.valid.group.Update;
 
 import javax.validation.constraints.Positive;
 
-import static ru.practicum.shareit.constants.Constants.CREATE_USER;
-import static ru.practicum.shareit.constants.Constants.DELETE_USER;
-import static ru.practicum.shareit.constants.Constants.GET_ALL_USERS;
-import static ru.practicum.shareit.constants.Constants.GET_USER;
-import static ru.practicum.shareit.constants.Constants.UPDATE_USER;
-
+/**
+ * <h3>User Controller</h3>
+ * {@link #CREATE_USER} Создать пользователя <br/>
+ * {@link #UPDATE_USER} Изменить пользователя <br/>
+ * {@link #GET_USER}   Посмотреть пользователя <br/>
+ * {@link #DELETE_USER} Удалить пользователя <br/>
+ * {@link #GET_ALL_USERS} Посмотреть всех пользователей <br/>
+ */
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
+    private final String CREATE_USER = "/users";
+    private final String UPDATE_USER = "/users/{id}";
+    private final String GET_USER = "/users/{id}";
+    private final String DELETE_USER = "/users/{id}";
+    private final String GET_ALL_USERS = "/users";
     private final UserClient userClient;
 
 

@@ -18,19 +18,25 @@ import ru.practicum.shareit.valid.group.Create;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
-import static ru.practicum.shareit.constants.Constants.CREATE_REQUEST;
 import static ru.practicum.shareit.constants.Constants.FROM;
-import static ru.practicum.shareit.constants.Constants.GET_ALL_REQUESTS;
-import static ru.practicum.shareit.constants.Constants.GET_BY_REQUESTER;
-import static ru.practicum.shareit.constants.Constants.GET_REQUEST;
 import static ru.practicum.shareit.constants.Constants.HEADER_USER_ID;
 import static ru.practicum.shareit.constants.Constants.SIZE;
-
+/**
+ * <h3>ItemRequest Controller</h3>
+ * {@link #CREATE_REQUEST} Создать запрос на предмет <br/>
+ * {@link #GET_BY_REQUESTER} Посмотреть запрос на предмет от имени запрашиваемого <br/>
+ * {@link #GET_REQUEST} Посмотреть запрос пользователя <br/>
+ * {@link #GET_ALL_REQUESTS} Посмотреть все запросы <br/>
+ */
 @RestController
 @RequiredArgsConstructor
 @Validated
 @Slf4j
 public class ItemRequestController {
+    private final String CREATE_REQUEST = "/requests";
+    private final String GET_BY_REQUESTER = "/requests";
+    private final String GET_REQUEST = "/requests/{id}";
+    private final String GET_ALL_REQUESTS = "/requests/all";
     private final ItemRequestClient itemRequestClient;
 
     @PostMapping(CREATE_REQUEST)

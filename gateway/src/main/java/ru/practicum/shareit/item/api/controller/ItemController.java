@@ -22,20 +22,29 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
-import static ru.practicum.shareit.constants.Constants.CREATE_COMMENT;
-import static ru.practicum.shareit.constants.Constants.CREATE_ITEM;
 import static ru.practicum.shareit.constants.Constants.FROM;
-import static ru.practicum.shareit.constants.Constants.GET_ALL_ITEMS;
-import static ru.practicum.shareit.constants.Constants.GET_ITEM;
 import static ru.practicum.shareit.constants.Constants.HEADER_USER_ID;
-import static ru.practicum.shareit.constants.Constants.SEARCH_ITEM;
 import static ru.practicum.shareit.constants.Constants.SIZE;
-import static ru.practicum.shareit.constants.Constants.UPDATE_ITEM;
 
+/**
+ * <h3>Item Controller</h3>
+ * {@link #CREATE_ITEM} Создать предмет <br/>
+ * {@link #UPDATE_ITEM} Изменить предмет <br/>
+ * {@link #GET_ITEM} Посмотреть предмет <br/>
+ * {@link #SEARCH_ITEM} Поиск предмета <br/>
+ * {@link #GET_ALL_ITEMS} Посмотреть все предметы <br/>
+ * {@link #CREATE_COMMENT} Оставить комментарий для предмета <br/>
+ */
 @RestController
 @RequiredArgsConstructor
 @Validated
 public class ItemController {
+    private final String CREATE_ITEM = "/items";
+    private final String UPDATE_ITEM = "/items/{id}";
+    private final String GET_ITEM = "/items/{id}";
+    private final String SEARCH_ITEM = "/items/search";
+    private final String GET_ALL_ITEMS = "/items";
+    private final String CREATE_COMMENT = "/items/{id}/comment";
     private final ItemClient itemClient;
 
 
