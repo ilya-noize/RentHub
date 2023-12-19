@@ -5,14 +5,14 @@ services:
     build: gateway
     image: gateway
     container_name: gateway
-    deploy:
-      resources:
-        limits:
-          cpus: '0.1'
-          memory: 128M
-        reservations:
-          cpus: '0.05'
-          memory: 64M
+    #    deploy:
+    #      resources:
+    #        limits:
+    #          cpus: '0.50'
+    #          memory: 64M
+    #        reservations:
+    #          cpus: '0.25'
+    #          memory: 16M
     ports:
       - "8080:8080"
     depends_on:
@@ -25,14 +25,14 @@ services:
     build: server
     image: server
     container_name: server
-    deploy:
-      resources:
-        limits:
-          cpus: '0.2'
-          memory: 512M
-        reservations:
-          cpus: '0.05'
-          memory: 256M
+    #    deploy:
+    #      resources:
+    #        limits:
+    #          cpus: '0.50'
+    #          memory: 128M
+    #        reservations:
+    #          cpus: '0.25'
+    #          memory: 32M
     ports:
       - "9090:9090"
     depends_on:
