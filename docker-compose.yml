@@ -14,7 +14,6 @@ services:
       - "8080:8080"
     networks:
       - frontend
-      - backend
     env_file:
       - .env
     depends_on:
@@ -32,6 +31,7 @@ services:
     ports:
       - "9090:9090"
     networks:
+      - frontend
       - backend
     env_file:
       - .env
@@ -57,4 +57,6 @@ networks:
   frontend:
     driver: bridge
   backend:
+    driver: bridge
+  databases:
     driver: bridge
