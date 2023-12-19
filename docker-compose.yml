@@ -12,11 +12,11 @@ services:
           memory: 256M
     ports:
       - "8080:8080"
+    networks:
+      - frontend
+      - backend
     depends_on:
       - server
-    environment:
-      - SHAREIT_SERVER_URL=http://server:9090
-#      - TZ=Europe/Moscow
 
   server:
     build: server
@@ -29,21 +29,28 @@ services:
           memory: 1024M
     ports:
       - "9090:9090"
+    networks:
+      - backend
     depends_on:
       - db
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-#      - TZ=Europe/Moscow
 
   db:
     image: postgres:16.0-alpine3.18
     container_name: PostgreSQL
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: '512M'
     ports:
       - "6541:5432"
-    environment:
-      - POSTGRES_DB=shareit
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
-#      - TZ=Europe/Moscow
+    networks:
+      - backend
+    env_file:
+      - .env
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
